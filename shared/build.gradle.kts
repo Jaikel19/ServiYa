@@ -66,6 +66,18 @@ kotlin {
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
+
+                // Coroutines
+                implementation(libs.kotlinx.coroutines.core)
+
+                // DateTime
+                implementation(libs.kotlinx.datetime)
+
+                // Ktor
+                implementation(project.dependencies.platform(libs.ktor.bom))
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
             }
         }
 
@@ -75,6 +87,12 @@ kotlin {
 
                 // Koin
                 implementation(libs.koin.test)
+
+                // Coroutines test
+                implementation(libs.kotlinx.coroutines.test)
+
+                // Ktor mock
+                implementation(libs.ktor.client.mock)
             }
         }
 
@@ -83,6 +101,8 @@ kotlin {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
+
+                implementation(libs.ktor.client.okhttp)
             }
         }
 
@@ -101,6 +121,8 @@ kotlin {
                 // part of KMP’s default source set hierarchy. Note that this source set depends
                 // on common by default and will correctly pull the iOS artifacts of any
                 // KMP dependencies declared in commonMain.
+
+                implementation(libs.ktor.client.darwin)
             }
         }
     }

@@ -33,6 +33,9 @@ kotlin {
             // Koin (Android)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.android)
+
+            // Coroutines (Android)
+            implementation(libs.kotlinx.coroutines.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
