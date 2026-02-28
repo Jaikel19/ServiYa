@@ -1,0 +1,51 @@
+package com.example.shared.presentation.services
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.shared.data.repository.IServiceRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+
+class ServicesViewModel(
+    private val serviceRepository: IServiceRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(ServicesUiState())
+    val uiState: StateFlow<ServicesUiState> = _uiState.asStateFlow()
+
+    init {
+        loadServices()
+    }
+
+    fun loadServices() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                services = emptyList(),
+                errorMessage = null
+            )
+
+            serviceRepository.services
+                .onEach { list ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        services = list,
+                        errorMessage = null
+                    )
+                }
+                .catch { e ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        services = emptyList(),
+                        errorMessage = e.message ?: "Error cargando servicios"
+                    )
+                }
+                .collect()
+        }
+    }
+}
