@@ -1,0 +1,45 @@
+import kotlin.Boolean;
+
+CREATE TABLE Service (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT,
+  price REAL,
+  isActive INTEGER AS Boolean DEFAULT 1
+);
+
+CREATE TABLE Booking (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  serviceId INTEGER NOT NULL REFERENCES Service(id),
+  clientName TEXT NOT NULL,
+  dateUtc TEXT NOT NULL,
+  notes TEXT
+);
+
+selectAllServices:
+SELECT
+  id,
+  title,
+  description,
+  category,
+  price,
+  isActive
+FROM Service;
+
+insertService:
+INSERT INTO Service(title, description, category, price, isActive)
+VALUES (?, ?, ?, ?, ?);
+
+deleteAllServices:
+DELETE FROM Service;
+
+selectAllBookings:
+SELECT * FROM Booking;
+
+insertBooking:
+INSERT INTO Booking(serviceId, clientName, dateUtc, notes)
+VALUES (?, ?, ?, ?);
+
+deleteAllBookings:
+DELETE FROM Booking;
