@@ -24,8 +24,15 @@ material3 = "1.10.0-alpha05"
 kotlinStdlib = "2.3.0"
 runner = "1.7.0"
 core = "1.7.0"
+composeIcons = "1.7.3"
+devsrComposeIcons = "1.1.1"
 
 [libraries]
+
+compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "composeMultiplatform" }
+composeIcons-tabler = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "devsrComposeIcons" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "composeMultiplatform" }
+
 # Koin
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
