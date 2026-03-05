@@ -55,6 +55,11 @@ kotlin {
 
             //
             implementation(projects.shared)
+
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.compose.material)
+            implementation(libs.composeIcons.tabler)
+            implementation(libs.compose.animation)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
