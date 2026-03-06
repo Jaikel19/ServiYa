@@ -18,11 +18,7 @@ class ServicesViewModel(
     private val _uiState = MutableStateFlow(ServicesUiState())
     val uiState: StateFlow<ServicesUiState> = _uiState.asStateFlow()
 
-    init {
-        loadServices()
-    }
-
-    fun loadServices() {
+    fun loadServices(workerId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
@@ -30,7 +26,7 @@ class ServicesViewModel(
                 errorMessage = null
             )
 
-            serviceRepository.services
+            serviceRepository.getServicesByWorker(workerId)
                 .onEach { list ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
@@ -42,7 +38,7 @@ class ServicesViewModel(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         services = emptyList(),
-                        errorMessage = e.message ?: "Error cargando servicios"
+                        errorMessage = e.message ?: "Error fetching services"
                     )
                 }
                 .collect()

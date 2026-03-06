@@ -1,71 +1,31 @@
 package com.example.shared.data.remote
 
-import com.example.shared.config.AppConfig
 import com.example.shared.domain.entity.Service
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 
-class RemoteServicesDataSource(
-    private val httpClient: HttpClient,
-    private val ioDispatcher: CoroutineDispatcher,
-    private val useFake: Boolean = true
-) : IRemoteServicesDataSource {
+class RemoteServicesDataSource : IRemoteServicesDataSource {
 
-    override fun getServices(): Flow<List<Service>> =
-        flow {
-            if (useFake) {
-                println("REMOTE -> FAKE")
-                delay(600L)
+    private val db = Firebase.firestore
 
-                emit(
-                    listOf(
-                        Service(
-                            id = 1L,
-                            title = "Corte de pelo",
-                            description = "Corte clásico a domicilio",
-                            price = 8000.0
-                        ),
-                        Service(
-                            id = 2L,
-                            title = "Grooming de mascotas",
-                            description = "Baño + corte + secado",
-                            price = 12000.0
-                        )
-                    )
-                )
-            } else {
-                println("REMOTE -> REAL API")
-                val services = httpClient
-                    .get("${AppConfig.BASE_URL}/api/services")
-                    .body<List<Service>>()
+    override fun getServicesByWorker(workerId: String): Flow<List<Service>> = flow {
+        val snapshot = db
+            .collection("users")
+            .document(workerId)
+            .collection("services")
+            .get()
 
-                emit(services)
-            }
-        }.flowOn(ioDispatcher)
+        val services = snapshot.documents.map { doc ->
+            Service(
+                id = doc.id,
+                name = doc.get("name"),
+                cost = doc.get("cost"),
+                duration = doc.get("duration") ?: "",
+                description = doc.get("description") ?: ""
+            )
+        }
+        emit(services)
+    }
 }
-
-
-/*
-class RemoteServicesDataSource(
-    private val httpClient: HttpClient,
-    private val ioDispatcher: CoroutineDispatcher,
-) : IRemoteServicesDataSource {
-
-    override fun getServices(): Flow<List<Service>> =
-        flow {
-            // cuando haya una API real, se cambia el URL
-            val services = httpClient
-                .get("https://example.com/api/services")
-                .body<List<Service>>()
-
-            emit(services)
-        }.flowOn(ioDispatcher)
-}
-
-*/
