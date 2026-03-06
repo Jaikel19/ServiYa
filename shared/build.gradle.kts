@@ -63,6 +63,9 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
                 // Add KMP dependencies here
 
+                implementation("dev.gitlive:firebase-firestore:2.4.0")
+                implementation("dev.gitlive:firebase-auth:2.4.0")
+
                 // Koin
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)
@@ -102,6 +105,8 @@ kotlin {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
+                implementation("com.google.firebase:firebase-firestore:26.1.1")
+                implementation("com.google.firebase:firebase-auth:24.0.1")
 
                 implementation(libs.ktor.client.okhttp)
 
