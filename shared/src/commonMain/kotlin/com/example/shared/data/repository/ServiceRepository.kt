@@ -9,7 +9,7 @@ class ServiceRepository(
     private val remote: IRemoteServicesDataSource
 ) : IServiceRepository {
 
-    override fun getServicesByWorker(workerId: String): Flow<List<Service>> =
+    override suspend fun getServicesByWorker(workerId: String): Flow<List<Service>> =
         remote.getServicesByWorker(workerId)
             .catch { e ->
                 println("ERROR fetching services: ${e.message}")

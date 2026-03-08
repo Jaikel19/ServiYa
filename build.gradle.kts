@@ -9,4 +9,5 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
     alias(libs.plugins.androidLint) apply false
     id("com.google.gms.google-services") version "4.4.4" apply false
+    kotlin("plugin.serialization") version "2.3.0" apply false
 }

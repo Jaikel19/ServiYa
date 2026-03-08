@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.androidLint)
     alias(libs.plugins.sqlDelight)
-    
+    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -54,8 +54,10 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
 
-                implementation("dev.gitlive:firebase-firestore:2.4.0")
-                implementation("dev.gitlive:firebase-auth:2.4.0")
+                // Firebase GitLive (KMP)
+                implementation(libs.gitlive.firebase.firestore)
+                implementation(libs.gitlive.firebase.auth)
+                implementation(libs.gitlive.firebase.common)
 
                 // Koin
                 implementation(project.dependencies.platform(libs.koin.bom))
@@ -93,9 +95,7 @@ kotlin {
 
         androidMain {
             dependencies {
-                implementation("com.google.firebase:firebase-firestore:26.1.1")
-                implementation("com.google.firebase:firebase-auth:24.0.1")
-
+                implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.ktor.client.okhttp)
 
                 // SQLDelight
@@ -130,4 +130,3 @@ sqldelight {
     }
     linkSqlite = true
 }
-

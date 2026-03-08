@@ -26,6 +26,8 @@ runner = "1.7.0"
 core = "1.7.0"
 composeIcons = "1.7.3"
 devsrComposeIcons = "1.1.1"
+firebase-gitlive-sdk = "2.4.0"
+firebase-bom = "34.10.0"
 
 [libraries]
 
@@ -64,6 +66,13 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 # SQLDelight
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+
+# Firebase GitLive
+gitlive-firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebase-gitlive-sdk" }
+gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", version.ref = "firebase-gitlive-sdk" }
+gitlive-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-gitlive-sdk" }
+gitlive-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-gitlive-sdk" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

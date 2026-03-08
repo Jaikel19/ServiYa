@@ -28,7 +28,9 @@ kotlin {
     
     sourceSets {
         androidMain.dependencies {
+            implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.uiTooling)
             implementation(libs.androidx.activity.compose)
 
             // Koin (Android)
@@ -39,6 +41,12 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
         }
         commonMain.dependencies {
+            // Firebase GitLive (KMP)
+            implementation(libs.gitlive.firebase.common)
+            implementation(libs.gitlive.firebase.analytics)
+            implementation(libs.gitlive.firebase.auth)
+            implementation(libs.gitlive.firebase.firestore)
+
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -94,10 +102,3 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
-
-dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
-    debugImplementation(libs.compose.uiTooling)
-    implementation("com.google.firebase:firebase-analytics")
-}
-

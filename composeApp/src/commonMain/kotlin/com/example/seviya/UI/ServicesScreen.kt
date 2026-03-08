@@ -16,9 +16,7 @@ fun ServicesScreen(viewModel: ServicesViewModel) {
 
     // Cambia este ID por un UID real de tu Firestore para probar
     LaunchedEffect(Unit) {
-        println(state.services)
-        viewModel.loadServices("p25ZTOWaBs1w4lwK905H")
-        println(state.services)
+        viewModel.loadServices("p25ZTOWaBs1w4lwK9O5H")
     }
 
 
