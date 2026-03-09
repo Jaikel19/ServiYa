@@ -16,7 +16,7 @@ fun ServicesScreen(viewModel: ServicesViewModel) {
 
     // Cambia este ID por un UID real de tu Firestore para probar
     LaunchedEffect(Unit) {
-        viewModel.loadServices("p25ZTOWaBs1w4lwK9O5H")
+        viewModel.loadServices("_schema")
     }
 
 
@@ -40,7 +40,7 @@ fun ServicesScreen(viewModel: ServicesViewModel) {
                 Text("Services found: ${state.services.size}")
                 Spacer(modifier = Modifier.height(16.dp))
                 state.services.forEach { service ->
-                    Text("- ${service.name} ₡${service.cost}")
+                    Text("- ${service.name} ₡${service.cost} ${service.duration}")
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
