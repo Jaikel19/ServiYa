@@ -4,5 +4,5 @@ import com.example.shared.domain.entity.Service
 import kotlinx.coroutines.flow.Flow
 
 interface IServiceRepository {
-    val services: Flow<List<Service>>
+    suspend fun getServicesByWorker(workerId: String): Flow<List<Service>>
 }

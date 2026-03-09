@@ -7,24 +7,22 @@ class LocalServicesDataSource(database: AppDatabase) : ILocalServicesDataSource 
     private val dbQuery = database.appDatabaseQueries
 
     override fun getAllServices(): List<Service> {
-        return dbQuery.selectAllServices(mapper = ::mapServiceSelecting).executeAsList()
+        return dbQuery.selectAllServices(mapper = ::mapService).executeAsList()
     }
 
-    private fun mapServiceSelecting(
-        id: Long,
-        title: String,
-        description: String?,
-        category: String?,
-        price: Double?,
-        isActive: Boolean?
+    private fun mapService(
+        id: String,
+        name: String,
+        cost: Double,
+        duration: String,
+        description: String
     ): Service {
         return Service(
             id = id,
-            title = title,
-            description = description,
-            category = category,
-            price = price,
-            isActive = isActive ?: true
+            name = name,
+            cost = cost,
+            duration = duration,
+            description = description
         )
     }
 
@@ -33,11 +31,11 @@ class LocalServicesDataSource(database: AppDatabase) : ILocalServicesDataSource 
             dbQuery.deleteAllServices()
             services.forEach { s ->
                 dbQuery.insertService(
-                    title = s.title,
-                    description = s.description,
-                    category = s.category,
-                    price = s.price,
-                    isActive = s.isActive
+                    id = s.id,
+                    name = s.name,
+                    cost = s.cost,
+                    duration = s.duration,
+                    description = s.description
                 )
             }
         }
