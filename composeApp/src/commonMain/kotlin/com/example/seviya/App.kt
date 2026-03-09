@@ -1,7 +1,19 @@
 package com.example.seviya
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.seviya.UI.LandingScreen
+import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
 import com.example.shared.presentation.services.ServicesViewModel
@@ -16,7 +28,7 @@ fun App() {
     when (currentScreen) {
         "landing" -> LandingScreen(
             onGoToServices = { currentScreen = "services" },
-            onLogin = { currentScreen = "travelTimeConfig" },     // según tu flujo actual
+            onLogin = { currentScreen = "roleAdmissionCatalog" },     // según tu flujo actual
             onRegister = { currentScreen = "roleCatalog" }        // ✅ ahora abre catálogo de roles
         )
 
@@ -50,5 +62,91 @@ fun App() {
                 // currentScreen = "registerWorker"
             }
         )
+
+        "roleAdmissionCatalog" -> RoleAdmissionCatalogScreen(
+            onGoHome = { currentScreen = "landing" },
+            onGoLogin = { /* ya estás aquí */ },
+            onGoRegister = { currentScreen = "roleCatalog" },
+            onPickClient = {
+                currentScreen = "clientDashboard"
+            },
+            onPickWorker = {
+                currentScreen = "workerDashboard"
+            }
+        )
+
+        "clientDashboard" -> ClientDashboardPlaceholder(
+            onBackToLanding = { currentScreen = "landing" }
+        )
+
+        "workerDashboard" -> WorkerDashboardPlaceholder(
+            onBackToLanding = { currentScreen = "landing" }
+        )
+    }
+}
+
+@Composable
+private fun WorkerDashboardPlaceholder(
+    onBackToLanding: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Dashboard Trabajador",
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            Text(
+                text = "Pantalla temporal para pruebas del flujo de ingreso.",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+            )
+
+            Button(onClick = onBackToLanding) {
+                Text("Volver al landing")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ClientDashboardPlaceholder(
+    onBackToLanding: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Dashboard Trabajador",
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            Text(
+                text = "Pantalla temporal para pruebas del flujo de ingreso.",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+            )
+
+            Button(onClick = onBackToLanding) {
+                Text("Volver al landing")
+            }
+        }
     }
 }
