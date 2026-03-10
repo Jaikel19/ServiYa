@@ -109,6 +109,8 @@ fun MonthlyCalendarScreen(
 
     val selectedDay = state.selectedBooking?.let { extractDayFromDate(it.date) }
 
+    val referenceDay = selectedDay ?: 1
+
     val cells = mutableListOf<Int?>()
     repeat(firstDayOffset) { cells.add(null) }
     for (day in 1..totalDays) cells.add(day)
@@ -117,6 +119,18 @@ fun MonthlyCalendarScreen(
     }
 
     val weeks = cells.chunked(7)
+
+    val visibleWeeks = if (isMonthMode.value) {
+        weeks
+    } else {
+        listOf(
+            getWeekForDay(
+                day = referenceDay,
+                month = state.currentMonth,
+                year = state.currentYear
+            )
+        )
+    }
 
     Scaffold(
         containerColor = AgendaColors.Background,
@@ -246,9 +260,9 @@ fun MonthlyCalendarScreen(
                         }
 
                         Column(
-                            modifier = Modifier.height(460.dp)
+                            modifier = Modifier.height(if (isMonthMode.value) 460.dp else 92.dp)
                         ) {
-                            weeks.forEach { week ->
+                            visibleWeeks.forEach { week ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -626,8 +640,8 @@ private fun AgendaBottomBar(
         BottomItem("Servicios", TablerIcons.Apps, false, onGoServices)
         BottomItem("Mapa", TablerIcons.Globe, false, onGoMap)
         BottomItem("Buscar", TablerIcons.Search, false, onGoSearch)
-        BottomItem("ALERTAS", TablerIcons.Bell, true, onGoAlerts)
-        BottomItem("Menú", TablerIcons.Menu2, false, onGoMenu)
+        BottomItem("ALERTAS", TablerIcons.Bell, false, onGoAlerts)
+        BottomItem("Menú", TablerIcons.Menu2, true, onGoMenu)
     }
 }
 
@@ -732,4 +746,23 @@ private fun extractMonthFromDate(date: String): Int {
 
 private fun extractYearFromDate(date: String): Int {
     return date.split("-").getOrNull(0)?.toIntOrNull() ?: 0
+}
+
+private fun getWeekForDay(
+    day: Int,
+    month: Int,
+    year: Int
+): List<Int?> {
+    val totalDays = getDaysInMonth(month, year)
+    val firstDayOffset = getFirstDayOffset(month, year)
+
+    val cells = mutableListOf<Int?>()
+    repeat(firstDayOffset) { cells.add(null) }
+    for (d in 1..totalDays) cells.add(d)
+    while (cells.size % 7 != 0) {
+        cells.add(null)
+    }
+
+    val weeks = cells.chunked(7)
+    return weeks.firstOrNull { week -> week.contains(day) } ?: weeks.first()
 }
