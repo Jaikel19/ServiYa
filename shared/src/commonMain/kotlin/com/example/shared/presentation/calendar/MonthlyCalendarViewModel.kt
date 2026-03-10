@@ -5,15 +5,25 @@ import com.example.shared.domain.entity.Booking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class MonthlyCalendarViewModel : ViewModel() {
+
+    private val today = Clock.System.now()
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .date
 
     private val _uiState = MutableStateFlow(
         MonthlyCalendarUiState(
-            currentMonth = 10,
-            currentYear = 2023
+            currentMonth = today.monthNumber,
+            currentYear = today.year
         )
     )
+
     val uiState: StateFlow<MonthlyCalendarUiState> = _uiState.asStateFlow()
 
     init {
@@ -21,13 +31,16 @@ class MonthlyCalendarViewModel : ViewModel() {
     }
 
     private fun loadFakeBookings() {
+        val month = today.monthNumber.toString().padStart(2, '0')
+        val year = today.year
+
         _uiState.value = _uiState.value.copy(
             isLoading = false,
             bookings = listOf(
                 Booking(
                     id = "1",
                     serviceName = "Corte de pelo",
-                    date = "2023-10-03",
+                    date = "$year-$month-03",
                     time = "10:00",
                     status = "scheduled",
                     notes = "Cliente pidió corte clásico"
@@ -35,7 +48,7 @@ class MonthlyCalendarViewModel : ViewModel() {
                 Booking(
                     id = "2",
                     serviceName = "Baño y grooming",
-                    date = "2023-10-06",
+                    date = "$year-$month-07",
                     time = "09:00",
                     status = "scheduled",
                     notes = "Mascota pequeña"
@@ -43,7 +56,7 @@ class MonthlyCalendarViewModel : ViewModel() {
                 Booking(
                     id = "3",
                     serviceName = "Baño y grooming",
-                    date = "2023-10-06",
+                    date = "$year-$month-23",
                     time = "14:30",
                     status = "scheduled",
                     notes = "Llevar shampoo especial"
@@ -51,7 +64,7 @@ class MonthlyCalendarViewModel : ViewModel() {
                 Booking(
                     id = "4",
                     serviceName = "Corte premium",
-                    date = "2023-10-10",
+                    date = "$year-$month-10",
                     time = "08:00",
                     status = "scheduled",
                     notes = "Incluye lavado"
@@ -59,7 +72,7 @@ class MonthlyCalendarViewModel : ViewModel() {
                 Booking(
                     id = "5",
                     serviceName = "Corte premium",
-                    date = "2023-10-10",
+                    date = "$year-$month-15",
                     time = "11:00",
                     status = "scheduled",
                     notes = "Cliente frecuente"
@@ -67,7 +80,7 @@ class MonthlyCalendarViewModel : ViewModel() {
                 Booking(
                     id = "6",
                     serviceName = "Corte premium",
-                    date = "2023-10-11",
+                    date = "$year-$month-27",
                     time = "12:00",
                     status = "scheduled",
                     notes = "Agregar secado"
@@ -75,7 +88,7 @@ class MonthlyCalendarViewModel : ViewModel() {
                 Booking(
                     id = "7",
                     serviceName = "Corte premium",
-                    date = "2023-10-11",
+                    date = "$year-$month-11",
                     time = "13:30",
                     status = "scheduled",
                     notes = "Cliente nuevo"
@@ -117,10 +130,14 @@ class MonthlyCalendarViewModel : ViewModel() {
     }
 
     fun selectBooking(booking: Booking) {
-        _uiState.value = _uiState.value.copy(selectedBooking = booking)
+        _uiState.value = _uiState.value.copy(
+            selectedBooking = booking
+        )
     }
 
     fun clearSelectedBooking() {
-        _uiState.value = _uiState.value.copy(selectedBooking = null)
+        _uiState.value = _uiState.value.copy(
+            selectedBooking = null
+        )
     }
 }
