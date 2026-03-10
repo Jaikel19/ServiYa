@@ -13,12 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.seviya.UI.LandingScreen
+import com.example.seviya.UI.MonthlyCalendarScreen
 import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
 import com.example.shared.presentation.services.ServicesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.ui.ServicesScreen
+import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 
 @Composable
 fun App() {
@@ -80,14 +82,26 @@ fun App() {
         )
 
         "workerDashboard" -> WorkerDashboardPlaceholder(
-            onBackToLanding = { currentScreen = "landing" }
+            onBackToLanding = { currentScreen = "landing" },
+            onGoToMonthlyCalendar = { currentScreen = "monthlyCalendar" }
         )
+
+        "monthlyCalendar" -> {
+
+            val viewModel: MonthlyCalendarViewModel = koinViewModel()
+
+            MonthlyCalendarScreen(
+                viewModel = viewModel,
+                onBack = { currentScreen = "landing" }
+            )
+        }
     }
 }
 
 @Composable
 private fun WorkerDashboardPlaceholder(
-    onBackToLanding: () -> Unit
+    onBackToLanding: () -> Unit,
+    onGoToMonthlyCalendar: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -113,6 +127,10 @@ private fun WorkerDashboardPlaceholder(
 
             Button(onClick = onBackToLanding) {
                 Text("Volver al landing")
+            }
+
+            Button(onClick = onGoToMonthlyCalendar) {
+                Text("ir a la agenda")
             }
         }
     }
