@@ -29,6 +29,7 @@ class MonthlyCalendarViewModel(
         MonthlyCalendarUiState(
             currentMonth = today.monthNumber,
             currentYear = today.year,
+            currentWeekDay = today.dayOfMonth,
             bookings = emptyList(),
             selectedBooking = null,
             isLoading = false,
@@ -69,32 +70,58 @@ class MonthlyCalendarViewModel(
         val currentMonth = _uiState.value.currentMonth
         val currentYear = _uiState.value.currentYear
 
+        val newMonth: Int
+        val newYear: Int
+
         if (currentMonth == 1) {
-            _uiState.value = _uiState.value.copy(
-                currentMonth = 12,
-                currentYear = currentYear - 1
-            )
+            newMonth = 12
+            newYear = currentYear - 1
         } else {
-            _uiState.value = _uiState.value.copy(
-                currentMonth = currentMonth - 1
-            )
+            newMonth = currentMonth - 1
+            newYear = currentYear
         }
+
+        val newWeekDay =
+            if (newMonth == today.monthNumber && newYear == today.year) {
+                today.dayOfMonth
+            } else {
+                1
+            }
+
+        _uiState.value = _uiState.value.copy(
+            currentMonth = newMonth,
+            currentYear = newYear,
+            currentWeekDay = newWeekDay
+        )
     }
 
     fun goToNextMonth() {
         val currentMonth = _uiState.value.currentMonth
         val currentYear = _uiState.value.currentYear
 
+        val newMonth: Int
+        val newYear: Int
+
         if (currentMonth == 12) {
-            _uiState.value = _uiState.value.copy(
-                currentMonth = 1,
-                currentYear = currentYear + 1
-            )
+            newMonth = 1
+            newYear = currentYear + 1
         } else {
-            _uiState.value = _uiState.value.copy(
-                currentMonth = currentMonth + 1
-            )
+            newMonth = currentMonth + 1
+            newYear = currentYear
         }
+
+        val newWeekDay =
+            if (newMonth == today.monthNumber && newYear == today.year) {
+                today.dayOfMonth
+            } else {
+                1
+            }
+
+        _uiState.value = _uiState.value.copy(
+            currentMonth = newMonth,
+            currentYear = newYear,
+            currentWeekDay = newWeekDay
+        )
     }
 
     fun selectBooking(booking: Booking) {
@@ -106,6 +133,12 @@ class MonthlyCalendarViewModel(
     fun clearSelectedBooking() {
         _uiState.value = _uiState.value.copy(
             selectedBooking = null
+        )
+    }
+
+    fun setCurrentWeekDay(day: Int) {
+        _uiState.value = _uiState.value.copy(
+            currentWeekDay = day
         )
     }
 }

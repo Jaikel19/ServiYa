@@ -109,7 +109,7 @@ fun MonthlyCalendarScreen(
 
     val selectedDay = state.selectedBooking?.let { extractDayFromDate(it.date) }
 
-    val referenceDay = selectedDay ?: 1
+    val referenceDay = selectedDay ?: state.currentWeekDay
 
     val cells = mutableListOf<Int?>()
     repeat(firstDayOffset) { cells.add(null) }

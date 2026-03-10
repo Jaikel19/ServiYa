@@ -5,6 +5,7 @@ import com.example.shared.domain.entity.Booking
 data class MonthlyCalendarUiState(
     val currentMonth: Int,
     val currentYear: Int,
+    val currentWeekDay: Int,
     val bookings: List<Booking> = emptyList(),
     val selectedBooking: Booking? = null,
     val isLoading: Boolean = false,
