@@ -13,12 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.seviya.UI.LandingScreen
+import com.example.seviya.UI.ProfessionalProfileRoute
+import com.example.seviya.UI.ProfessionalProfileScreen
 import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
 import com.example.shared.presentation.services.ServicesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.ui.ServicesScreen
+import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 
 @Composable
 fun App() {
@@ -49,6 +52,22 @@ fun App() {
             onGoRegister = { currentScreen = "roleCatalog" }
         )
 
+        "professionalProfile" -> {
+            val viewModel: ProfessionalProfileViewModel = koinViewModel()
+
+            ProfessionalProfileRoute(
+                workerId = "worker_demo_001",
+                viewModel = viewModel,
+                onBack = { currentScreen = "landing" },
+                onOpenChat = { },
+                onBottomServices = { },
+                onBottomMap = { },
+                onBottomSearch = { },
+                onBottomNotifications = { },
+                onBottomMenu = { }
+            )
+        }
+
         "roleCatalog" -> RoleCatalogScreen(
             onGoHome = { currentScreen = "landing" },
             onGoLogin = { currentScreen = "travelTimeConfig" },
@@ -76,7 +95,7 @@ fun App() {
         )
 
         "clientDashboard" -> ClientDashboardPlaceholder(
-            onBackToLanding = { currentScreen = "landing" }
+            onGoToProfessionalProfile = { currentScreen = "professionalProfile" }
         )
 
         "workerDashboard" -> WorkerDashboardPlaceholder(
@@ -120,7 +139,7 @@ private fun WorkerDashboardPlaceholder(
 
 @Composable
 private fun ClientDashboardPlaceholder(
-    onBackToLanding: () -> Unit
+    onGoToProfessionalProfile: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -134,7 +153,7 @@ private fun ClientDashboardPlaceholder(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Dashboard Trabajador",
+                text = "Dashboard Cliente",
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -144,8 +163,8 @@ private fun ClientDashboardPlaceholder(
                 modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
             )
 
-            Button(onClick = onBackToLanding) {
-                Text("Volver al landing")
+            Button(onClick = onGoToProfessionalProfile) {
+                Text("Ir al perfil profesional")
             }
         }
     }
