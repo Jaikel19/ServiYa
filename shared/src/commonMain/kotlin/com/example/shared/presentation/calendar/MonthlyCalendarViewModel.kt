@@ -1,17 +1,25 @@
 package com.example.shared.presentation.calendar
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.shared.data.repository.IBookingRepository
 import com.example.shared.domain.entity.Booking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-class MonthlyCalendarViewModel : ViewModel() {
+class MonthlyCalendarViewModel(
+    private val bookingRepository: IBookingRepository
+) : ViewModel() {
 
     private val today = Clock.System.now()
         .toLocalDateTime(TimeZone.currentSystemDefault())
@@ -20,81 +28,41 @@ class MonthlyCalendarViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(
         MonthlyCalendarUiState(
             currentMonth = today.monthNumber,
-            currentYear = today.year
+            currentYear = today.year,
+            bookings = emptyList(),
+            selectedBooking = null,
+            isLoading = false,
+            errorMessage = null
         )
     )
 
     val uiState: StateFlow<MonthlyCalendarUiState> = _uiState.asStateFlow()
 
-    init {
-        loadFakeBookings()
-    }
-
-    private fun loadFakeBookings() {
-        val month = today.monthNumber.toString().padStart(2, '0')
-        val year = today.year
-
-        _uiState.value = _uiState.value.copy(
-            isLoading = false,
-            bookings = listOf(
-                Booking(
-                    id = "1",
-                    serviceName = "Corte de pelo",
-                    date = "$year-$month-03",
-                    time = "10:00",
-                    status = "scheduled",
-                    notes = "Cliente pidió corte clásico"
-                ),
-                Booking(
-                    id = "2",
-                    serviceName = "Baño y grooming",
-                    date = "$year-$month-07",
-                    time = "09:00",
-                    status = "scheduled",
-                    notes = "Mascota pequeña"
-                ),
-                Booking(
-                    id = "3",
-                    serviceName = "Baño y grooming",
-                    date = "$year-$month-23",
-                    time = "14:30",
-                    status = "scheduled",
-                    notes = "Llevar shampoo especial"
-                ),
-                Booking(
-                    id = "4",
-                    serviceName = "Corte premium",
-                    date = "$year-$month-10",
-                    time = "08:00",
-                    status = "scheduled",
-                    notes = "Incluye lavado"
-                ),
-                Booking(
-                    id = "5",
-                    serviceName = "Corte premium",
-                    date = "$year-$month-15",
-                    time = "11:00",
-                    status = "scheduled",
-                    notes = "Cliente frecuente"
-                ),
-                Booking(
-                    id = "6",
-                    serviceName = "Corte premium",
-                    date = "$year-$month-27",
-                    time = "12:00",
-                    status = "scheduled",
-                    notes = "Agregar secado"
-                ),
-                Booking(
-                    id = "7",
-                    serviceName = "Corte premium",
-                    date = "$year-$month-11",
-                    time = "13:30",
-                    status = "scheduled",
-                    notes = "Cliente nuevo"
-                )
+    fun loadBookings(workerId: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                bookings = emptyList(),
+                errorMessage = null
             )
-        )
+
+            bookingRepository.getBookingsByWorker(workerId)
+                .onEach { bookings ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        bookings = bookings,
+                        errorMessage = null
+                    )
+                }
+                .catch { e ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        bookings = emptyList(),
+                        errorMessage = e.message ?: "Error fetching bookings"
+                    )
+                }
+                .collect()
+        }
     }
 
     fun goToPreviousMonth() {

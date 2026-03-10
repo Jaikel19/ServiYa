@@ -10,5 +10,5 @@ val presentationModule = module {
     // ViewModels: LoginViewModel, RegisterViewModel, etc...
 
     factory { ServicesViewModel(get()) }
-    viewModel { MonthlyCalendarViewModel() }
+    viewModel { MonthlyCalendarViewModel(get()) }
 }

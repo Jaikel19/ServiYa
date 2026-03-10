@@ -41,6 +41,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -95,6 +96,10 @@ fun MonthlyCalendarScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val isMonthMode = remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadBookings("worker_123")
+    }
 
     val daysOfWeek = listOf("LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM")
     val monthName = getMonthName(state.currentMonth)
@@ -185,6 +190,24 @@ fun MonthlyCalendarScreen(
                 }
 
                 Spacer(modifier = Modifier.height(18.dp))
+
+                if (state.isLoading) {
+                    Text(
+                        text = "Cargando citas...",
+                        color = AgendaColors.Muted,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+
+                state.errorMessage?.let { error ->
+                    Text(
+                        text = "Error: $error",
+                        color = AgendaColors.Red,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),

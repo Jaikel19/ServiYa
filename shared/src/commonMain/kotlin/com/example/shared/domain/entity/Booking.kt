@@ -1,5 +1,8 @@
 package com.example.shared.domain.entity
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Booking(
     val id: String = "",
     val serviceName: String = "",
