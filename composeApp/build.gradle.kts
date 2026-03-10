@@ -69,6 +69,8 @@ kotlin {
             implementation(libs.compose.material)
             implementation(libs.composeIcons.tabler)
             implementation(libs.compose.animation)
+
+            implementation("media.kamel:kamel-image-default:1.0.9")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
