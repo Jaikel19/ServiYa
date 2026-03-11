@@ -1,5 +1,6 @@
 package com.example.shared.di.modules
 
+import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.services.ServicesViewModel
 import org.koin.dsl.module
@@ -13,4 +14,5 @@ val presentationModule = module {
     factory { ServicesViewModel(get()) }
     viewModel { MonthlyCalendarViewModel(get()) }
     factory { ProfessionalProfileViewModel(get()) }
+    factory { CategoriesViewModel(get()) }
 }

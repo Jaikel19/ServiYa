@@ -24,6 +24,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.ui.ServicesScreen
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
+import com.example.seviya.UI.CategoriesCatalogRoute
+import com.example.shared.presentation.categories.CategoriesViewModel
 
 @Composable
 fun App() {
@@ -96,10 +98,34 @@ fun App() {
             }
         )
 
-        "clientDashboard" -> ClientDashboardPlaceholder(
-            onGoToProfessionalProfile = { currentScreen = "professionalProfile" },
-            onGoToServices = { currentScreen = "services" }
+        "categoriesCatalog" -> {
+            val viewModel: CategoriesViewModel = koinViewModel()
 
+            CategoriesCatalogRoute(
+                viewModel = viewModel,
+                onGoServices = { currentScreen = "categoriesCatalog" },
+                onGoMap = { currentScreen = "map" },
+                onGoSearch = { currentScreen = "search" },
+                onGoAlerts = { currentScreen = "alerts" },
+                onGoAgenda = { currentScreen = "monthlyCalendar" },
+                onGoProfile = { currentScreen = "profile" },
+                onGoConfiguration = { currentScreen = "configuration" },
+                onGoMessages = { currentScreen = "messages" },
+                onGoDashboard = { currentScreen = "dashboard" },
+                onGoSettings = { currentScreen = "settings" },
+                onCategoryClick = { category ->
+                    // para abrir la lista de trabajadores por categoría
+                    // Ejemplo:
+                    // currentScreen = "workersByCategory"
+                }
+            )
+        }
+
+        "clientDashboard" -> ClientDashboardPlaceholder(
+            onBackToLanding = { currentScreen = "landing" },
+            onGoToProfessionalProfile = { currentScreen = "professionalProfile" },
+            onGoToCategories = { currentScreen = "categoriesCatalog" },
+            onGoToServices = { currentScreen = "services" }
         )
 
         "workerDashboard" -> WorkerDashboardPlaceholder(
@@ -160,6 +186,8 @@ private fun WorkerDashboardPlaceholder(
 @Composable
 private fun ClientDashboardPlaceholder(
     onGoToProfessionalProfile: () -> Unit,
+    onBackToLanding: () -> Unit,
+    onGoToCategories: () -> Unit,
     onGoToServices:() ->Unit
 ) {
     Surface(
@@ -184,13 +212,28 @@ private fun ClientDashboardPlaceholder(
                 modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
             )
 
+            Button(onClick = onBackToLanding) {
+                Text("Volver al landing")
+            }
+
             Button(onClick = onGoToProfessionalProfile) {
                 Text("Ir al perfil profesional")
             }
 
-            Button(onClick = onGoToServices) {
-                Text("Service")
+            Button(
+                onClick = onGoToCategories,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Text("Ir a categorías")
             }
+            
+            Button(
+                onClick = onGoToServices,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Text("Ir a servicios")
+            }
+            
         }
     }
 }
