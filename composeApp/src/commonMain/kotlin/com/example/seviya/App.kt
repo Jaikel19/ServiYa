@@ -124,9 +124,8 @@ fun App() {
         "clientDashboard" -> ClientDashboardPlaceholder(
             onBackToLanding = { currentScreen = "landing" },
             onGoToProfessionalProfile = { currentScreen = "professionalProfile" },
-            onGoToCategories = { currentScreen = "categoriesCatalog" }
+            onGoToCategories = { currentScreen = "categoriesCatalog" },
             onGoToServices = { currentScreen = "services" }
-
         )
 
         "workerDashboard" -> WorkerDashboardPlaceholder(
@@ -188,7 +187,7 @@ private fun WorkerDashboardPlaceholder(
 private fun ClientDashboardPlaceholder(
     onGoToProfessionalProfile: () -> Unit,
     onBackToLanding: () -> Unit,
-    onGoToCategories: () -> Unit
+    onGoToCategories: () -> Unit,
     onGoToServices:() ->Unit
 ) {
     Surface(
