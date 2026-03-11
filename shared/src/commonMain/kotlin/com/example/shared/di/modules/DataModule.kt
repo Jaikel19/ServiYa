@@ -5,19 +5,23 @@ import com.example.shared.data.local.DriverFactory
 import com.example.shared.data.local.ILocalServicesDataSource
 import com.example.shared.data.local.LocalServicesDataSource
 import com.example.shared.data.remote.IRemoteBookingDataSource
-import com.example.shared.data.remote.IRemoteServicesDataSource
+import com.example.shared.data.remote.Service.IRemoteServicesDataSource
 import com.example.shared.data.remote.RemoteBookingDataSource
-import com.example.shared.data.remote.RemoteServicesDataSource
+import com.example.shared.data.remote.Service.RemoteServicesDataSource
 import com.example.shared.data.remote.categories.IRemoteCategoriesDataSource
 import com.example.shared.data.remote.categories.RemoteCategoriesDataSource
 import com.example.shared.data.repository.BookingRepository
 import com.example.shared.data.repository.IBookingRepository
 import com.example.shared.data.remote.professionalProfile.IRemoteProfessionalProfileDataSource
 import com.example.shared.data.remote.professionalProfile.RemoteProfessionalProfileDataSource
-import com.example.shared.data.repository.IServiceRepository
-import com.example.shared.data.repository.ServiceRepository
+
+import com.example.shared.data.repository.Service.IServiceRepository
+import com.example.shared.data.repository.Service.ServiceRepository
+
+
 import com.example.shared.data.repository.categories.CategoryRepository
 import com.example.shared.data.repository.categories.ICategoryRepository
+
 import com.example.shared.data.repository.professionalProfile.IProfessionalProfileRepository
 import com.example.shared.data.repository.professionalProfile.ProfessionalProfileRepository
 import org.koin.dsl.module

@@ -2,7 +2,7 @@ package com.example.shared.presentation.services
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shared.data.repository.IServiceRepository
+import com.example.shared.data.repository.Service.IServiceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
