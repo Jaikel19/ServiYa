@@ -12,5 +12,9 @@ data class Booking(
     val status: String = "",
     val totalCost: Double = 0.0,
     val services: List<Service> = emptyList(),
-    val location: Address = Address()
+    val location: Address = Address(),
+    val paymentReceiptUrl: String = "",
+    val cancellationReason: String = "",
+    val cancellationBy: String = "",
+    val ratingToClientDone: Boolean = false
 )

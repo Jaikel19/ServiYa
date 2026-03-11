@@ -26,11 +26,13 @@ import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.seviya.UI.CategoriesCatalogRoute
 import com.example.shared.presentation.categories.CategoriesViewModel
+import com.example.seviya.UI.WorkerAppointmentDetailScreen
 
 @Composable
 fun App() {
 
     var currentScreen by remember { mutableStateOf("landing") }
+    var selectedBooking by remember { mutableStateOf<com.example.shared.domain.entity.Booking?>(null) }
 
     when (currentScreen) {
         "landing" -> LandingScreen(
@@ -139,8 +141,39 @@ fun App() {
 
             MonthlyCalendarScreen(
                 viewModel = viewModel,
-                onBack = { currentScreen = "landing" }
+                onBack = { currentScreen = "landing" },
+                onOpenBookingDetail = { booking ->
+                    selectedBooking = booking
+                    currentScreen = "workerAppointmentDetail"
+                }
             )
+        }
+
+        "workerAppointmentDetail" -> {
+            selectedBooking?.let { booking ->
+                WorkerAppointmentDetailScreen(
+                    booking = booking,
+                    onBack = { currentScreen = "monthlyCalendar" },
+                    onOpenMaps = {
+                        // TODO abrir Google Maps / Waze
+                    },
+                    onVerifyPayment = {
+                        // TODO verificar pago
+                    },
+                    onStartAppointment = {
+                        // TODO iniciar cita
+                    },
+                    onFinishAppointment = {
+                        // TODO finalizar cita
+                    },
+                    onRateClient = {
+                        // TODO calificar cliente
+                    },
+                    onCancelAppointment = {
+                        // TODO cancelar cita
+                    }
+                )
+            }
         }
     }
 }
