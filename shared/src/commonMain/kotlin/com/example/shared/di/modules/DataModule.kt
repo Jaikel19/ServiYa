@@ -20,6 +20,7 @@ import com.example.shared.data.repository.Service.ServiceRepository
 
 
 import com.example.shared.data.repository.categories.CategoryRepository
+import com.example.shared.data.repository.categories.ICategoryRepository
 
 import com.example.shared.data.repository.professionalProfile.IProfessionalProfileRepository
 import com.example.shared.data.repository.professionalProfile.ProfessionalProfileRepository
