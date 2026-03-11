@@ -1,54 +1,49 @@
 package com.example.seviya
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import com.example.seviya.UI.LandingScreen
-import com.example.seviya.UI.RoleCatalogScreen
-import com.example.seviya.UI.TravelTimeConfigScreen
-import com.example.shared.presentation.services.ServicesViewModel
-import org.koin.compose.viewmodel.koinViewModel
-import com.example.seviya.ui.ServicesScreen
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.painterResource
+
+import seviya.composeapp.generated.resources.Res
+import seviya.composeapp.generated.resources.compose_multiplatform
 
 @Composable
+@Preview
 fun App() {
-
-    var currentScreen by remember { mutableStateOf("landing") }
-
-    when (currentScreen) {
-        "landing" -> LandingScreen(
-            onGoToServices = { currentScreen = "services" },
-            onLogin = { currentScreen = "travelTimeConfig" },     // según tu flujo actual
-            onRegister = { currentScreen = "roleCatalog" }        // ✅ ahora abre catálogo de roles
-        )
-
-        "services" -> {
-            val viewModel: ServicesViewModel = koinViewModel()
-            ServicesScreen(viewModel)
-        }
-
-        "travelTimeConfig" -> TravelTimeConfigScreen(
-            initialMinutes = 30,
-            onBack = { currentScreen = "landing" },
-            onSave = { minutes ->
-                // TODO guardar minutes
-                currentScreen = "landing"
-            },
-            onGoHome = { currentScreen = "landing" },
-            onGoServices = { currentScreen = "services" },
-            onGoRegister = { currentScreen = "roleCatalog" }
-        )
-
-        "roleCatalog" -> RoleCatalogScreen(
-            onGoHome = { currentScreen = "landing" },
-            onGoLogin = { currentScreen = "travelTimeConfig" },
-            onGoRegister = { /* ya estás aquí */ },
-            onPickClient = {
-                // TODO: ir a registro de cliente
-                // currentScreen = "registerClient"
-            },
-            onPickWorker = {
-                // TODO: ir a registro de trabajador
-                // currentScreen = "registerWorker"
+    MaterialTheme {
+        var showContent by remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .safeContentPadding()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Button(onClick = { showContent = !showContent }) {
+                Text("Click me!")
             }
-        )
+            AnimatedVisibility(showContent) {
+                val greeting = remember { Greeting().greet() }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    Text("Compose: $greeting")
+                }
+            }
+        }
     }
 }
