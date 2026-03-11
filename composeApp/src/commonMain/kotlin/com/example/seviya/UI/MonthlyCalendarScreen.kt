@@ -341,8 +341,8 @@ fun MonthlyCalendarScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Servicio: ${booking.services.firstOrNull()?.name ?: "Sin servicio"}")
-                    Text("Fecha: ${booking.date}")
-                    Text("Hora: ${booking.time}")
+                    Text("Fecha: ${extractDateOnly(booking.date)}")
+                    Text("Hora: ${extractTimeFromDateTime(booking.date)}")
                     Text("Estado: ${booking.status}")
                 }
             },
@@ -551,7 +551,7 @@ private fun RowScope.AgendaDayCell(
 
                 bookings.take(4).forEach { booking ->
                     AgendaBookingChip(
-                        text = booking.time,
+                        text = extractTimeFromDateTime(booking.date),
                         onClick = { onBookingClick(booking) }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -735,16 +735,35 @@ private fun getFirstDayOffset(month: Int, year: Int): Int {
     return ((h + 5) % 7)
 }
 
+private fun extractDateOnly(dateTime: String): String {
+    return when {
+        dateTime.contains("T") -> dateTime.substringBefore("T")
+        dateTime.contains(" ") -> dateTime.substringBefore(" ")
+        else -> dateTime
+    }
+}
+
+private fun extractTimeFromDateTime(dateTime: String): String {
+    return when {
+        dateTime.contains("T") -> dateTime.substringAfter("T").take(5)
+        dateTime.contains(" ") -> dateTime.substringAfter(" ").take(5)
+        else -> ""
+    }
+}
+
 private fun extractDayFromDate(date: String): Int {
-    return date.split("-").getOrNull(2)?.toIntOrNull() ?: 0
+    val cleanDate = extractDateOnly(date)
+    return cleanDate.split("-").getOrNull(2)?.toIntOrNull() ?: 0
 }
 
 private fun extractMonthFromDate(date: String): Int {
-    return date.split("-").getOrNull(1)?.toIntOrNull() ?: 0
+    val cleanDate = extractDateOnly(date)
+    return cleanDate.split("-").getOrNull(1)?.toIntOrNull() ?: 0
 }
 
 private fun extractYearFromDate(date: String): Int {
-    return date.split("-").getOrNull(0)?.toIntOrNull() ?: 0
+    val cleanDate = extractDateOnly(date)
+    return cleanDate.split("-").getOrNull(0)?.toIntOrNull() ?: 0
 }
 
 private fun getWeekForDay(
