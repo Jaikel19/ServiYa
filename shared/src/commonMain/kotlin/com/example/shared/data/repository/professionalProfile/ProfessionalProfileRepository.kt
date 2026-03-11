@@ -20,6 +20,7 @@ class ProfessionalProfileRepository(
 
             val categoryNames = remoteProfile.getCategoryNames(profile.categories)
             val province = remoteProfile.getWorkerProvinceFromAddresses(workerId).orEmpty()
+            val cancellationPolicy = remoteProfile.getWorkerCancellationPolicy(workerId)
 
             ProfessionalProfileData(
                 workerId = workerId,
@@ -35,7 +36,8 @@ class ProfessionalProfileRepository(
                 trustScore = profile.trustScore,
                 locationProvince = province,
                 categoryNames = categoryNames,
-                services = services
+                services = services,
+                cancellationPolicy = cancellationPolicy
             )
         }
     }

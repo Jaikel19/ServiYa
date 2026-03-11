@@ -14,5 +14,6 @@ data class ProfessionalProfileData(
     val trustScore: Int = 0,
     val locationProvince: String = "",
     val categoryNames: List<String> = emptyList(),
-    val services: List<Service> = emptyList()
+    val services: List<Service> = emptyList(),
+    val cancellationPolicy: CancellationPolicy? = null
 )

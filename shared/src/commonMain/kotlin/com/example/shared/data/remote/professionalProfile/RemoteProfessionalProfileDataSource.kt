@@ -1,6 +1,7 @@
 package com.example.shared.data.remote.professionalProfile
 
 import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.CancellationPolicy
 import com.example.shared.domain.entity.Category
 import com.example.shared.domain.entity.WorkerProfile
 import dev.gitlive.firebase.Firebase
@@ -49,6 +50,19 @@ class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource
                 .firstOrNull()
                 ?.data<Address>()
                 ?.province
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun getWorkerCancellationPolicy(workerId: String): CancellationPolicy? {
+        return try {
+            db.collection("users")
+                .document(workerId)
+                .collection("cancellationPolicy")
+                .document("cancellationPolicy")
+                .get()
+                .data<CancellationPolicy>()
         } catch (e: Exception) {
             null
         }

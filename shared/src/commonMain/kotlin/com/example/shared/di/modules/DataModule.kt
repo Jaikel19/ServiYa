@@ -8,6 +8,8 @@ import com.example.shared.data.remote.IRemoteBookingDataSource
 import com.example.shared.data.remote.Service.IRemoteServicesDataSource
 import com.example.shared.data.remote.RemoteBookingDataSource
 import com.example.shared.data.remote.Service.RemoteServicesDataSource
+import com.example.shared.data.remote.cancellationPolicy.IRemoteCancellationPolicyDataSource
+import com.example.shared.data.remote.cancellationPolicy.RemoteCancellationPolicyDataSource
 import com.example.shared.data.remote.categories.IRemoteCategoriesDataSource
 import com.example.shared.data.remote.categories.RemoteCategoriesDataSource
 import com.example.shared.data.repository.BookingRepository
@@ -49,4 +51,5 @@ val dataModule = module {
 
     single<IRemoteCategoriesDataSource> { RemoteCategoriesDataSource() }
     single<ICategoryRepository> { CategoryRepository(get()) }
+
 }

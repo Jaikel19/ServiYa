@@ -66,6 +66,7 @@ import com.example.shared.domain.entity.ProfessionalProfileData
 import com.example.shared.domain.entity.Service
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileUiState
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
+import com.example.shared.domain.entity.CancellationPolicy
 
 import kotlin.math.round
 import io.kamel.image.KamelImage
@@ -296,7 +297,9 @@ fun ProfessionalProfileScreen(
                                             )
 
                                             Spacer(Modifier.height(16.dp))
-                                            CancellationPoliciesCard()
+                                            CancellationPoliciesCard(
+                                                policy = profile.cancellationPolicy
+                                            )
                                         }
 
                                         ProfileTab.SERVICES -> {
@@ -978,7 +981,9 @@ private fun ProfileTabItem(
 }
 
 @Composable
-private fun CancellationPoliciesCard() {
+private fun CancellationPoliciesCard(
+    policy: CancellationPolicy?
+) {
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = ProfileWFColors.SurfaceSoft),
@@ -1008,9 +1013,23 @@ private fun CancellationPoliciesCard() {
 
             Spacer(Modifier.height(16.dp))
 
-            BulletLine("Cancelación gratuita hasta 24 horas antes del servicio.")
-            Spacer(Modifier.height(14.dp))
-            BulletLine("50% de cargo por cancelaciones con menos de 12 horas.")
+            if (policy == null) {
+                Text(
+                    text = "No hay políticas de cancelación registradas.",
+                    color = ProfileWFColors.TextSecondary,
+                    fontSize = 14.sp
+                )
+            } else {
+                BulletLine("Más de 7 días antes: ${policy.before7DaysOrMore}%")
+                Spacer(Modifier.height(14.dp))
+                BulletLine("Entre 3 y 6 días antes: ${policy.between3And6Days}%")
+                Spacer(Modifier.height(14.dp))
+                BulletLine("48 horas antes: ${policy.before48h}%")
+                Spacer(Modifier.height(14.dp))
+                BulletLine("24 horas antes: ${policy.before24h}%")
+                Spacer(Modifier.height(14.dp))
+                BulletLine("El mismo día o con menos de 24 horas: ${policy.sameDayOrLess24h}%")
+            }
         }
     }
 }
