@@ -9,7 +9,7 @@ class BookingRepository(
     private val remote: IRemoteBookingDataSource
 ) : IBookingRepository {
 
-    override suspend fun getBookingsByWorker(workerId: String): Flow<List<Booking>> =
+    override fun getBookingsByWorker(workerId: String): Flow<List<Booking>> =
         remote.getBookingsByWorker(workerId)
             .catch { e ->
                 println("ERROR fetching bookings: ${e.message}")

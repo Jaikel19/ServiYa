@@ -98,7 +98,7 @@ fun MonthlyCalendarScreen(
     val isMonthMode = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadBookings("worker_123")
+        viewModel.loadBookings("worker_demo_001")
     }
 
     val daysOfWeek = listOf("LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM")
@@ -340,11 +340,10 @@ fun MonthlyCalendarScreen(
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Servicio: ${booking.serviceName}")
+                    Text("Servicio: ${booking.services.firstOrNull()?.name ?: "Sin servicio"}")
                     Text("Fecha: ${booking.date}")
                     Text("Hora: ${booking.time}")
                     Text("Estado: ${booking.status}")
-                    Text("Notas: ${booking.notes}")
                 }
             },
             shape = RoundedCornerShape(28.dp),
