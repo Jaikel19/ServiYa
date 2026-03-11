@@ -33,16 +33,7 @@ data class Category(
     val name: String = ""
 )
 
-@Serializable
-data class Address(
-    val id: String = "",
-    val alias: String = "",
-    val district: String = "",
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0,
-    val province: String = "",
-    val reference: String = ""
-)
+
 
 data class ProfessionalProfileData(
     val workerId: String = "",

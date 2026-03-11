@@ -19,7 +19,6 @@ import com.example.shared.data.remote.Services.IRemoteServicesDataSource
 import com.example.shared.data.remote.Services.RemoteServicesDataSource
 import com.example.shared.data.repository.Services.IServiceRepository
 import com.example.shared.data.repository.Services.ServiceRepository
-
 import org.koin.dsl.module
 
 val dataModule = module {

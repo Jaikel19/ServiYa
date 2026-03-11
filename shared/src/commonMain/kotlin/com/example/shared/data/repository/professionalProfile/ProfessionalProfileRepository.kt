@@ -1,7 +1,8 @@
 package com.example.shared.data.repository.professionalProfile
 
 import com.example.shared.data.remote.professionalProfile.IRemoteProfessionalProfileDataSource
-import com.example.shared.data.repository.IServiceRepository
+
+import com.example.shared.data.repository.Services.IServiceRepository
 import com.example.shared.domain.entity.ProfessionalProfileData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
