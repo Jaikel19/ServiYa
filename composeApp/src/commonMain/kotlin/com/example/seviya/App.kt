@@ -125,6 +125,8 @@ fun App() {
             onBackToLanding = { currentScreen = "landing" },
             onGoToProfessionalProfile = { currentScreen = "professionalProfile" },
             onGoToCategories = { currentScreen = "categoriesCatalog" }
+            onGoToServices = { currentScreen = "services" }
+
         )
 
         "workerDashboard" -> WorkerDashboardPlaceholder(
@@ -187,6 +189,7 @@ private fun ClientDashboardPlaceholder(
     onGoToProfessionalProfile: () -> Unit,
     onBackToLanding: () -> Unit,
     onGoToCategories: () -> Unit
+    onGoToServices:() ->Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -224,6 +227,14 @@ private fun ClientDashboardPlaceholder(
             ) {
                 Text("Ir a categorías")
             }
+            
+            Button(
+                onClick = onGoToServices,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Text("Ir a servicios")
+            }
+            
         }
     }
 }
