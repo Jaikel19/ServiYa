@@ -103,10 +103,16 @@ fun App() {
 
             CategoriesCatalogRoute(
                 viewModel = viewModel,
-                onGoHome = { currentScreen = "landing" },
                 onGoServices = { currentScreen = "categoriesCatalog" },
-                onGoLogin = { currentScreen = "roleAdmissionCatalog" },
-                onGoRegister = { currentScreen = "roleCatalog" },
+                onGoMap = { currentScreen = "map" },
+                onGoSearch = { currentScreen = "search" },
+                onGoAlerts = { currentScreen = "alerts" },
+                onGoAgenda = { currentScreen = "monthlyCalendar" },
+                onGoProfile = { currentScreen = "profile" },
+                onGoConfiguration = { currentScreen = "configuration" },
+                onGoMessages = { currentScreen = "messages" },
+                onGoDashboard = { currentScreen = "dashboard" },
+                onGoSettings = { currentScreen = "settings" },
                 onCategoryClick = { category ->
                     // para abrir la lista de trabajadores por categoría
                     // Ejemplo:
