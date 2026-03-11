@@ -22,6 +22,8 @@ import com.example.shared.presentation.services.ServicesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.ui.ServicesScreen
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
+import com.example.seviya.UI.CategoriesCatalogRoute
+import com.example.shared.presentation.categories.CategoriesViewModel
 
 @Composable
 fun App() {
@@ -94,8 +96,27 @@ fun App() {
             }
         )
 
+        "categoriesCatalog" -> {
+            val viewModel: CategoriesViewModel = koinViewModel()
+
+            CategoriesCatalogRoute(
+                viewModel = viewModel,
+                onGoHome = { currentScreen = "landing" },
+                onGoServices = { currentScreen = "categoriesCatalog" },
+                onGoLogin = { currentScreen = "roleAdmissionCatalog" },
+                onGoRegister = { currentScreen = "roleCatalog" },
+                onCategoryClick = { category ->
+                    // para abrir la lista de trabajadores por categoría
+                    // Ejemplo:
+                    // currentScreen = "workersByCategory"
+                }
+            )
+        }
+
         "clientDashboard" -> ClientDashboardPlaceholder(
-            onGoToProfessionalProfile = { currentScreen = "professionalProfile" }
+            onBackToLanding = { currentScreen = "landing" },
+            onGoToProfessionalProfile = { currentScreen = "professionalProfile" },
+            onGoToCategories = { currentScreen = "categoriesCatalog" }
         )
 
         "workerDashboard" -> WorkerDashboardPlaceholder(
@@ -139,7 +160,9 @@ private fun WorkerDashboardPlaceholder(
 
 @Composable
 private fun ClientDashboardPlaceholder(
-    onGoToProfessionalProfile: () -> Unit
+    onGoToProfessionalProfile: () -> Unit,
+    onBackToLanding: () -> Unit,
+    onGoToCategories: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -163,8 +186,19 @@ private fun ClientDashboardPlaceholder(
                 modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
             )
 
+            Button(onClick = onBackToLanding) {
+                Text("Volver al landing")
+            }
+
             Button(onClick = onGoToProfessionalProfile) {
                 Text("Ir al perfil profesional")
+            }
+
+            Button(
+                onClick = onGoToCategories,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Text("Ir a categorías")
             }
         }
     }
