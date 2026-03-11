@@ -10,17 +10,22 @@ class RemoteBookingDataSource : IRemoteBookingDataSource {
 
     private val db = Firebase.firestore
 
-    override suspend fun getBookingsByWorker(workerId: String): Flow<List<Booking>> {
-        return db.collection("users")
-            .document(workerId)
-            .collection("bookings")
+    override fun getBookingsByWorker(workerId: String): Flow<List<Booking>> {
+        return db.collection("appointments")
             .snapshots
             .map { snapshot ->
-                snapshot.documents.map { doc ->
+                snapshot.documents.mapNotNull { doc ->
                     try {
-                        doc.data<Booking>().copy(id = doc.id)
+                        if (doc.id == "_schema") return@mapNotNull null
+
+                        val booking = doc.data<Booking>()
+
+                        if (booking.workerId != workerId) return@mapNotNull null
+
+                        booking
                     } catch (e: Exception) {
-                        Booking(id = doc.id)
+                        println("ERROR mapping booking ${doc.id}: ${e.message}")
+                        null
                     }
                 }
             }

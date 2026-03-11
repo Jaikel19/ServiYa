@@ -97,7 +97,9 @@ fun App() {
         )
 
         "clientDashboard" -> ClientDashboardPlaceholder(
-            onGoToProfessionalProfile = { currentScreen = "professionalProfile" }
+            onGoToProfessionalProfile = { currentScreen = "professionalProfile" },
+            onGoToServices = { currentScreen = "services" }
+
         )
 
         "workerDashboard" -> WorkerDashboardPlaceholder(
@@ -157,7 +159,8 @@ private fun WorkerDashboardPlaceholder(
 
 @Composable
 private fun ClientDashboardPlaceholder(
-    onGoToProfessionalProfile: () -> Unit
+    onGoToProfessionalProfile: () -> Unit,
+    onGoToServices:() ->Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -183,6 +186,10 @@ private fun ClientDashboardPlaceholder(
 
             Button(onClick = onGoToProfessionalProfile) {
                 Text("Ir al perfil profesional")
+            }
+
+            Button(onClick = onGoToServices) {
+                Text("Service")
             }
         }
     }
