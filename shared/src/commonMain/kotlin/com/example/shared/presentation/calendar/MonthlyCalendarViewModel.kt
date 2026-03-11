@@ -49,6 +49,7 @@ class MonthlyCalendarViewModel(
 
             bookingRepository.getBookingsByWorker(workerId)
                 .onEach { bookings ->
+                    println("DEBUG bookings recibidos en ViewModel: $bookings")
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         bookings = bookings,

@@ -4,10 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Booking(
-    val id: String = "",
-    val serviceName: String = "",
-    val date: String = "",   // formato: YYYY-MM-DD
-    val time: String = "",   // formato: HH:mm
+    val clientId: String = "",
+    val clientName: String = "",
+    val workerId: String = "",
+    val workerName: String = "",
+    val date: String = "",
     val status: String = "",
-    val notes: String = ""
+    val totalCost: Double = 0.0,
+    val services: List<Service> = emptyList(),
+    val location: Address = Address()
 )
