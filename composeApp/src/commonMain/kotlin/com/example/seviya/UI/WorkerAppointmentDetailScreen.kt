@@ -54,6 +54,7 @@ import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 
 private object DetailColors {
     val Blue = Color(0xFF0A4DB3)
@@ -91,6 +92,8 @@ fun WorkerAppointmentDetailScreen(
     onGoAlerts: () -> Unit = {},
     onGoMenu: () -> Unit = {}
 ) {
+    val uriHandler = LocalUriHandler.current
+
     Scaffold(
         containerColor = DetailColors.Background,
         contentWindowInsets = WindowInsets.statusBars,
@@ -218,13 +221,21 @@ fun WorkerAppointmentDetailScreen(
                     ) {
                         RouteButton(
                             text = "Google Maps",
-                            onClick = onOpenGoogleMaps,
+                            onClick = {
+                                val lat = booking.location.latitude
+                                val lng = booking.location.longitude
+                                uriHandler.openUri("https://www.google.com/maps/search/?api=1&query=$lat,$lng")
+                            },
                             modifier = Modifier.weight(1f)
                         )
 
                         RouteButton(
                             text = "Abrir en Waze",
-                            onClick = onOpenWaze,
+                            onClick = {
+                                val lat = booking.location.latitude
+                                val lng = booking.location.longitude
+                                uriHandler.openUri("https://waze.com/ul?ll=$lat,$lng&navigate=yes")
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -469,19 +480,55 @@ private fun StepCard(
 
 @Composable
 private fun StatusChip(status: String) {
-    val isConfirmed = status.equals("confirmed", ignoreCase = true)
+
+    val text: String
+    val background: Color
+    val textColor: Color
+
+    when (status.lowercase()) {
+
+        "confirmed" -> {
+            text = "CONFIRMADA"
+            background = Color(0xFFE6F7EC)
+            textColor = Color(0xFF1F9D55)
+        }
+
+        "in_progress" -> {
+            text = "EN PROGRESO"
+            background = Color(0xFFFFF6D6)
+            textColor = Color(0xFFD97706)
+        }
+
+        "completed" -> {
+            text = "FINALIZADA"
+            background = Color(0xFFEAF2FF)
+            textColor = Color(0xFF0A4DB3)
+        }
+
+        "cancelled" -> {
+            text = "CANCELADA"
+            background = Color(0xFFFCE9E9)
+            textColor = Color(0xFFE54848)
+        }
+
+        else -> {
+            text = status.uppercase()
+            background = Color(0xFFEDEFF3)
+            textColor = Color(0xFF6B7280)
+        }
+    }
 
     Surface(
         shape = RoundedCornerShape(14.dp),
-        color = if (isConfirmed) DetailColors.GreenSoft else DetailColors.RedSoft
+        color = background
     ) {
         Text(
-            text = if (isConfirmed) "CONFIRMADA" else status.uppercase(),
-            color = if (isConfirmed) DetailColors.GreenText else DetailColors.RedText,
+            text = text,
+            color = textColor,
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.ExtraBold
             ),
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)
         )
     }
 }
