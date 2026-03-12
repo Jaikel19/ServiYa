@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "269843269783",
+    "project_id": "serviya-c6775",
+    "storage_bucket": "serviya-c6775.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269843269783:android:2aa035db4d48c8d52341d2",
+        "android_client_info": {
+          "package_name": "com.example.seviya"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzQ1xetjhOPrLXefCjV-P9bt2jn4420jI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

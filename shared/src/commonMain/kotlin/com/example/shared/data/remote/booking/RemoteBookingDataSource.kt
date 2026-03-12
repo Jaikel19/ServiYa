@@ -1,0 +1,67 @@
+package com.example.shared.data.remote
+
+import com.example.shared.domain.entity.Booking
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.firestore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+class RemoteBookingDataSource : IRemoteBookingDataSource {
+
+    private val db = Firebase.firestore
+
+    override fun getBookingsByWorker(workerId: String): Flow<List<Booking>> {
+        return db.collection("appointments")
+            .snapshots
+            .map { snapshot ->
+                snapshot.documents.mapNotNull { doc ->
+                    try {
+                        if (doc.id == "_schema") return@mapNotNull null
+
+                        val booking = doc.data<Booking>().copy(id = doc.id)
+
+                        if (booking.workerId != workerId) return@mapNotNull null
+
+                        booking
+                    } catch (e: Exception) {
+                        println("ERROR mapping booking ${doc.id}: ${e.message}")
+                        null
+                    }
+                }
+            }
+    }
+
+    override suspend fun confirmPayment(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "confirmed"
+            )
+    }
+
+    override suspend fun startAppointment(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "in_progress"
+            )
+    }
+
+    override suspend fun completeAppointment(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "completed"
+            )
+    }
+
+    override suspend fun cancelAppointmentByWorker(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "cancelled",
+                "cancellationReason" to "Cancelada por trabajador",
+                "cancellationBy" to "worker"
+            )
+    }
+}
