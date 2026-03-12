@@ -3,6 +3,7 @@ package com.example.shared.data.repository.professionalProfile
 import com.example.shared.data.remote.professionalProfile.IRemoteProfessionalProfileDataSource
 import com.example.shared.data.repository.Service.IServiceRepository
 import com.example.shared.domain.entity.ProfessionalProfileData
+import com.example.shared.domain.entity.WorkerSchedule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -14,6 +15,9 @@ class ProfessionalProfileRepository(
     override suspend fun getProfessionalProfile(workerId: String): Flow<ProfessionalProfileData?> {
         val profileFlow = remoteProfile.getWorkerProfile(workerId)
         val servicesFlow = servicesRepository.getServicesByWorker(workerId)
+        val schedule = remoteProfile.getWorkerSchedule(workerId)
+        val portfolios = remoteProfile.getWorkerPortfolios(workerId)
+        val reviews = remoteProfile.getWorkerReviews(workerId)
 
         return combine(profileFlow, servicesFlow) { profile, services ->
             if (profile == null) return@combine null
@@ -29,6 +33,7 @@ class ProfessionalProfileRepository(
                 email = profile.email,
                 phone = profile.phone,
                 profilePictureLink = profile.profilePicture,
+                description = profile.description,
                 role = profile.role,
                 stars = profile.stars,
                 status = profile.status,
@@ -37,7 +42,10 @@ class ProfessionalProfileRepository(
                 locationProvince = province,
                 categoryNames = categoryNames,
                 services = services,
-                cancellationPolicy = cancellationPolicy
+                cancellationPolicy = cancellationPolicy,
+                schedule = schedule,
+                portfolios = portfolios,
+                reviews = reviews
             )
         }
     }

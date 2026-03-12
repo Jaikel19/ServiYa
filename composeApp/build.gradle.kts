@@ -69,6 +69,7 @@ kotlin {
             implementation(libs.compose.material)
             implementation(libs.composeIcons.tabler)
             implementation(libs.compose.animation)
+            implementation(libs.kotlinx.datetime)
 
             implementation("media.kamel:kamel-image-default:1.0.9")
         }

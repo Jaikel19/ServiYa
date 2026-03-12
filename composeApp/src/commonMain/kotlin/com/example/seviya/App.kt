@@ -12,34 +12,41 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.seviya.UI.CategoriesCatalogRoute
 import com.example.seviya.UI.LandingScreen
 import com.example.seviya.UI.MonthlyCalendarScreen
 import com.example.seviya.UI.ProfessionalProfileRoute
-import com.example.seviya.UI.ProfessionalProfileScreen
 import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
-import com.example.shared.presentation.services.ServicesViewModel
-import org.koin.compose.viewmodel.koinViewModel
+import com.example.seviya.UI.WorkersListRoute
 import com.example.seviya.ui.ServicesScreen
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
-import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
-import com.example.seviya.UI.CategoriesCatalogRoute
 import com.example.shared.presentation.categories.CategoriesViewModel
+import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
+import com.example.shared.presentation.services.ServicesViewModel
+import com.example.shared.presentation.workersList.WorkersListViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.UI.WorkerAppointmentDetailScreen
 
 @Composable
 fun App() {
-
     var currentScreen by remember { mutableStateOf("landing") }
     val monthlyCalendarViewModel: MonthlyCalendarViewModel = koinViewModel()
     val calendarState by monthlyCalendarViewModel.uiState.collectAsState()
 
+    // categoría seleccionada
+    var selectedCategoryId by remember { mutableStateOf<String?>(null) }
+    var selectedCategoryName by remember { mutableStateOf<String?>(null) }
+
+    // worker seleccionado
+    var selectedWorkerId by remember { mutableStateOf<String?>(null) }
+
     when (currentScreen) {
         "landing" -> LandingScreen(
             onGoToServices = { currentScreen = "services" },
-            onLogin = { currentScreen = "roleAdmissionCatalog" },     // según tu flujo actual
-            onRegister = { currentScreen = "roleCatalog" }        // ✅ ahora abre catálogo de roles
+            onLogin = { currentScreen = "roleAdmissionCatalog" },
+            onRegister = { currentScreen = "roleCatalog" }
         )
 
         "services" -> {
@@ -50,8 +57,7 @@ fun App() {
         "travelTimeConfig" -> TravelTimeConfigScreen(
             initialMinutes = 30,
             onBack = { currentScreen = "landing" },
-            onSave = { minutes ->
-                // TODO guardar minutes
+            onSave = { _ ->
                 currentScreen = "landing"
             },
             onGoHome = { currentScreen = "landing" },
@@ -63,35 +69,32 @@ fun App() {
             val viewModel: ProfessionalProfileViewModel = koinViewModel()
 
             ProfessionalProfileRoute(
-                workerId = "worker_demo_001",
+                workerId = selectedWorkerId ?: "worker_demo_001",
                 viewModel = viewModel,
-                onBack = { currentScreen = "landing" },
-                onOpenChat = { },
-                onBottomServices = { },
-                onBottomMap = { },
-                onBottomSearch = { },
-                onBottomNotifications = { },
-                onBottomMenu = { }
+                onBack = { currentScreen = "workersList" },
+                onBottomServices = { currentScreen = "categoriesCatalog" },
+                onBottomMap = { currentScreen = "map" },
+                onBottomSearch = { currentScreen = "search" },
+                onBottomNotifications = { currentScreen = "alerts" },
+                onBottomMenu = { currentScreen = "clientDashboard" }
             )
         }
 
         "roleCatalog" -> RoleCatalogScreen(
             onGoHome = { currentScreen = "landing" },
             onGoLogin = { currentScreen = "travelTimeConfig" },
-            onGoRegister = { /* ya estás aquí */ },
+            onGoRegister = { },
             onPickClient = {
-                // TODO: ir a registro de cliente
-                // currentScreen = "registerClient"
+                // TODO
             },
             onPickWorker = {
-                // TODO: ir a registro de trabajador
-                // currentScreen = "registerWorker"
+                // TODO
             }
         )
 
         "roleAdmissionCatalog" -> RoleAdmissionCatalogScreen(
             onGoHome = { currentScreen = "landing" },
-            onGoLogin = { /* ya estás aquí */ },
+            onGoLogin = { },
             onGoRegister = { currentScreen = "roleCatalog" },
             onPickClient = {
                 currentScreen = "clientDashboard"
@@ -106,6 +109,7 @@ fun App() {
 
             CategoriesCatalogRoute(
                 viewModel = viewModel,
+                selectedCategoryId = selectedCategoryId,
                 onGoServices = { currentScreen = "categoriesCatalog" },
                 onGoMap = { currentScreen = "map" },
                 onGoSearch = { currentScreen = "search" },
@@ -116,17 +120,46 @@ fun App() {
                 onGoMessages = { currentScreen = "messages" },
                 onGoDashboard = { currentScreen = "dashboard" },
                 onGoSettings = { currentScreen = "settings" },
+
                 onCategoryClick = { category ->
-                    // para abrir la lista de trabajadores por categoría
-                    // Ejemplo:
-                    // currentScreen = "workersByCategory"
+                    selectedCategoryId = category.id
+                    selectedCategoryName = category.name
+                },
+
+                onContinueWithSelectedCategory = {
+                    if (!selectedCategoryId.isNullOrBlank()) {
+                        currentScreen = "workersList"
+                    }
                 }
+            )
+        }
+
+        "workersList" -> {
+            val viewModel: WorkersListViewModel = koinViewModel()
+
+            WorkersListRoute(
+                viewModel = viewModel,
+                selectedCategoryId = selectedCategoryId,
+                selectedCategoryName = selectedCategoryName,
+                onWorkerClick = { workerId ->
+                    selectedWorkerId = workerId
+                    currentScreen = "professionalProfile"
+                },
+                onThemeClick = { },
+                onBottomServices = { currentScreen = "categoriesCatalog" },
+                onBottomMap = { currentScreen = "map" },
+                onBottomSearch = { currentScreen = "search" },
+                onBottomNotifications = { currentScreen = "alerts" },
+                onBottomMenu = { currentScreen = "clientDashboard" }
             )
         }
 
         "clientDashboard" -> ClientDashboardPlaceholder(
             onBackToLanding = { currentScreen = "landing" },
-            onGoToProfessionalProfile = { currentScreen = "professionalProfile" },
+            onGoToProfessionalProfile = {
+                selectedWorkerId = "worker_demo_001"
+                currentScreen = "professionalProfile"
+            },
             onGoToCategories = { currentScreen = "categoriesCatalog" },
             onGoToServices = { currentScreen = "services" }
         )
@@ -137,6 +170,8 @@ fun App() {
         )
 
         "monthlyCalendar" -> {
+            val viewModel: MonthlyCalendarViewModel = koinViewModel()
+
             MonthlyCalendarScreen(
                 viewModel = monthlyCalendarViewModel,
                 onBack = { currentScreen = "landing" },
@@ -215,7 +250,7 @@ private fun WorkerDashboardPlaceholder(
             }
 
             Button(onClick = onGoToMonthlyCalendar) {
-                Text("ir a la agenda")
+                Text("Ir a la agenda")
             }
         }
     }
@@ -226,7 +261,7 @@ private fun ClientDashboardPlaceholder(
     onGoToProfessionalProfile: () -> Unit,
     onBackToLanding: () -> Unit,
     onGoToCategories: () -> Unit,
-    onGoToServices:() ->Unit
+    onGoToServices: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -264,14 +299,13 @@ private fun ClientDashboardPlaceholder(
             ) {
                 Text("Ir a categorías")
             }
-            
+
             Button(
                 onClick = onGoToServices,
                 modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a servicios")
             }
-            
         }
     }
 }

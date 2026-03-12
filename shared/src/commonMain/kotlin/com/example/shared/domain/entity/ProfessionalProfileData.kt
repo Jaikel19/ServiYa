@@ -6,6 +6,7 @@ data class ProfessionalProfileData(
     val name: String = "",
     val email: String = "",
     val phone: String = "",
+    val description: String = "",
     val profilePictureLink: String = "",
     val role: String = "",
     val stars: Double = 0.0,
@@ -15,5 +16,8 @@ data class ProfessionalProfileData(
     val locationProvince: String = "",
     val categoryNames: List<String> = emptyList(),
     val services: List<Service> = emptyList(),
-    val cancellationPolicy: CancellationPolicy? = null
+    val cancellationPolicy: CancellationPolicy? = null,
+    val schedule: List<WorkerSchedule> = emptyList(),
+    val portfolios: List<PortfolioItem> = emptyList(),
+    val reviews: List<WorkerReviewItem> = emptyList()
 )
