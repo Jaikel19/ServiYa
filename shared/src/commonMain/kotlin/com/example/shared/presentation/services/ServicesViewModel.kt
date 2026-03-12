@@ -3,6 +3,7 @@ package com.example.shared.presentation.services
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Service.IServiceRepository
+import com.example.shared.domain.entity.Service
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +26,6 @@ class ServicesViewModel(
                 services = emptyList(),
                 errorMessage = null
             )
-
             serviceRepository.getServicesByWorker(workerId)
                 .onEach { list ->
                     _uiState.value = _uiState.value.copy(
@@ -42,6 +42,30 @@ class ServicesViewModel(
                     )
                 }
                 .collect()
+        }
+    }
+
+    fun createService(workerId: String, service: Service) {
+        viewModelScope.launch {
+            try {
+                serviceRepository.createService(workerId, service)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error creating service"
+                )
+            }
+        }
+    }
+
+    fun updateService(workerId: String, service: Service) {
+        viewModelScope.launch {
+            try {
+                serviceRepository.updateService(workerId, service)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error updating service"
+                )
+            }
         }
     }
 }
