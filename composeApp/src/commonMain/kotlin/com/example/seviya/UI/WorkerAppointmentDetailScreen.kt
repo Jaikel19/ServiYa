@@ -260,11 +260,20 @@ fun WorkerAppointmentDetailScreen(
 
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
-                                color = DetailColors.RedSoft
+                                color = if (isPaymentVerified(booking))
+                                    DetailColors.GreenSoft
+                                else
+                                    DetailColors.RedSoft
                             ) {
                                 Text(
-                                    text = "PENDIENTE",
-                                    color = DetailColors.RedText,
+                                    text = if (isPaymentVerified(booking))
+                                        "VERIFICADO"
+                                    else
+                                        "PENDIENTE",
+                                    color = if (isPaymentVerified(booking))
+                                        DetailColors.GreenText
+                                    else
+                                        DetailColors.RedText,
                                     style = MaterialTheme.typography.labelLarge.copy(
                                         fontWeight = FontWeight.Bold
                                     ),
@@ -297,15 +306,17 @@ fun WorkerAppointmentDetailScreen(
                                     contentScale = ContentScale.Crop
                                 )
 
-                                Button(
-                                    onClick = onVerifyPayment,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = DetailColors.Blue
-                                    ),
-                                    shape = RoundedCornerShape(18.dp)
-                                ) {
-                                    Text("Confirmar pago")
+                                if (canVerifyPayment(booking)) {
+                                    Button(
+                                        onClick = onVerifyPayment,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = DetailColors.Blue
+                                        ),
+                                        shape = RoundedCornerShape(18.dp)
+                                    ) {
+                                        Text("Confirmar pago")
+                                    }
                                 }
                             }
                         }
@@ -321,7 +332,7 @@ fun WorkerAppointmentDetailScreen(
 
                 if (canFinishAppointment(booking)) {
                     PrimaryActionButton(
-                        text = "Finalizar cita",
+                        text = "Completar cita",
                         onClick = onFinishAppointment
                     )
                 }
@@ -486,6 +497,12 @@ private fun StatusChip(status: String) {
     val textColor: Color
 
     when (status.lowercase()) {
+
+        "payment_pending" -> {
+            text = "PAGO PENDIENTE"
+            background = Color(0xFFFFF1E6)
+            textColor = Color(0xFFFF8C00)
+        }
 
         "confirmed" -> {
             text = "CONFIRMADA"
@@ -681,6 +698,11 @@ private fun canShowPaymentReceipt(booking: Booking): Boolean {
     return booking.paymentReceiptUrl.isNotBlank()
 }
 
+private fun canVerifyPayment(booking: Booking): Boolean {
+    return booking.status.equals("payment_pending", ignoreCase = true) &&
+            booking.paymentReceiptUrl.isNotBlank()
+}
+
 private fun canStartAppointment(booking: Booking): Boolean {
     return booking.status.equals("confirmed", ignoreCase = true)
 }
@@ -696,6 +718,12 @@ private fun canRateClient(booking: Booking): Boolean {
 
 private fun canCancelAppointment(booking: Booking): Boolean {
     return booking.status.equals("confirmed", ignoreCase = true)
+}
+
+private fun isPaymentVerified(booking: Booking): Boolean {
+    return booking.status.equals("confirmed", ignoreCase = true) ||
+            booking.status.equals("in_progress", ignoreCase = true) ||
+            booking.status.equals("completed", ignoreCase = true)
 }
 
 private fun extractDateOnlyDetail(dateTime: String): String {
