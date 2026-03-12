@@ -154,24 +154,32 @@ fun App() {
                 WorkerAppointmentDetailScreen(
                     booking = booking,
                     onBack = { currentScreen = "monthlyCalendar" },
-                    onOpenMaps = {
-                        // TODO abrir Google Maps / Waze
+                    onOpenGoogleMaps = {
+                        // TODO
+                    },
+                    onOpenWaze = {
+                        // TODO
                     },
                     onVerifyPayment = {
-                        // TODO verificar pago
+                        // TODO
                     },
                     onStartAppointment = {
-                        // TODO iniciar cita
+                        // TODO
                     },
                     onFinishAppointment = {
-                        // TODO finalizar cita
+                        // TODO
                     },
                     onRateClient = {
-                        // TODO calificar cliente
+                        // TODO
                     },
                     onCancelAppointment = {
-                        // TODO cancelar cita
-                    }
+                        // TODO
+                    },
+                    onGoServices = { currentScreen = "services" },
+                    onGoMap = { currentScreen = "map" },
+                    onGoSearch = { currentScreen = "search" },
+                    onGoAlerts = { currentScreen = "alerts" },
+                    onGoMenu = { currentScreen = "monthlyCalendar" }
                 )
             }
         }
