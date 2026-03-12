@@ -50,9 +50,18 @@ class MonthlyCalendarViewModel(
             bookingRepository.getBookingsByWorker(workerId)
                 .onEach { bookings ->
                     println("DEBUG bookings recibidos en ViewModel: $bookings")
+
+                    val currentSelected = _uiState.value.selectedBooking
+                    val refreshedSelected = if (currentSelected != null) {
+                        bookings.firstOrNull { it.id == currentSelected.id }
+                    } else {
+                        null
+                    }
+
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         bookings = bookings,
+                        selectedBooking = refreshedSelected,
                         errorMessage = null
                     )
                 }
@@ -141,5 +150,53 @@ class MonthlyCalendarViewModel(
         _uiState.value = _uiState.value.copy(
             currentWeekDay = day
         )
+    }
+
+    fun confirmPayment(bookingId: String) {
+        viewModelScope.launch {
+            try {
+                bookingRepository.confirmPayment(bookingId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error al confirmar pago"
+                )
+            }
+        }
+    }
+
+    fun startAppointment(bookingId: String) {
+        viewModelScope.launch {
+            try {
+                bookingRepository.startAppointment(bookingId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error al iniciar cita"
+                )
+            }
+        }
+    }
+
+    fun completeAppointment(bookingId: String) {
+        viewModelScope.launch {
+            try {
+                bookingRepository.completeAppointment(bookingId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error al completar cita"
+                )
+            }
+        }
+    }
+
+    fun cancelAppointmentByWorker(bookingId: String) {
+        viewModelScope.launch {
+            try {
+                bookingRepository.cancelAppointmentByWorker(bookingId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error al cancelar cita"
+                )
+            }
+        }
     }
 }
