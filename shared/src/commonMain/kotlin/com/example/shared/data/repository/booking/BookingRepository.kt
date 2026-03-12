@@ -15,4 +15,20 @@ class BookingRepository(
                 println("ERROR fetching bookings: ${e.message}")
                 emit(emptyList())
             }
+
+    override suspend fun confirmPayment(bookingId: String) {
+        remote.confirmPayment(bookingId)
+    }
+
+    override suspend fun startAppointment(bookingId: String) {
+        remote.startAppointment(bookingId)
+    }
+
+    override suspend fun completeAppointment(bookingId: String) {
+        remote.completeAppointment(bookingId)
+    }
+
+    override suspend fun cancelAppointmentByWorker(bookingId: String) {
+        remote.cancelAppointmentByWorker(bookingId)
+    }
 }

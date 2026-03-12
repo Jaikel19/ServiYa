@@ -18,7 +18,7 @@ class RemoteBookingDataSource : IRemoteBookingDataSource {
                     try {
                         if (doc.id == "_schema") return@mapNotNull null
 
-                        val booking = doc.data<Booking>()
+                        val booking = doc.data<Booking>().copy(id = doc.id)
 
                         if (booking.workerId != workerId) return@mapNotNull null
 
@@ -29,5 +29,39 @@ class RemoteBookingDataSource : IRemoteBookingDataSource {
                     }
                 }
             }
+    }
+
+    override suspend fun confirmPayment(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "confirmed"
+            )
+    }
+
+    override suspend fun startAppointment(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "in_progress"
+            )
+    }
+
+    override suspend fun completeAppointment(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "completed"
+            )
+    }
+
+    override suspend fun cancelAppointmentByWorker(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "cancelled",
+                "cancellationReason" to "Cancelada por trabajador",
+                "cancellationBy" to "worker"
+            )
     }
 }

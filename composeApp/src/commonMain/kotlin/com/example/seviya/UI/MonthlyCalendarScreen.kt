@@ -92,7 +92,8 @@ fun MonthlyCalendarScreen(
     onGoMap: () -> Unit = {},
     onGoSearch: () -> Unit = {},
     onGoAlerts: () -> Unit = {},
-    onGoMenu: () -> Unit = {}
+    onGoMenu: () -> Unit = {},
+    onOpenBookingDetail: (Booking) -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
     val isMonthMode = remember { mutableStateOf(true) }
@@ -285,6 +286,7 @@ fun MonthlyCalendarScreen(
                                             isSelected = selectedDay == day,
                                             onBookingClick = { booking ->
                                                 viewModel.selectBooking(booking)
+                                                onOpenBookingDetail(booking)
                                             }
                                         )
                                     }
@@ -319,36 +321,6 @@ fun MonthlyCalendarScreen(
                 }
             }
         }
-    }
-
-    state.selectedBooking?.let { booking ->
-        AlertDialog(
-            onDismissRequest = { viewModel.clearSelectedBooking() },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.clearSelectedBooking() },
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Text("Cerrar")
-                }
-            },
-            title = {
-                Text(
-                    text = "Detalle de cita",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                )
-            },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Servicio: ${booking.services.firstOrNull()?.name ?: "Sin servicio"}")
-                    Text("Fecha: ${extractDateOnly(booking.date)}")
-                    Text("Hora: ${extractTimeFromDateTime(booking.date)}")
-                    Text("Estado: ${booking.status}")
-                }
-            },
-            shape = RoundedCornerShape(28.dp),
-            containerColor = Color(0xFFF8F4FB)
-        )
     }
 }
 

@@ -27,10 +27,13 @@ import com.example.shared.presentation.professionalProfile.ProfessionalProfileVi
 import com.example.shared.presentation.services.ServicesViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import com.example.seviya.UI.WorkerAppointmentDetailScreen
 
 @Composable
 fun App() {
     var currentScreen by remember { mutableStateOf("landing") }
+    val monthlyCalendarViewModel: MonthlyCalendarViewModel = koinViewModel()
+    val calendarState by monthlyCalendarViewModel.uiState.collectAsState()
 
     // categoría seleccionada
     var selectedCategoryId by remember { mutableStateOf<String?>(null) }
@@ -170,9 +173,47 @@ fun App() {
             val viewModel: MonthlyCalendarViewModel = koinViewModel()
 
             MonthlyCalendarScreen(
-                viewModel = viewModel,
-                onBack = { currentScreen = "landing" }
+                viewModel = monthlyCalendarViewModel,
+                onBack = { currentScreen = "landing" },
+                onOpenBookingDetail = { booking ->
+                    monthlyCalendarViewModel.selectBooking(booking)
+                    currentScreen = "workerAppointmentDetail"
+                }
             )
+        }
+
+        "workerAppointmentDetail" -> {
+            calendarState.selectedBooking?.let { booking ->
+                WorkerAppointmentDetailScreen(
+                    booking = booking,
+                    onBack = {
+                        monthlyCalendarViewModel.clearSelectedBooking()
+                        currentScreen = "monthlyCalendar"
+                    },
+                    onOpenGoogleMaps = {},
+                    onOpenWaze = {},
+                    onVerifyPayment = {
+                        monthlyCalendarViewModel.confirmPayment(booking.id)
+                    },
+                    onStartAppointment = {
+                        monthlyCalendarViewModel.startAppointment(booking.id)
+                    },
+                    onFinishAppointment = {
+                        monthlyCalendarViewModel.completeAppointment(booking.id)
+                    },
+                    onRateClient = {
+                        // de momento sin lógica real
+                    },
+                    onCancelAppointment = {
+                        monthlyCalendarViewModel.cancelAppointmentByWorker(booking.id)
+                    },
+                    onGoServices = { currentScreen = "services" },
+                    onGoMap = { currentScreen = "map" },
+                    onGoSearch = { currentScreen = "search" },
+                    onGoAlerts = { currentScreen = "alerts" },
+                    onGoMenu = { currentScreen = "monthlyCalendar" }
+                )
+            }
         }
     }
 }
