@@ -1,0 +1,48 @@
+package com.example.shared.data.repository.workersList
+
+import com.example.shared.data.remote.workersList.IRemoteWorkersListDataSource
+import com.example.shared.data.repository.Service.IServiceRepository
+import com.example.shared.domain.entity.WorkerListItemData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+
+class WorkersListRepository(
+    private val remote: IRemoteWorkersListDataSource,
+    private val servicesRepository: IServiceRepository
+) : IWorkersListRepository {
+
+    override suspend fun getWorkers(): Flow<List<WorkerListItemData>> {
+        return remote.getWorkers().map { workers ->
+            workers.map { workerRemote ->
+                val workerId = workerRemote.workerId
+                val profile = workerRemote.profile
+
+                val address = remote.getWorkerAddress(workerId)
+                val categoryNames = remote.getCategoryNames(profile.categories)
+
+                val services = try {
+                    servicesRepository.getServicesByWorker(workerId).first()
+                } catch (e: Exception) {
+                    emptyList()
+                }
+
+                val startingPrice = services.minOfOrNull { it.cost } ?: 0.0
+
+                WorkerListItemData(
+                    workerId = workerId,
+                    uid = profile.uid,
+                    name = profile.name,
+                    profilePictureLink = profile.profilePicture,
+                    stars = profile.stars,
+                    status = profile.status,
+                    categoryIds = profile.categories,
+                    categoryNames = categoryNames,
+                    province = address?.province.orEmpty(),
+                    district = address?.district.orEmpty(),
+                    startingPrice = startingPrice
+                )
+            }.sortedByDescending { it.stars }
+        }
+    }
+}

@@ -28,6 +28,11 @@ import com.example.shared.data.repository.professionalProfile.IProfessionalProfi
 import com.example.shared.data.repository.professionalProfile.ProfessionalProfileRepository
 import org.koin.dsl.module
 
+import com.example.shared.data.remote.workersList.IRemoteWorkersListDataSource
+import com.example.shared.data.remote.workersList.RemoteWorkersListDataSource
+import com.example.shared.data.repository.workersList.IWorkersListRepository
+import com.example.shared.data.repository.workersList.WorkersListRepository
+
 val dataModule = module {
 
     // Remote
@@ -51,5 +56,8 @@ val dataModule = module {
 
     single<IRemoteCategoriesDataSource> { RemoteCategoriesDataSource() }
     single<ICategoryRepository> { CategoryRepository(get()) }
+
+    single<IRemoteWorkersListDataSource> { RemoteWorkersListDataSource() }
+    single<IWorkersListRepository> { WorkersListRepository(get(), get()) }
 
 }

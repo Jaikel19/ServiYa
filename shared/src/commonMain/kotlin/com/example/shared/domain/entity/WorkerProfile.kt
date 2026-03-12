@@ -1,5 +1,6 @@
 package com.example.shared.domain.entity
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,6 +11,8 @@ data class WorkerProfile(
     val identification: String = "",
     val phone: String = "",
     val profilePicture: String = "",
+    @SerialName("_description")
+    val description: String = "",
     val role: String = "",
     val stars: Double = 0.0,
     val status: String = "",

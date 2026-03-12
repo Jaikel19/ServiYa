@@ -78,6 +78,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import kotlinx.coroutines.delay
@@ -103,6 +105,7 @@ private object CategoriesUI {
 @Composable
 fun CategoriesCatalogRoute(
     viewModel: CategoriesViewModel,
+    selectedCategoryId: String?,
     onGoServices: () -> Unit,
     onGoMap: () -> Unit,
     onGoSearch: () -> Unit,
@@ -113,12 +116,14 @@ fun CategoriesCatalogRoute(
     onGoMessages: () -> Unit,
     onGoDashboard: () -> Unit,
     onGoSettings: () -> Unit,
-    onCategoryClick: (Category) -> Unit = {}
+    onCategoryClick: (Category) -> Unit = {},
+    onContinueWithSelectedCategory: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     CategoriesCatalogScreen(
         uiState = uiState,
+        selectedCategoryId = selectedCategoryId,
         onGoServices = onGoServices,
         onGoMap = onGoMap,
         onGoSearch = onGoSearch,
@@ -129,13 +134,14 @@ fun CategoriesCatalogRoute(
         onGoMessages = onGoMessages,
         onGoDashboard = onGoDashboard,
         onGoSettings = onGoSettings,
-        onCategoryClick = onCategoryClick
+        onCategoryClick = onCategoryClick,
+        onContinueWithSelectedCategory = onContinueWithSelectedCategory
     )
 }
-
 @Composable
 fun CategoriesCatalogScreen(
     uiState: CategoriesUiState,
+    selectedCategoryId: String?,
     onGoServices: () -> Unit,
     onGoMap: () -> Unit,
     onGoSearch: () -> Unit,
@@ -146,7 +152,8 @@ fun CategoriesCatalogScreen(
     onGoMessages: () -> Unit,
     onGoDashboard: () -> Unit,
     onGoSettings: () -> Unit,
-    onCategoryClick: (Category) -> Unit = {}
+    onCategoryClick: (Category) -> Unit = {},
+    onContinueWithSelectedCategory: () -> Unit
 ) {
     val menuExpanded = remember { mutableStateOf(false) }
 
@@ -178,75 +185,90 @@ fun CategoriesCatalogScreen(
                     )
                     .padding(padding)
             ) {
-                Column(
+                Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    CategoriesHeader()
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        CategoriesHeader()
 
-                    val errorMessage = uiState.errorMessage
+                        val errorMessage = uiState.errorMessage
 
-                    when {
-                        uiState.isLoading -> {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    color = CategoriesUI.Blue,
-                                    strokeWidth = 3.5.dp
-                                )
-                            }
-                        }
-
-                        errorMessage != null && uiState.categories.isEmpty() -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 24.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Surface(
-                                    shape = RoundedCornerShape(24.dp),
-                                    color = Color.White,
-                                    border = BorderStroke(1.dp, CategoriesUI.CardBorder),
-                                    shadowElevation = 6.dp
+                        when {
+                            uiState.isLoading -> {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = errorMessage,
-                                        modifier = Modifier.padding(20.dp),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = CategoriesUI.TextDark,
-                                        textAlign = TextAlign.Center
+                                    CircularProgressIndicator(
+                                        color = CategoriesUI.Blue,
+                                        strokeWidth = 3.5.dp
                                     )
                                 }
                             }
-                        }
 
-                        else -> {
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(2),
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(
-                                    start = 20.dp,
-                                    end = 20.dp,
-                                    top = 10.dp,
-                                    bottom = 110.dp
-                                ),
-                                verticalArrangement = Arrangement.spacedBy(18.dp),
-                                horizontalArrangement = Arrangement.spacedBy(18.dp)
-                            ) {
-                                itemsIndexed(
-                                    items = uiState.categories,
-                                    key = { _, item -> item.id }
-                                ) { index, category ->
-                                    CategoryCard(
-                                        category = category,
-                                        index = index,
-                                        onClick = { onCategoryClick(category) }
-                                    )
+                            errorMessage != null && uiState.categories.isEmpty() -> {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 24.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Surface(
+                                        shape = RoundedCornerShape(24.dp),
+                                        color = Color.White,
+                                        border = BorderStroke(1.dp, CategoriesUI.CardBorder),
+                                        shadowElevation = 6.dp
+                                    ) {
+                                        Text(
+                                            text = errorMessage,
+                                            modifier = Modifier.padding(20.dp),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = CategoriesUI.TextDark,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            }
+
+                            else -> {
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(2),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        top = 10.dp,
+                                        bottom = 180.dp
+                                    ),
+                                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(18.dp)
+                                ) {
+                                    itemsIndexed(
+                                        items = uiState.categories,
+                                        key = { _, item -> item.id }
+                                    ) { index, category ->
+                                        CategoryCard(
+                                            category = category,
+                                            index = index,
+                                            selected = category.id == selectedCategoryId,
+                                            onClick = { onCategoryClick(category) }
+                                        )
+                                    }
                                 }
                             }
                         }
+                    }
+
+                    if (!uiState.isLoading && uiState.categories.isNotEmpty()) {
+                        ContinueButtonBar(
+                            enabled = !selectedCategoryId.isNullOrBlank(),
+                            onClick = onContinueWithSelectedCategory,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(horizontal = 20.dp, vertical = 16.dp)
+                        )
                     }
                 }
             }
@@ -291,6 +313,49 @@ fun CategoriesCatalogScreen(
                     menuExpanded.value = false
                     onGoSettings()
                 }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ContinueButtonBar(
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 14.dp,
+                shape = RoundedCornerShape(24.dp),
+                clip = false
+            ),
+        shape = RoundedCornerShape(24.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, CategoriesUI.CardBorder)
+    ) {
+        Button(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .height(56.dp),
+            shape = RoundedCornerShape(18.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CategoriesUI.Blue,
+                disabledContainerColor = CategoriesUI.Inactive.copy(alpha = 0.35f),
+                contentColor = Color.White,
+                disabledContentColor = Color.White.copy(alpha = 0.75f)
+            )
+        ) {
+            Text(
+                text = "Ver trabajadores",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
@@ -541,6 +606,7 @@ private fun HeaderWave(modifier: Modifier = Modifier) {
 private fun CategoryCard(
     category: Category,
     index: Int,
+    selected: Boolean,
     onClick: () -> Unit
 ) {
     val visuals = categoryVisual(category.id)
@@ -609,8 +675,13 @@ private fun CategoryCard(
             )
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(30.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, CategoriesUI.CardBorder),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) visuals.cardTint else Color.White
+        ),
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) visuals.accent else CategoriesUI.CardBorder
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(
@@ -727,12 +798,14 @@ private fun CategoryCard(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clip(RoundedCornerShape(50.dp))
-                        .background(visuals.buttonBackground)
+                        .background(
+                            if (selected) visuals.accent.copy(alpha = 0.16f) else visuals.buttonBackground
+                        )
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Ver opciones",
+                        text = if (selected) "Seleccionada" else "Ver opciones",
                         color = visuals.buttonText,
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold
