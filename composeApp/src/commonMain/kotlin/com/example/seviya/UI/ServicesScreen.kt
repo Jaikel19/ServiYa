@@ -1,6 +1,8 @@
 package com.example.seviya.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,18 +21,33 @@ fun ServicesScreen(viewModel: ServicesViewModel) {
     var cost by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var editingService by remember { mutableStateOf<Service?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.loadServices(workerId)
+    }
+
+    // Cuando se selecciona un servicio para editar, llena los campos
+    LaunchedEffect(editingService) {
+        editingService?.let {
+            name = it.name
+            cost = it.cost.toString()
+            duration = it.duration
+            description = it.description
+        }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         // ── Formulario ────────────────────────────────────────
-        Text("New Service", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = if (editingService != null) "Edit Service" else "New Service",
+            style = MaterialTheme.typography.titleMedium
+        )
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
@@ -65,28 +82,59 @@ fun ServicesScreen(viewModel: ServicesViewModel) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                val costDouble = cost.toDoubleOrNull() ?: 0.0
-                viewModel.createService(
-                    workerId,
-                    Service(
-                        name = name,
-                        cost = costDouble,
-                        duration = duration,
-                        description = description
-                    )
-                )
-                // Limpiar campos
-                name = ""
-                cost = ""
-                duration = ""
-                description = ""
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = name.isNotBlank() && cost.isNotBlank()
-        ) {
-            Text("Save Service")
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Botón cancelar edición
+            if (editingService != null) {
+                OutlinedButton(
+                    onClick = {
+                        editingService = null
+                        name = ""
+                        cost = ""
+                        duration = ""
+                        description = ""
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cancel")
+                }
+            }
+
+            // Botón guardar / actualizar
+            Button(
+                onClick = {
+                    val costDouble = cost.toDoubleOrNull() ?: 0.0
+                    if (editingService != null) {
+                        viewModel.updateService(
+                            workerId,
+                            editingService!!.copy(
+                                name = name,
+                                cost = costDouble,
+                                duration = duration,
+                                description = description
+                            )
+                        )
+                    } else {
+                        viewModel.createService(
+                            workerId,
+                            Service(
+                                name = name,
+                                cost = costDouble,
+                                duration = duration,
+                                description = description
+                            )
+                        )
+                    }
+                    editingService = null
+                    name = ""
+                    cost = ""
+                    duration = ""
+                    description = ""
+                },
+                modifier = Modifier.weight(1f),
+                enabled = name.isNotBlank() && cost.isNotBlank()
+            ) {
+                Text(if (editingService != null) "Update" else "Save")
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -108,8 +156,38 @@ fun ServicesScreen(viewModel: ServicesViewModel) {
                 Text("Services: ${state.services.size}", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 state.services.forEach { service ->
-                    Text("- ${service.name} ₡${service.cost} · ${service.duration}")
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(service.name, style = MaterialTheme.typography.bodyLarge)
+                            Text("₡${service.cost} · ${service.duration}")
+                            if (service.description.isNotBlank()) {
+                                Text(service.description, style = MaterialTheme.typography.bodySmall)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                // Editar
+                                OutlinedButton(
+                                    onClick = { editingService = service },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Edit")
+                                }
+                                // Eliminar
+                                Button(
+                                    onClick = { viewModel.deleteService(workerId, service.id) },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.error
+                                    )
+                                ) {
+                                    Text("Delete")
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

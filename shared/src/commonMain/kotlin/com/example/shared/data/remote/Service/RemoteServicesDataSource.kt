@@ -68,4 +68,16 @@ class RemoteServicesDataSource : IRemoteServicesDataSource {
             println("ERROR updateService: ${e.message}")
         }
     }
+
+    override suspend fun deleteService(workerId: String, serviceId: String) {
+        try {
+            db.collection("users")
+                .document(workerId)
+                .collection("services")
+                .document(serviceId)
+                .delete()
+        } catch (e: Exception) {
+            println("ERROR deleteService: ${e.message}")
+        }
+    }
 }
