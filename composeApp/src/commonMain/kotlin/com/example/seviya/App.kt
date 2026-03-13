@@ -1,8 +1,14 @@
 package com.example.seviya
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,11 +26,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,6 +45,7 @@ import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
 import com.example.seviya.UI.WorkerAppointmentDetailScreen
+import com.example.seviya.UI.WorkerDashboardRoute
 import com.example.seviya.UI.WorkersListRoute
 import com.example.seviya.components.ClientBottomBar
 import com.example.seviya.components.ClientTab
@@ -84,24 +91,21 @@ import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.services.ServicesViewModel
+import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
-import compose.icons.tablericons.Bell
 import compose.icons.tablericons.Briefcase
 import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.ChartBar
 import compose.icons.tablericons.Clock
 import compose.icons.tablericons.Dashboard
-import compose.icons.tablericons.Globe
+import compose.icons.tablericons.Logout
 import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
-import compose.icons.tablericons.Search
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
 import org.koin.compose.viewmodel.koinViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import compose.icons.tablericons.Logout
 
 enum class SessionRole {
     GUEST,
@@ -114,6 +118,7 @@ fun App() {
     val navController = rememberNavController()
 
     var sessionRole by rememberSaveable { mutableStateOf(SessionRole.GUEST) }
+    var currentWorkerId by rememberSaveable { mutableStateOf("worker_demo_001") }
 
     var clientMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var workerMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -179,7 +184,7 @@ fun App() {
         }
 
     AppTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.background,
                 bottomBar = {
@@ -283,7 +288,31 @@ fun App() {
                 NavHost(
                     navController = navController,
                     startDestination = Landing,
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = androidx.compose.ui.Modifier.padding(innerPadding),
+                    enterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(320)
+                        ) + fadeIn(animationSpec = tween(260))
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(280)
+                        ) + fadeOut(animationSpec = tween(220))
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween(320)
+                        ) + fadeIn(animationSpec = tween(260))
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween(280)
+                        ) + fadeOut(animationSpec = tween(220))
+                    }
                 ) {
                     composable<Landing> {
                         LandingScreen(
@@ -346,6 +375,7 @@ fun App() {
                             onPickWorker = {
                                 sessionRole = SessionRole.WORKER
                                 currentWorkerTab = WorkerTab.DASHBOARD
+                                currentWorkerId = "worker_demo_001"
                                 navController.navigateSingleTop(WorkerDashboard)
                             }
                         )
@@ -370,6 +400,7 @@ fun App() {
                             onPickWorker = {
                                 sessionRole = SessionRole.WORKER
                                 currentWorkerTab = WorkerTab.DASHBOARD
+                                currentWorkerId = "worker_demo_001"
                                 navController.navigateSingleTop(WorkerDashboard)
                             }
                         )
@@ -572,16 +603,39 @@ fun App() {
                     }
 
                     composable<WorkerDashboard> {
-                        WorkerDashboardPlaceholder(
-                            onBackToLanding = {
-                                sessionRole = SessionRole.GUEST
-                                clientMenuExpanded = false
-                                workerMenuExpanded = false
-                                navController.navigateSingleTop(Landing)
+                        val viewModel: WorkerDashboardViewModel = koinViewModel()
+
+                        WorkerDashboardRoute(
+                            workerId = currentWorkerId,
+                            viewModel = viewModel,
+                            onOpenMessages = {
+                                navController.navigateSingleTop(WorkerMessages)
                             },
-                            onGoToMonthlyCalendar = {
-                                currentWorkerTab = WorkerTab.AGENDA
-                                navController.navigateSingleTop(WorkerAgenda)
+                            onOpenReports = {
+                                navController.navigateSingleTop(WorkerReports)
+                            },
+                            onOpenSchedule = {
+                                navController.navigateSingleTop(WorkerSchedule)
+                            },
+                            onOpenPortfolio = {
+                                navController.navigateSingleTop(WorkerPortfolio)
+                            },
+                            onOpenSettings = {
+                                navController.navigateSingleTop(WorkerSettings)
+                            },
+                            onOpenAppointmentDetail = { booking ->
+                                monthlyCalendarViewModel.selectBooking(booking)
+                                navController.navigateSingleTop(WorkerAppointmentDetail)
+                            },
+                            onStartAppointment = { booking ->
+                                monthlyCalendarViewModel.startAppointment(booking.id)
+                            },
+                            onCompleteAppointment = { booking ->
+                                monthlyCalendarViewModel.completeAppointment(booking.id)
+                            },
+                            onOpenReview = { booking ->
+                                monthlyCalendarViewModel.selectBooking(booking)
+                                navController.navigateSingleTop(WorkerAppointmentDetail)
                             }
                         )
                     }
@@ -718,8 +772,20 @@ fun App() {
 
             AnimatedVisibility(
                 visible = clientMenuExpanded,
-                enter = fadeIn(),
-                exit = fadeOut()
+                enter = slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(220)) + scaleIn(
+                    initialScale = 0.98f,
+                    animationSpec = tween(300)
+                ),
+                exit = slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(260)
+                ) + fadeOut(animationSpec = tween(180)) + scaleOut(
+                    targetScale = 0.98f,
+                    animationSpec = tween(260)
+                )
             ) {
                 FullScreenMenu(
                     title = "Menú cliente",
@@ -740,8 +806,20 @@ fun App() {
 
             AnimatedVisibility(
                 visible = workerMenuExpanded,
-                enter = fadeIn(),
-                exit = fadeOut()
+                enter = slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(220)) + scaleIn(
+                    initialScale = 0.98f,
+                    animationSpec = tween(300)
+                ),
+                exit = slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(260)
+                ) + fadeOut(animationSpec = tween(180)) + scaleOut(
+                    targetScale = 0.98f,
+                    animationSpec = tween(260)
+                )
             ) {
                 FullScreenMenu(
                     title = "Menú trabajador",
@@ -943,11 +1021,11 @@ private fun ClientDashboardPlaceholder(
     onGoToServices: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = Modifier
+            modifier = androidx.compose.ui.Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -961,26 +1039,26 @@ private fun ClientDashboardPlaceholder(
             Text(
                 text = "Pantalla temporal para pruebas del flujo de ingreso.",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+                modifier = androidx.compose.ui.Modifier.padding(top = 12.dp, bottom = 24.dp)
             )
 
             Button(
                 onClick = onGoToCategories,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a categorías")
             }
 
             Button(
                 onClick = onGoToProfessionalProfile,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir al perfil profesional")
             }
 
             Button(
                 onClick = onGoToServices,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a servicios")
             }
@@ -998,11 +1076,11 @@ private fun WorkerDashboardPlaceholder(
     onGoToMonthlyCalendar: () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = Modifier
+            modifier = androidx.compose.ui.Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -1016,12 +1094,12 @@ private fun WorkerDashboardPlaceholder(
             Text(
                 text = "Pantalla temporal para pruebas del flujo de ingreso.",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+                modifier = androidx.compose.ui.Modifier.padding(top = 12.dp, bottom = 24.dp)
             )
 
             Button(
                 onClick = onGoToMonthlyCalendar,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a la agenda")
             }
@@ -1039,11 +1117,11 @@ private fun FeaturePlaceholder(
     subtitle: String
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = Modifier
+            modifier = androidx.compose.ui.Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -1057,7 +1135,7 @@ private fun FeaturePlaceholder(
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 12.dp),
+                modifier = androidx.compose.ui.Modifier.padding(top = 12.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
