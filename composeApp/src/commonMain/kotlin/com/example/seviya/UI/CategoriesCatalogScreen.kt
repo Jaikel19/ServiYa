@@ -1,70 +1,5 @@
 package com.example.seviya.UI
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.shared.domain.entity.Category
-import com.example.shared.presentation.categories.CategoriesUiState
-import com.example.shared.presentation.categories.CategoriesViewModel
-import compose.icons.TablerIcons
-import compose.icons.tablericons.*
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -76,31 +11,103 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.seviya.theme.*
+import com.example.shared.domain.entity.Category
+import com.example.shared.presentation.categories.CategoriesUiState
+import com.example.shared.presentation.categories.CategoriesViewModel
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Adjustments
+import compose.icons.tablericons.Apps
+import compose.icons.tablericons.Bell
+import compose.icons.tablericons.Briefcase
+import compose.icons.tablericons.Brush
+import compose.icons.tablericons.Building
+import compose.icons.tablericons.CalendarEvent
+import compose.icons.tablericons.Camera
+import compose.icons.tablericons.Car
+import compose.icons.tablericons.ChevronLeft
+import compose.icons.tablericons.ChevronRight
+import compose.icons.tablericons.Dashboard
+import compose.icons.tablericons.Droplet
+import compose.icons.tablericons.Globe
+import compose.icons.tablericons.MapPin
+import compose.icons.tablericons.Menu2
+import compose.icons.tablericons.Message
+import compose.icons.tablericons.Paint
+import compose.icons.tablericons.Photo
+import compose.icons.tablericons.Plug
+import compose.icons.tablericons.Scissors
+import compose.icons.tablericons.Search
+import compose.icons.tablericons.Settings
+import compose.icons.tablericons.Tree
+import compose.icons.tablericons.User
 import kotlinx.coroutines.delay
-
-private object CategoriesUI {
-    val Blue = Color(0xFF004AAD)
-    val BlueDark = Color(0xFF022E6F)
-    val BlueSoft = Color(0xFFEAF2FF)
-    val Red = Color(0xFFEF4444)
-
-    val Background = Color(0xFFF6F8FC)
-    val BackgroundTop = Color(0xFFEFF5FF)
-
-    val CardBorder = Color(0xFFE7ECF5)
-    val CardShadow = Color(0x14000000)
-    val Inactive = Color(0xFF97A3B6)
-
-    val TextDark = Color(0xFF14213D)
-    val TextMuted = Color(0xFF6B7280)
-    val SubtitleOnBlue = Color(0xFFD7E3FF)
-}
 
 @Composable
 fun CategoriesCatalogRoute(
@@ -138,6 +145,7 @@ fun CategoriesCatalogRoute(
         onContinueWithSelectedCategory = onContinueWithSelectedCategory
     )
 }
+
 @Composable
 fun CategoriesCatalogScreen(
     uiState: CategoriesUiState,
@@ -159,18 +167,8 @@ fun CategoriesCatalogScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            containerColor = CategoriesUI.Background,
-            contentWindowInsets = WindowInsets.systemBars,
-            bottomBar = {
-                CategoriesBottomBar(
-                    menuActive = menuExpanded.value,
-                    onGoServices = onGoServices,
-                    onGoMap = onGoMap,
-                    onGoSearch = onGoSearch,
-                    onGoAlerts = onGoAlerts,
-                    onGoMenu = { menuExpanded.value = true }
-                )
-            }
+            containerColor = AppBackgroundAlt,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0)
         ) { padding ->
             Box(
                 modifier = Modifier
@@ -178,19 +176,15 @@ fun CategoriesCatalogScreen(
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                CategoriesUI.BackgroundTop,
-                                CategoriesUI.Background
+                                BackgroundTopBlue,
+                                AppBackgroundAlt
                             )
                         )
                     )
                     .padding(padding)
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.fillMaxSize()) {
                         CategoriesHeader()
 
                         val errorMessage = uiState.errorMessage
@@ -202,7 +196,7 @@ fun CategoriesCatalogScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     CircularProgressIndicator(
-                                        color = CategoriesUI.Blue,
+                                        color = BrandBlue,
                                         strokeWidth = 3.5.dp
                                     )
                                 }
@@ -217,15 +211,15 @@ fun CategoriesCatalogScreen(
                                 ) {
                                     Surface(
                                         shape = RoundedCornerShape(24.dp),
-                                        color = Color.White,
-                                        border = BorderStroke(1.dp, CategoriesUI.CardBorder),
+                                        color = White,
+                                        border = BorderStroke(1.dp, BorderSoftAlt),
                                         shadowElevation = 6.dp
                                     ) {
                                         Text(
                                             text = errorMessage,
                                             modifier = Modifier.padding(20.dp),
                                             style = MaterialTheme.typography.bodyLarge,
-                                            color = CategoriesUI.TextDark,
+                                            color = TextBluePrimary,
                                             textAlign = TextAlign.Center
                                         )
                                     }
@@ -333,8 +327,8 @@ private fun ContinueButtonBar(
                 clip = false
             ),
         shape = RoundedCornerShape(24.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, CategoriesUI.CardBorder)
+        color = White,
+        border = BorderStroke(1.dp, BorderSoftAlt)
     ) {
         Button(
             onClick = onClick,
@@ -345,10 +339,10 @@ private fun ContinueButtonBar(
                 .height(56.dp),
             shape = RoundedCornerShape(18.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = CategoriesUI.Blue,
-                disabledContainerColor = CategoriesUI.Inactive.copy(alpha = 0.35f),
-                contentColor = Color.White,
-                disabledContentColor = Color.White.copy(alpha = 0.75f)
+                containerColor = BrandBlue,
+                disabledContainerColor = InactiveSoft.copy(alpha = 0.35f),
+                contentColor = White,
+                disabledContentColor = White.copy(alpha = 0.75f)
             )
         ) {
             Text(
@@ -370,8 +364,8 @@ private fun CategoriesHeader() {
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        CategoriesUI.Blue,
-                        CategoriesUI.BlueDark
+                        BrandBlue,
+                        BrandBlueDeep
                     )
                 )
             )
@@ -402,7 +396,7 @@ private fun CategoriesHeader() {
                     fontSize = 30.sp,
                     lineHeight = 36.sp
                 ),
-                color = Color.White
+                color = White
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -414,15 +408,15 @@ private fun CategoriesHeader() {
                     fontWeight = FontWeight.Medium,
                     lineHeight = 21.sp
                 ),
-                color = CategoriesUI.SubtitleOnBlue
+                color = TextOnBlueSubtitle
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Surface(
                 shape = RoundedCornerShape(18.dp),
-                color = Color.White.copy(alpha = 0.12f),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))
+                color = White.copy(alpha = 0.12f),
+                border = BorderStroke(1.dp, White.copy(alpha = 0.08f))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
@@ -431,7 +425,7 @@ private fun CategoriesHeader() {
                     Icon(
                         imageVector = TablerIcons.Search,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = White,
                         modifier = Modifier.size(18.dp)
                     )
 
@@ -439,7 +433,7 @@ private fun CategoriesHeader() {
 
                     Text(
                         text = "Selecciona una categoría para comenzar",
-                        color = Color.White,
+                        color = White,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold
                         )
@@ -464,13 +458,13 @@ private fun BrandLogo() {
             modifier = Modifier
                 .size(30.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(Color.White.copy(alpha = 0.14f)),
+                .background(White.copy(alpha = 0.14f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = TablerIcons.MapPin,
                 contentDescription = null,
-                tint = Color.White,
+                tint = White,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -481,14 +475,14 @@ private fun BrandLogo() {
             text = buildAnnotatedString {
                 withStyle(
                     SpanStyle(
-                        color = Color.White,
+                        color = White,
                         fontWeight = FontWeight.ExtraBold
                     )
                 ) { append("Servi") }
 
                 withStyle(
                     SpanStyle(
-                        color = CategoriesUI.Red,
+                        color = BrandRed,
                         fontWeight = FontWeight.ExtraBold
                     )
                 ) { append("Ya") }
@@ -535,9 +529,7 @@ private fun DecorativeHeaderBubbles() {
         label = "bubbleBottomOffset"
     )
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -545,7 +537,7 @@ private fun DecorativeHeaderBubbles() {
                 .offset(y = bubbleTopOffset.dp)
                 .size(120.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.06f))
+                .background(White.copy(alpha = 0.06f))
         )
 
         Box(
@@ -555,7 +547,7 @@ private fun DecorativeHeaderBubbles() {
                 .offset(y = bubbleMiddleOffset.dp)
                 .size(72.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.05f))
+                .background(White.copy(alpha = 0.05f))
         )
 
         Box(
@@ -565,7 +557,7 @@ private fun DecorativeHeaderBubbles() {
                 .offset(y = bubbleBottomOffset.dp)
                 .size(90.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.05f))
+                .background(White.copy(alpha = 0.05f))
         )
     }
 }
@@ -597,7 +589,7 @@ private fun HeaderWave(modifier: Modifier = Modifier) {
 
         drawPath(
             path = path,
-            color = CategoriesUI.Background
+            color = AppBackgroundAlt
         )
     }
 }
@@ -676,11 +668,11 @@ private fun CategoryCard(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) visuals.cardTint else Color.White
+            containerColor = if (selected) visuals.cardTint else White
         ),
         border = BorderStroke(
             width = if (selected) 2.dp else 1.dp,
-            color = if (selected) visuals.accent else CategoriesUI.CardBorder
+            color = if (selected) visuals.accent else BorderSoftAlt
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -691,7 +683,7 @@ private fun CategoryCard(
                     Brush.verticalGradient(
                         colors = listOf(
                             visuals.cardTint,
-                            Color.White
+                            White
                         )
                     )
                 )
@@ -778,7 +770,7 @@ private fun CategoryCard(
                             fontSize = 15.sp,
                             lineHeight = 22.sp
                         ),
-                        color = CategoriesUI.TextDark
+                        color = TextBluePrimary
                     )
 
                     Spacer(modifier = Modifier.height(2.dp))
@@ -790,7 +782,7 @@ private fun CategoryCard(
                             fontSize = 12.sp,
                             lineHeight = 17.sp
                         ),
-                        color = CategoriesUI.TextMuted
+                        color = TextSecondary
                     )
                 }
 
@@ -848,7 +840,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFF6F8),
             iconPlateStart = Color(0xFFFFE0E8),
             iconPlateEnd = Color(0xFFFFCFDA),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFD24166),
             buttonBackground = Color(0xFFFFEAF0),
             buttonText = Color(0xFFD24166)
@@ -861,7 +853,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF8F7FF),
             iconPlateStart = Color(0xFFE5E2FF),
             iconPlateEnd = Color(0xFFD8D3FF),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF5C54C7),
             buttonBackground = Color(0xFFEFEDFF),
             buttonText = Color(0xFF5C54C7)
@@ -874,7 +866,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFF7FB),
             iconPlateStart = Color(0xFFF9E1EC),
             iconPlateEnd = Color(0xFFF4CFE0),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFBF4B89),
             buttonBackground = Color(0xFFFDEAF3),
             buttonText = Color(0xFFBF4B89)
@@ -887,7 +879,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFF7F4),
             iconPlateStart = Color(0xFFFFE5DB),
             iconPlateEnd = Color(0xFFFFD3C4),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC15739),
             buttonBackground = Color(0xFFFFEEE7),
             buttonText = Color(0xFFC15739)
@@ -900,7 +892,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF9F7FF),
             iconPlateStart = Color(0xFFEAE5FF),
             iconPlateEnd = Color(0xFFDDD5FF),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF7564D6),
             buttonBackground = Color(0xFFF1EDFF),
             buttonText = Color(0xFF7564D6)
@@ -913,7 +905,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF4FCF7),
             iconPlateStart = Color(0xFFDFF5E6),
             iconPlateEnd = Color(0xFFCDEED9),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF2F8E5A),
             buttonBackground = Color(0xFFEAF7EF),
             buttonText = Color(0xFF2F8E5A)
@@ -926,7 +918,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFBF7FF),
             iconPlateStart = Color(0xFFF0E2FF),
             iconPlateEnd = Color(0xFFE4D0FF),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF8347C8),
             buttonBackground = Color(0xFFF4EBFF),
             buttonText = Color(0xFF8347C8)
@@ -939,7 +931,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF5FAFF),
             iconPlateStart = Color(0xFFE2F0FF),
             iconPlateEnd = Color(0xFFD2E7FF),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF3B78BC),
             buttonBackground = Color(0xFFEBF5FF),
             buttonText = Color(0xFF3B78BC)
@@ -952,7 +944,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFFCF1),
             iconPlateStart = Color(0xFFFFF4C6),
             iconPlateEnd = Color(0xFFFFEAA2),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFB88900),
             buttonBackground = Color(0xFFFFF6D8),
             buttonText = Color(0xFFB88900)
@@ -965,7 +957,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFF7F5),
             iconPlateStart = Color(0xFFFFE5E0),
             iconPlateEnd = Color(0xFFFFD5CE),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC85A4E),
             buttonBackground = Color(0xFFFFEEE9),
             buttonText = Color(0xFFC85A4E)
@@ -978,7 +970,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFF7FB),
             iconPlateStart = Color(0xFFF8E0EC),
             iconPlateEnd = Color(0xFFF3D1E2),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFB24A86),
             buttonBackground = Color(0xFFFBEAF3),
             buttonText = Color(0xFFB24A86)
@@ -991,7 +983,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFFAF5),
             iconPlateStart = Color(0xFFFFECD8),
             iconPlateEnd = Color(0xFFFFDFC0),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC97528),
             buttonBackground = Color(0xFFFFF1E3),
             buttonText = Color(0xFFC97528)
@@ -1004,7 +996,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF6FBFD),
             iconPlateStart = Color(0xFFE4F1F7),
             iconPlateEnd = Color(0xFFD5E8F2),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF4E7691),
             buttonBackground = Color(0xFFEDF6FA),
             buttonText = Color(0xFF4E7691)
@@ -1017,7 +1009,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF3FCFD),
             iconPlateStart = Color(0xFFDFF7FA),
             iconPlateEnd = Color(0xFFCBEFF4),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF248C99),
             buttonBackground = Color(0xFFE9F8FA),
             buttonText = Color(0xFF248C99)
@@ -1030,7 +1022,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF8FDF3),
             iconPlateStart = Color(0xFFE8F5D4),
             iconPlateEnd = Color(0xFFD9EFB8),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF5F8E2F),
             buttonBackground = Color(0xFFF0F7E2),
             buttonText = Color(0xFF5F8E2F)
@@ -1043,7 +1035,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF4FCF7),
             iconPlateStart = Color(0xFFDDF4E6),
             iconPlateEnd = Color(0xFFCDEDD9),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF2F855A),
             buttonBackground = Color(0xFFEAF7EF),
             buttonText = Color(0xFF2F855A)
@@ -1056,7 +1048,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF4FCFB),
             iconPlateStart = Color(0xFFDDF6F3),
             iconPlateEnd = Color(0xFFCDEEE9),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF379A93),
             buttonBackground = Color(0xFFEAF8F6),
             buttonText = Color(0xFF379A93)
@@ -1069,7 +1061,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFF7FB),
             iconPlateStart = Color(0xFFF9E2EC),
             iconPlateEnd = Color(0xFFF3D1E0),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFBF5686),
             buttonBackground = Color(0xFFFDEBF3),
             buttonText = Color(0xFFBF5686)
@@ -1082,7 +1074,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFFFF8F3),
             iconPlateStart = Color(0xFFFFE8D8),
             iconPlateEnd = Color(0xFFFFD9C3),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC9672C),
             buttonBackground = Color(0xFFFFF0E5),
             buttonText = Color(0xFFC9672C)
@@ -1095,7 +1087,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF9F7FF),
             iconPlateStart = Color(0xFFEAE3FF),
             iconPlateEnd = Color(0xFFDDD2FF),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF7852C1),
             buttonBackground = Color(0xFFF1EDFF),
             buttonText = Color(0xFF7852C1)
@@ -1108,7 +1100,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF4FCFA),
             iconPlateStart = Color(0xFFDDF5F0),
             iconPlateEnd = Color(0xFFCAEDE5),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF358C7F),
             buttonBackground = Color(0xFFEAF8F4),
             buttonText = Color(0xFF358C7F)
@@ -1121,7 +1113,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF6F8FF),
             iconPlateStart = Color(0xFFE4E9FF),
             iconPlateEnd = Color(0xFFD5DDFF),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF4968DE),
             buttonBackground = Color(0xFFEDF1FF),
             buttonText = Color(0xFF4968DE)
@@ -1134,7 +1126,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF7F9FC),
             iconPlateStart = Color(0xFFE8EDF5),
             iconPlateEnd = Color(0xFFDCE4F0),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF596780),
             buttonBackground = Color(0xFFEEF2F7),
             buttonText = Color(0xFF596780)
@@ -1147,7 +1139,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF2FCFD),
             iconPlateStart = Color(0xFFDDF7FA),
             iconPlateEnd = Color(0xFFC8EFF4),
-            iconInner = Color.White.copy(alpha = 0.92f),
+            iconInner = White.copy(alpha = 0.92f),
             iconTint = Color(0xFF138A99),
             buttonBackground = Color(0xFFE8F8FA),
             buttonText = Color(0xFF138A99)
@@ -1160,7 +1152,7 @@ private fun categoryVisual(categoryId: String): CategoryVisuals {
             cardTint = Color(0xFFF7F9FC),
             iconPlateStart = Color(0xFFE8EDF5),
             iconPlateEnd = Color(0xFFDCE4F0),
-            iconInner = Color.White.copy(alpha = 0.94f),
+            iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF596780),
             buttonBackground = Color(0xFFEEF2F7),
             buttonText = Color(0xFF596780)
@@ -1187,8 +1179,8 @@ private fun RowScope.BottomItem(
     active: Boolean,
     onClick: () -> Unit
 ) {
-    val color = if (active) CategoriesUI.Blue else Color(0xFF98A2B3)
-    val bg = if (active) Color(0xFFEAF1FB) else Color.Transparent
+    val color = if (active) BrandBlue else InactiveSoft
+    val bg = if (active) NavItemActiveBackground else Color.Transparent
 
     NavigationBarItem(
         selected = active,
@@ -1225,59 +1217,6 @@ private fun RowScope.BottomItem(
 }
 
 @Composable
-private fun CategoriesBottomBar(
-    menuActive: Boolean,
-    onGoServices: () -> Unit,
-    onGoMap: () -> Unit,
-    onGoSearch: () -> Unit,
-    onGoAlerts: () -> Unit,
-    onGoMenu: () -> Unit
-) {
-    NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 10.dp,
-        modifier = Modifier
-            .border(1.dp, Color(0xFFE9EDF2))
-            .windowInsetsPadding(WindowInsets.navigationBars)
-    ) {
-        BottomItem(
-            label = "Servicios",
-            icon = TablerIcons.Apps,
-            active = !menuActive,
-            onClick = onGoServices
-        )
-
-        BottomItem(
-            label = "Mapa",
-            icon = TablerIcons.Globe,
-            active = false,
-            onClick = onGoMap
-        )
-
-        BottomItem(
-            label = "Buscar",
-            icon = TablerIcons.Search,
-            active = false,
-            onClick = onGoSearch
-        )
-
-        BottomItem(
-            label = "Alertas",
-            icon = TablerIcons.Bell,
-            active = false,
-            onClick = onGoAlerts
-        )
-
-        BottomItem(
-            label = "Menú",
-            icon = TablerIcons.Menu2,
-            active = menuActive,
-            onClick = onGoMenu
-        )
-    }
-}
-
-@Composable
 private fun CategoriesFullScreenMenu(
     onDismiss: () -> Unit,
     onGoAgenda: () -> Unit,
@@ -1289,7 +1228,7 @@ private fun CategoriesFullScreenMenu(
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color(0xFFF7F7F8)
+        color = MenuSurface
     ) {
         Column(
             modifier = Modifier
@@ -1300,7 +1239,7 @@ private fun CategoriesFullScreenMenu(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF7F7F8))
+                    .background(MenuSurface)
                     .padding(start = 10.dp, end = 18.dp, top = 10.dp, bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -1314,7 +1253,7 @@ private fun CategoriesFullScreenMenu(
                     Icon(
                         imageVector = TablerIcons.ChevronLeft,
                         contentDescription = null,
-                        tint = CategoriesUI.TextDark,
+                        tint = TextBluePrimary,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -1323,7 +1262,7 @@ private fun CategoriesFullScreenMenu(
 
                 Text(
                     text = "Menú",
-                    color = Color(0xFF1F1F1F),
+                    color = MenuTitle,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 24.sp,
@@ -1335,7 +1274,7 @@ private fun CategoriesFullScreenMenu(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(White)
                     .padding(top = 6.dp, bottom = 20.dp)
             ) {
                 SettingsStyleMenuItem(
@@ -1437,7 +1376,7 @@ private fun SettingsStyleMenuItem(
         ) {
             Text(
                 text = title,
-                color = Color(0xFF202124),
+                color = MenuItemTitle,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Medium,
                     fontSize = 17.sp,
@@ -1449,7 +1388,7 @@ private fun SettingsStyleMenuItem(
 
             Text(
                 text = subtitle,
-                color = Color(0xFF8A8F98),
+                color = MenuItemSubtitle,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
@@ -1467,7 +1406,7 @@ private fun SettingsListDivider() {
             .fillMaxWidth()
             .padding(start = 72.dp, end = 18.dp)
             .height(1.dp)
-            .background(Color(0xFFE9E9EC))
+            .background(MenuDivider)
     )
 }
 

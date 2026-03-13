@@ -16,20 +16,19 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -37,9 +36,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -52,8 +48,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.seviya.theme.*
 import com.example.shared.domain.entity.Booking
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import compose.icons.TablerIcons
@@ -65,24 +61,6 @@ import compose.icons.tablericons.ChevronRight
 import compose.icons.tablericons.Globe
 import compose.icons.tablericons.Menu2
 import compose.icons.tablericons.Search
-import compose.icons.tablericons.Settings
-
-private object AgendaColors {
-    val Blue = Color(0xFF004AAD)
-    val BlueDark = Color(0xFF033B8A)
-    val BlueSoft = Color(0xFFEFF5FF)
-    val BlueChip = Color(0xFFF3F7FF)
-    val BlueLine = Color(0xFF1E5CC6)
-    val BlueText = Color(0xFF0C4AAA)
-
-    val Background = Color(0xFFF4F5F8)
-    val Surface = Color(0xFFFFFFFF)
-    val Border = Color(0xFFDCE2EA)
-    val Muted = Color(0xFF97A3B6)
-    val Text = Color(0xFF1D2433)
-    val Red = Color(0xFFE53935)
-    val White = Color(0xFFFFFFFF)
-}
 
 @Composable
 fun MonthlyCalendarScreen(
@@ -109,7 +87,6 @@ fun MonthlyCalendarScreen(
     val firstDayOffset = getFirstDayOffset(state.currentMonth, state.currentYear)
 
     val selectedDay = state.selectedBooking?.let { extractDayFromDate(it.date) }
-
     val referenceDay = selectedDay ?: state.currentWeekDay
 
     val cells = mutableListOf<Int?>()
@@ -134,22 +111,13 @@ fun MonthlyCalendarScreen(
     }
 
     Scaffold(
-        containerColor = AgendaColors.Background,
-        contentWindowInsets = WindowInsets.systemBars,
-        bottomBar = {
-            AgendaBottomBar(
-                onGoServices = onGoServices,
-                onGoMap = onGoMap,
-                onGoSearch = onGoSearch,
-                onGoAlerts = onGoAlerts,
-                onGoMenu = onGoMenu
-            )
-        }
+        containerColor = Color(0xFFF4F5F8),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AgendaColors.Background)
+                .background(Color(0xFFF4F5F8))
                 .padding(padding)
         ) {
             AgendaHeader(
@@ -174,15 +142,13 @@ fun MonthlyCalendarScreen(
                             text = "$monthName ${state.currentYear}",
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontWeight = FontWeight.ExtraBold,
-                                color = AgendaColors.Text
+                                color = Color(0xFF1D2433)
                             ),
                             modifier = Modifier.weight(1f),
                             maxLines = 2
                         )
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             MonthArrow(
                                 icon = TablerIcons.ChevronLeft,
                                 onClick = { viewModel.goToPreviousMonth() }
@@ -209,7 +175,7 @@ fun MonthlyCalendarScreen(
                 if (state.isLoading) {
                     Text(
                         text = "Cargando citas...",
-                        color = AgendaColors.Muted,
+                        color = InactiveSoft,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
@@ -218,7 +184,7 @@ fun MonthlyCalendarScreen(
                 state.errorMessage?.let { error ->
                     Text(
                         text = "Error: $error",
-                        color = AgendaColors.Red,
+                        color = Color(0xFFE53935),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
@@ -227,12 +193,11 @@ fun MonthlyCalendarScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(26.dp),
-                    colors = CardDefaults.cardColors(containerColor = AgendaColors.Surface),
-                    border = BorderStroke(1.dp, AgendaColors.Border),
+                    colors = CardDefaults.cardColors(containerColor = White),
+                    border = BorderStroke(1.dp, Color(0xFFDCE2EA)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -244,14 +209,14 @@ fun MonthlyCalendarScreen(
                                         .weight(1f)
                                         .border(
                                             width = 0.5.dp,
-                                            color = AgendaColors.Border
+                                            color = Color(0xFFDCE2EA)
                                         )
                                         .padding(vertical = 12.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = day,
-                                        color = if (index == 6) AgendaColors.Red else AgendaColors.Muted,
+                                        color = if (index == 6) Color(0xFFE53935) else InactiveSoft,
                                         style = MaterialTheme.typography.labelLarge.copy(
                                             fontWeight = FontWeight.Bold
                                         )
@@ -298,10 +263,8 @@ fun MonthlyCalendarScreen(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    LegendDot(color = AgendaColors.BlueLine)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    LegendDot(color = Color(0xFF1E5CC6))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "OCUPADO",
@@ -332,7 +295,7 @@ private fun AgendaHeader(
         modifier = Modifier
             .fillMaxWidth()
             .height(126.dp)
-            .background(AgendaColors.Blue)
+            .background(BrandBlue)
     ) {
         Surface(
             modifier = Modifier
@@ -340,8 +303,8 @@ private fun AgendaHeader(
                 .clip(RoundedCornerShape(999.dp))
                 .clickable { onBack() },
             shape = RoundedCornerShape(999.dp),
-            color = Color.White.copy(alpha = 0.13f),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f))
+            color = White.copy(alpha = 0.13f),
+            border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
         ) {
             Box(
                 modifier = Modifier.padding(horizontal = 28.dp, vertical = 18.dp),
@@ -350,12 +313,12 @@ private fun AgendaHeader(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Servi",
-                        color = AgendaColors.White,
+                        color = White,
                         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
                     )
                     Text(
                         text = "Ya",
-                        color = Color(0xFFEF4444),
+                        color = BrandRed,
                         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
                     )
                 }
@@ -367,8 +330,8 @@ private fun AgendaHeader(
                 .align(Alignment.TopEnd)
                 .padding(end = 20.dp, top = 28.dp),
             shape = RoundedCornerShape(999.dp),
-            color = Color.White.copy(alpha = 0.13f),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f))
+            color = White.copy(alpha = 0.13f),
+            border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 22.dp, vertical = 14.dp),
@@ -377,13 +340,13 @@ private fun AgendaHeader(
                 Icon(
                     imageVector = TablerIcons.CalendarEvent,
                     contentDescription = null,
-                    tint = AgendaColors.White,
+                    tint = White,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "AGENDA",
-                    color = AgendaColors.White,
+                    color = White,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold)
                 )
             }
@@ -403,7 +366,7 @@ private fun MonthArrow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = AgendaColors.Muted,
+            tint = InactiveSoft,
             modifier = Modifier.size(16.dp)
         )
     }
@@ -445,14 +408,14 @@ private fun MonthWeekToggle(
 private fun ToggleChip(
     selected: Boolean,
     text: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(if (selected) AgendaColors.Surface else Color.Transparent)
+            .background(if (selected) White else Color.Transparent)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -465,7 +428,7 @@ private fun ToggleChip(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (selected) AgendaColors.BlueText else AgendaColors.Muted,
+            tint = if (selected) Color(0xFF0C4AAA) else InactiveSoft,
             modifier = Modifier.size(18.dp)
         )
 
@@ -473,7 +436,7 @@ private fun ToggleChip(
 
         Text(
             text = text,
-            color = if (selected) AgendaColors.BlueText else AgendaColors.Muted,
+            color = if (selected) Color(0xFF0C4AAA) else InactiveSoft,
             style = MaterialTheme.typography.titleSmall.copy(
                 fontWeight = FontWeight.Bold
             ),
@@ -489,7 +452,7 @@ private fun RowScope.AgendaDayCell(
     isSelected: Boolean,
     onBookingClick: (Booking) -> Unit
 ) {
-    val borderColor = if (isSelected) AgendaColors.BlueLine else AgendaColors.Border
+    val borderColor = if (isSelected) Color(0xFF1E5CC6) else Color(0xFFDCE2EA)
     val borderWidth = if (isSelected) 2.dp else 0.5.dp
 
     Box(
@@ -498,11 +461,11 @@ private fun RowScope.AgendaDayCell(
             .fillMaxHeight()
             .then(
                 if (day == null) {
-                    Modifier.background(AgendaColors.Surface)
+                    Modifier.background(White)
                 } else {
                     Modifier
                         .border(borderWidth, borderColor)
-                        .background(AgendaColors.Surface)
+                        .background(White)
                 }
             )
             .padding(horizontal = 3.dp, vertical = 4.dp)
@@ -511,10 +474,13 @@ private fun RowScope.AgendaDayCell(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
                     Text(
                         text = day.toString(),
-                        color = AgendaColors.Muted,
+                        color = InactiveSoft,
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                     )
                 }
@@ -532,7 +498,7 @@ private fun RowScope.AgendaDayCell(
                 if (bookings.size > 4) {
                     Text(
                         text = "+${bookings.size - 4} más",
-                        color = AgendaColors.BlueText,
+                        color = Color(0xFF0C4AAA),
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(top = 2.dp)
                     )
@@ -554,7 +520,7 @@ private fun AgendaBookingChip(
             .clip(RoundedCornerShape(6.dp))
             .clickable { onClick() },
         shape = RoundedCornerShape(6.dp),
-        color = AgendaColors.BlueChip
+        color = Color(0xFFF3F7FF)
     ) {
         Row(
             modifier = Modifier
@@ -566,14 +532,14 @@ private fun AgendaBookingChip(
                 modifier = Modifier
                     .width(2.dp)
                     .height(14.dp)
-                    .background(AgendaColors.BlueLine)
+                    .background(Color(0xFF1E5CC6))
             )
 
             Spacer(modifier = Modifier.width(5.dp))
 
             Text(
                 text = text,
-                color = AgendaColors.BlueText,
+                color = Color(0xFF0C4AAA),
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
@@ -590,70 +556,6 @@ private fun LegendDot(color: Color) {
             .size(14.dp)
             .clip(CircleShape)
             .background(color)
-    )
-}
-
-@Composable
-private fun AgendaBottomBar(
-    onGoServices: () -> Unit,
-    onGoMap: () -> Unit,
-    onGoSearch: () -> Unit,
-    onGoAlerts: () -> Unit,
-    onGoMenu: () -> Unit
-) {
-    NavigationBar(
-        containerColor = AgendaColors.Surface,
-        tonalElevation = 10.dp,
-        modifier = Modifier
-            .border(1.dp, Color(0xFFE9EDF2))
-            .windowInsetsPadding(WindowInsets.navigationBars)
-    ) {
-        BottomItem("Servicios", TablerIcons.Apps, false, onGoServices)
-        BottomItem("Mapa", TablerIcons.Globe, false, onGoMap)
-        BottomItem("Buscar", TablerIcons.Search, false, onGoSearch)
-        BottomItem("ALERTAS", TablerIcons.Bell, false, onGoAlerts)
-        BottomItem("Menú", TablerIcons.Menu2, true, onGoMenu)
-    }
-}
-
-@Composable
-private fun androidx.compose.foundation.layout.RowScope.BottomItem(
-    label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    active: Boolean,
-    onClick: () -> Unit
-) {
-    val color = if (active) AgendaColors.Blue else Color(0xFF98A2B3)
-
-    NavigationBarItem(
-        selected = active,
-        onClick = onClick,
-        icon = {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(if (active) Color(0xFFE7EDF5) else Color.Transparent)
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = color
-                )
-            }
-        },
-        label = {
-            Text(
-                text = label,
-                color = color,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = if (active) FontWeight.ExtraBold else FontWeight.Medium
-                )
-            )
-        },
-        colors = NavigationBarItemDefaults.colors(
-            indicatorColor = Color.Transparent
-        )
     )
 }
 

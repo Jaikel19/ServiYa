@@ -54,15 +54,7 @@ fun TravelTimeConfigScreen(
 
     Scaffold(
         containerColor = Brand.Bg,
-        bottomBar = {
-            ConfigBottomBar(
-                active = BottomTab.LOGIN,
-                onHome = onGoHome,
-                onServices = onGoServices,
-                onLogin = { /* ya estás aquí */ },
-                onRegister = onGoRegister
-            )
-        }
+
     ) { padding ->
 
         Column(
