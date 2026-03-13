@@ -114,3 +114,15 @@ val StatusCompletedText = BrandBlue
 
 val StatusCancelledBackground = Color(0xFFFCE9E9)
 val StatusCancelledText = BrandRed
+
+//Dashboard
+val VibrantRed = Color(0xFFFF3B30)
+val ActiveChipBackground = Color(0xFFFFE7E3)
+val ActiveChipText = Color(0xFFFF3B30)
+val OnlineGreen = Color(0xFF22C55E)
+val MetricGreen = Color(0xFF16A34A)
+val HeaderBlueGlass = Color(0x1FFFFFFF)
+val HeaderBlueBorder = Color(0x33FFFFFF)
+val SoftRedSurface = Color(0xFFFFF1F0)
+val RingTrack = Color(0xFFE9EEF5)
+val CardBlueDeep = Color(0xFF002D69)
