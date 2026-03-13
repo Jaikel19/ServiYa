@@ -68,4 +68,16 @@ class ServicesViewModel(
             }
         }
     }
+
+    fun deleteService(workerId: String, serviceId: String) {
+        viewModelScope.launch {
+            try {
+                serviceRepository.deleteService(workerId, serviceId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error deleting service"
+                )
+            }
+        }
+    }
 }

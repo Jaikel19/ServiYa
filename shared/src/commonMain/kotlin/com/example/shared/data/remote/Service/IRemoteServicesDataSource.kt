@@ -8,4 +8,5 @@ interface IRemoteServicesDataSource {
     suspend fun getServiceById(workerId: String, serviceId: String): Service?
     suspend fun createService(workerId: String, service: Service): String
     suspend fun updateService(workerId: String, service: Service)
+    suspend fun deleteService(workerId: String, serviceId: String)
 }
