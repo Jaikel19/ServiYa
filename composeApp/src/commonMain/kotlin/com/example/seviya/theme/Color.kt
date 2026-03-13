@@ -99,6 +99,22 @@ val MenuItemTitle = Color(0xFF202124)
 val MenuItemSubtitle = Color(0xFF8A8F98)
 val MenuDivider = Color(0xFFE9E9EC)
 
+// Estados de citas
+val StatusPendingBackground = Color(0xFFFFF1E6)
+val StatusPendingText = Color(0xFFFF8C00)
+
+val StatusConfirmedBackground = Color(0xFFE6F7EC)
+val StatusConfirmedText = Success
+
+val StatusInProgressBackground = Color(0xFFFFF6D6)
+val StatusInProgressText = Warning
+
+val StatusCompletedBackground = Color(0xFFEAF2FF)
+val StatusCompletedText = BrandBlue
+
+val StatusCancelledBackground = Color(0xFFFCE9E9)
+val StatusCancelledText = BrandRed
+
 //Dashboard
 val VibrantRed = Color(0xFFFF3B30)
 val ActiveChipBackground = Color(0xFFFFE7E3)
