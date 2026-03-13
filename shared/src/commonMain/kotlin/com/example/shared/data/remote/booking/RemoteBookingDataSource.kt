@@ -2,6 +2,7 @@ package com.example.shared.data.remote
 
 import com.example.shared.domain.entity.Booking
 import com.example.shared.domain.entity.CancellationPolicy
+import com.example.shared.domain.entity.WorkerProfile
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
@@ -85,6 +86,23 @@ class RemoteBookingDataSource : IRemoteBookingDataSource {
             }
         } catch (e: Exception) {
             println("ERROR getting cancellation policy for worker $workerId: ${e.message}")
+            null
+        }
+    }
+
+    override suspend fun getWorkerProfile(workerId: String): WorkerProfile? {
+        return try {
+            val doc = db.collection("users")
+                .document(workerId)
+                .get()
+
+            if (!doc.exists) {
+                null
+            } else {
+                doc.data<WorkerProfile>().copy(uid = doc.id)
+            }
+        } catch (e: Exception) {
+            println("ERROR getting worker profile for $workerId: ${e.message}")
             null
         }
     }

@@ -21,6 +21,11 @@ import kotlinx.serialization.Serializable
 @Serializable object ClientConfiguration
 @Serializable object ClientSettings
 
+@Serializable
+data class ClientAppointmentDetail(
+    val bookingId: String
+)
+
 // Trabajador
 @Serializable object WorkerDashboard
 @Serializable object WorkerAgenda

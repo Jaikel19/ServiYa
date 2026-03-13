@@ -2,6 +2,7 @@ package com.example.shared.data.remote
 
 import com.example.shared.domain.entity.Booking
 import com.example.shared.domain.entity.CancellationPolicy
+import com.example.shared.domain.entity.WorkerProfile
 import kotlinx.coroutines.flow.Flow
 
 interface IRemoteBookingDataSource {
@@ -10,6 +11,7 @@ interface IRemoteBookingDataSource {
 
     suspend fun getBookingById(bookingId: String): Booking?
     suspend fun getCancellationPolicyByWorkerId(workerId: String): CancellationPolicy?
+    suspend fun getWorkerProfile(workerId: String): WorkerProfile?
 
     suspend fun confirmPayment(bookingId: String)
     suspend fun startAppointment(bookingId: String)

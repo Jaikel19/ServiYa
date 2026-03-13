@@ -85,6 +85,10 @@ import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.services.ServicesViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
+import androidx.compose.runtime.LaunchedEffect
+import com.example.seviya.UI.ClientAppointmentDetailScreen
+import com.example.seviya.navigation.ClientAppointmentDetail
+import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Bell
@@ -511,6 +515,51 @@ fun App() {
                             onGoToServices = {
                                 sessionRole = SessionRole.GUEST
                                 navController.navigateSingleTop(Services)
+                            },
+                            onGoToClientAppointmentDetail = {
+                                navController.navigate(
+                                    ClientAppointmentDetail(bookingId = "appointment_demo_002")
+                                )
+                            }
+                        )
+                    }
+
+                    composable<ClientAppointmentDetail> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ClientAppointmentDetail>()
+                        val viewModel: ClientAppointmentDetailViewModel = koinViewModel()
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(route.bookingId) {
+                            viewModel.loadBookingDetail(route.bookingId)
+                        }
+
+                        ClientAppointmentDetailScreen(
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onCancelAppointment = {
+                                viewModel.cancelAppointmentByClient()
+                            },
+                            onChatClick = { },
+                            onReviewClick = { },
+                            onGoServices = {
+                                currentClientTab = ClientTab.SERVICES
+                                navController.navigateSingleTop(CategoriesCatalog)
+                            },
+                            onGoMap = {
+                                currentClientTab = ClientTab.MAP
+                                navController.navigateSingleTop(ClientMap)
+                            },
+                            onGoSearch = {
+                                currentClientTab = ClientTab.SEARCH
+                                navController.navigateSingleTop(ClientSearch)
+                            },
+                            onGoAlerts = {
+                                currentClientTab = ClientTab.ALERTS
+                                navController.navigateSingleTop(ClientAlerts)
+                            },
+                            onGoMenu = {
+                                clientMenuExpanded = true
+                                workerMenuExpanded = false
                             }
                         )
                     }
@@ -940,7 +989,8 @@ private fun ClientDashboardPlaceholder(
     onGoToProfessionalProfile: () -> Unit,
     onBackToLanding: () -> Unit,
     onGoToCategories: () -> Unit,
-    onGoToServices: () -> Unit
+    onGoToServices: () -> Unit,
+    onGoToClientAppointmentDetail: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -983,6 +1033,13 @@ private fun ClientDashboardPlaceholder(
                 modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a servicios")
+            }
+
+            Button(
+                onClick = onGoToClientAppointmentDetail,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Text("Ir a detalle de cita cliente")
             }
 
             Button(onClick = onBackToLanding) {

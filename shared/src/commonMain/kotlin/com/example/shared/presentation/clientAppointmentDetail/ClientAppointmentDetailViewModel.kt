@@ -33,9 +33,13 @@ class ClientAppointmentDetailViewModel(
                 val cancellationPolicy =
                     bookingRepository.getCancellationPolicyByWorkerId(booking.workerId)
 
+                val worker =
+                    bookingRepository.getWorkerProfile(booking.workerId)
+
                 _uiState.value = ClientAppointmentDetailUiState(
                     isLoading = false,
                     booking = booking,
+                    worker = worker,
                     cancellationPolicy = cancellationPolicy,
                     errorMessage = null
                 )
