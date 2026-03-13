@@ -48,27 +48,16 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
+import com.example.seviya.theme.*
 
 // ✅ Tabler Icons (compose-icons)
 import compose.icons.TablerIcons
 import compose.icons.tablericons.*
 
-private object LandingColors {
-    val Primary = Color(0xFF004AAD)
-    val PrimaryDark = Color(0xFF033B8A)
-    val Secondary = Color(0xFFEF4444)
-    val Accent = Color(0xFFFBBF24)
-
-    val TextOnBlue = Color(0xFFE6F0FF)
-    val SurfaceSoft = Color(0xFFF6F7FB)
-    val CardBorder = Color(0xFFEAEAF2)
-    val Muted = Color(0xFF6B7280)
-}
-
 private val HERO_WAVE_H = 92.dp
 private val FOOTER_WAVE_H = 92.dp
-private val HERO_EXTRA_BOTTOM = 16.dp      // ✅ header más largo para que no se corten cards
-private val FOOTER_EXTRA_BOTTOM = 16.dp     // ✅ footer más largo
+private val HERO_EXTRA_BOTTOM = 16.dp
+private val FOOTER_EXTRA_BOTTOM = 16.dp
 
 @Immutable
 private data class MissionCategory(
@@ -88,14 +77,8 @@ fun LandingScreen(
     val layoutDirection = LocalLayoutDirection.current
 
     Scaffold(
-        bottomBar = {
-            LandingBottomBar(
-                onHome = { /* ya estás en Inicio */ },
-                onLogin = onLogin,
-                onRegister = onRegister
-            )
-        },
-        containerColor = Color.White
+        containerColor = White,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         val bottomSafe = padding.calculateBottomPadding()
 
@@ -103,7 +86,6 @@ fun LandingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    top = padding.calculateTopPadding(),
                     start = padding.calculateStartPadding(layoutDirection),
                     end = padding.calculateEndPadding(layoutDirection),
                     bottom = 0.dp
@@ -188,7 +170,7 @@ private fun AnimatedSection(
     ) { content() }
 }
 
-/* ----------------------------- EFECTOS (SHIMMER / BOUNCE / GLOW) ----------------------------- */
+/* ----------------------------- EFECTOS ----------------------------- */
 
 private fun Modifier.shimmerOverlay(alpha: Float = 0.18f, durationMs: Int = 1600): Modifier = composed {
     val inf = rememberInfiniteTransition(label = "shimmer")
@@ -211,7 +193,7 @@ private fun Modifier.shimmerOverlay(alpha: Float = 0.18f, durationMs: Int = 1600
         val brush = Brush.linearGradient(
             colors = listOf(
                 Color.Transparent,
-                Color.White.copy(alpha = alpha),
+                White.copy(alpha = alpha),
                 Color.Transparent
             ),
             start = Offset(startX, 0f),
@@ -248,7 +230,6 @@ private fun HeaderHero(
 ) {
     val inf = rememberInfiniteTransition(label = "hero_inf")
 
-    // ✅ Gradiente animado (se mueve)
     val gradT by inf.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -259,7 +240,6 @@ private fun HeaderHero(
         label = "gradT"
     )
 
-    // ✅ Glows pulsantes
     val glowA by inf.animateFloat(
         initialValue = 0.10f,
         targetValue = 0.18f,
@@ -273,7 +253,6 @@ private fun HeaderHero(
         label = "glowB"
     )
 
-    // ✅ Float/parallax para el contenido (muy suave)
     val floatY by inf.animateFloat(
         initialValue = 0f,
         targetValue = 10f,
@@ -282,7 +261,7 @@ private fun HeaderHero(
     )
 
     val headerBrush = Brush.linearGradient(
-        colors = listOf(LandingColors.Primary, LandingColors.PrimaryDark),
+        colors = listOf(BrandBlue, BrandBlueAlt),
         start = Offset(0f, 0f),
         end = Offset(900f + 400f * gradT, 1300f - 250f * gradT)
     )
@@ -292,7 +271,6 @@ private fun HeaderHero(
             .fillMaxWidth()
             .background(headerBrush)
     ) {
-        // ✅ Contenido con padding; bottom amplio para que NO se corte nada
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -303,7 +281,6 @@ private fun HeaderHero(
 
             Spacer(Modifier.height(18.dp))
 
-            // ✅ pill con micro “breathing”
             val pillPulse by inf.animateFloat(
                 initialValue = 0.10f,
                 targetValue = 0.16f,
@@ -317,9 +294,9 @@ private fun HeaderHero(
             AnimatedSection(140) {
                 Text(
                     text = buildAnnotatedString {
-                        withStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Black)) { append("¡Encontrá al ") }
-                        withStyle(SpanStyle(color = LandingColors.Secondary, fontWeight = FontWeight.Black)) { append("experto ideal") }
-                        withStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Black)) { append(" para cualquier tarea!") }
+                        withStyle(SpanStyle(color = White, fontWeight = FontWeight.Black)) { append("¡Encontrá al ") }
+                        withStyle(SpanStyle(color = BrandRed, fontWeight = FontWeight.Black)) { append("experto ideal") }
+                        withStyle(SpanStyle(color = White, fontWeight = FontWeight.Black)) { append(" para cualquier tarea!") }
                     },
                     style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black)
                 )
@@ -330,7 +307,7 @@ private fun HeaderHero(
             AnimatedSection(200) {
                 Text(
                     text = "Desde belleza hasta tecnología, conectamos profesionales contigo en segundos.",
-                    color = LandingColors.TextOnBlue.copy(alpha = 0.92f),
+                    color = TextOnBlueSoft.copy(alpha = 0.92f),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
                 )
             }
@@ -355,32 +332,29 @@ private fun HeaderHero(
 
             Spacer(Modifier.height(18.dp))
 
-            // ✅ cards flotando (más alto)
             AnimatedSection(400) { FloatingCardsMock(extraFloat = floatY) }
         }
 
-        // ✅ OLA full width + más alta + highlight suave
         WaveDivider(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .height(HERO_WAVE_H),
-            color = Color.White,
+            color = White,
             invert = false
         )
 
-        // ✅ glows animados
         Box(
             modifier = Modifier
                 .size(220.dp)
                 .offset(x = 170.dp, y = (-46).dp)
-                .background(LandingColors.Secondary.copy(alpha = glowA), CircleShape)
+                .background(BrandRed.copy(alpha = glowA), CircleShape)
         )
         Box(
             modifier = Modifier
                 .size(300.dp)
                 .offset(x = (-170).dp, y = 240.dp)
-                .background(Color(0xFF67A8FF).copy(alpha = glowB), CircleShape)
+                .background(SkyBlue.copy(alpha = glowB), CircleShape)
         )
     }
 }
@@ -394,8 +368,8 @@ private fun TopBrandRow() {
     ) {
         Text(
             text = buildAnnotatedString {
-                withStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Black)) { append("Servi") }
-                withStyle(SpanStyle(color = LandingColors.Secondary, fontWeight = FontWeight.Black)) { append("Ya") }
+                withStyle(SpanStyle(color = White, fontWeight = FontWeight.Black)) { append("Servi") }
+                withStyle(SpanStyle(color = BrandRed, fontWeight = FontWeight.Black)) { append("Ya") }
             },
             style = MaterialTheme.typography.headlineSmall
         )
@@ -406,7 +380,7 @@ private fun TopBrandRow() {
                     .height(6.dp)
                     .width(28.dp)
                     .clip(RoundedCornerShape(99.dp))
-                    .background(LandingColors.Secondary)
+                    .background(BrandRed)
             )
             Spacer(Modifier.width(6.dp))
             DotPill()
@@ -422,7 +396,7 @@ private fun DotPill() {
         modifier = Modifier
             .size(6.dp)
             .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.25f))
+            .background(White.copy(alpha = 0.25f))
     )
 }
 
@@ -431,8 +405,8 @@ private fun MissionPill(text: String, bgAlpha: Float = 0.12f) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(Color.White.copy(alpha = bgAlpha))
-            .border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(999.dp))
+            .background(White.copy(alpha = bgAlpha))
+            .border(1.dp, White.copy(alpha = 0.18f), RoundedCornerShape(999.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -440,25 +414,25 @@ private fun MissionPill(text: String, bgAlpha: Float = 0.12f) {
             modifier = Modifier
                 .size(8.dp)
                 .clip(CircleShape)
-                .background(LandingColors.Accent)
+                .background(AccentYellow)
         )
         Spacer(Modifier.width(10.dp))
         Text(
             text = text,
-            color = Color.White,
+            color = White,
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraBold)
         )
     }
 }
 
-/* ----------------------------- BUTTONS (shimmer + bounce) ----------------------------- */
+/* ----------------------------- BUTTONS ----------------------------- */
 
 @Composable
 private fun PrimaryCTAButton(text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(22.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = LandingColors.Secondary),
+        colors = ButtonDefaults.buttonColors(containerColor = BrandRed),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp, pressedElevation = 2.dp),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 14.dp),
         modifier = Modifier
@@ -466,9 +440,8 @@ private fun PrimaryCTAButton(text: String, onClick: () -> Unit) {
             .height(56.dp)
             .clip(RoundedCornerShape(22.dp))
             .shimmerOverlay(alpha = 0.22f, durationMs = 1500)
-            .bouncyClick(onClick) // ✅ bounce al presionar
+            .bouncyClick(onClick)
     ) {
-        // ✅ Texto centrado y chevron a la derecha
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = text,
@@ -482,7 +455,7 @@ private fun PrimaryCTAButton(text: String, onClick: () -> Unit) {
             Icon(
                 imageVector = TablerIcons.ChevronRight,
                 contentDescription = null,
-                tint = Color.White,
+                tint = White,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
@@ -494,10 +467,10 @@ private fun SecondaryCTAButton(text: String, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(22.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.28f)),
+        border = BorderStroke(1.dp, White.copy(alpha = 0.28f)),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White.copy(alpha = 0.06f),
-            contentColor = Color.White
+            containerColor = White.copy(alpha = 0.06f),
+            contentColor = White
         ),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
         modifier = Modifier
@@ -509,7 +482,7 @@ private fun SecondaryCTAButton(text: String, onClick: () -> Unit) {
     }
 }
 
-/* ----------------------------- MOCK CARDS (FLOAT + SHINE) ----------------------------- */
+/* ----------------------------- MOCK CARDS ----------------------------- */
 
 @Composable
 private fun FloatingCardsMock(extraFloat: Float = 0f) {
@@ -530,7 +503,7 @@ private fun FloatingCardsMock(extraFloat: Float = 0f) {
                 .size(width = 150.dp, height = 190.dp)
                 .offset(x = (-90).dp, y = (-24).dp - (a + extraFloat * 0.35f).dp),
             icon = TablerIcons.ShieldLock,
-            iconTint = Color(0xFFBBD7FF)
+            iconTint = SkyBlueSoft
         )
 
         GlassCard(
@@ -538,7 +511,7 @@ private fun FloatingCardsMock(extraFloat: Float = 0f) {
                 .size(width = 150.dp, height = 190.dp)
                 .offset(x = 90.dp, y = (2).dp + (b + extraFloat * 0.25f).dp),
             icon = TablerIcons.Star,
-            iconTint = LandingColors.Accent
+            iconTint = AccentYellow
         )
 
         GlassCardMain(
@@ -554,15 +527,15 @@ private fun GlassCard(modifier: Modifier, icon: ImageVector, iconTint: Color) {
     Card(
         modifier = modifier.clip(RoundedCornerShape(26.dp)).shimmerOverlay(alpha = 0.10f, durationMs = 2200),
         shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.10f)),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f))
+        colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.10f)),
+        border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
     ) {
         Column(Modifier.fillMaxSize().padding(14.dp)) {
             Box(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color.White.copy(alpha = 0.10f)),
+                    .background(White.copy(alpha = 0.10f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(icon, null, tint = iconTint, modifier = Modifier.size(22.dp))
@@ -573,7 +546,7 @@ private fun GlassCard(modifier: Modifier, icon: ImageVector, iconTint: Color) {
                     .height(6.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(99.dp))
-                    .background(Color.White.copy(alpha = 0.12f))
+                    .background(White.copy(alpha = 0.12f))
             )
             Spacer(Modifier.height(10.dp))
             Box(
@@ -581,7 +554,7 @@ private fun GlassCard(modifier: Modifier, icon: ImageVector, iconTint: Color) {
                     .height(5.dp)
                     .fillMaxWidth(0.75f)
                     .clip(RoundedCornerShape(99.dp))
-                    .background(Color.White.copy(alpha = 0.08f))
+                    .background(White.copy(alpha = 0.08f))
             )
         }
     }
@@ -592,18 +565,18 @@ private fun GlassCardMain(modifier: Modifier) {
     Card(
         modifier = modifier.clip(RoundedCornerShape(28.dp)).shimmerOverlay(alpha = 0.10f, durationMs = 2400),
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.12f)),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.20f))
+        colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.12f)),
+        border = BorderStroke(1.dp, White.copy(alpha = 0.20f))
     ) {
         Column(Modifier.fillMaxSize().padding(16.dp)) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(LandingColors.Secondary.copy(alpha = 0.18f)),
+                    .background(BrandRed.copy(alpha = 0.18f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(TablerIcons.Check, null, tint = LandingColors.Secondary, modifier = Modifier.size(24.dp))
+                Icon(TablerIcons.Check, null, tint = BrandRed, modifier = Modifier.size(24.dp))
             }
 
             Spacer(Modifier.height(14.dp))
@@ -613,14 +586,14 @@ private fun GlassCardMain(modifier: Modifier) {
                     .height(8.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(99.dp))
-                    .background(Color.White.copy(alpha = 0.12f))
+                    .background(White.copy(alpha = 0.12f))
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(0.65f)
                         .clip(RoundedCornerShape(99.dp))
-                        .background(LandingColors.Secondary)
+                        .background(BrandRed)
                 )
             }
 
@@ -631,7 +604,7 @@ private fun GlassCardMain(modifier: Modifier) {
                     .height(6.dp)
                     .fillMaxWidth(0.70f)
                     .clip(RoundedCornerShape(99.dp))
-                    .background(Color.White.copy(alpha = 0.10f))
+                    .background(White.copy(alpha = 0.10f))
             )
             Spacer(Modifier.height(8.dp))
             Box(
@@ -639,7 +612,7 @@ private fun GlassCardMain(modifier: Modifier) {
                     .height(6.dp)
                     .fillMaxWidth(0.50f)
                     .clip(RoundedCornerShape(99.dp))
-                    .background(Color.White.copy(alpha = 0.08f))
+                    .background(White.copy(alpha = 0.08f))
             )
 
             Spacer(Modifier.weight(1f))
@@ -648,7 +621,7 @@ private fun GlassCardMain(modifier: Modifier) {
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 10.dp)
-                    .border(1.dp, Color.White.copy(alpha = 0.10f), RoundedCornerShape(14.dp))
+                    .border(1.dp, White.copy(alpha = 0.10f), RoundedCornerShape(14.dp))
                     .padding(horizontal = 10.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -658,7 +631,7 @@ private fun GlassCardMain(modifier: Modifier) {
                         Modifier
                             .size(18.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF6EA8FF).copy(alpha = 0.35f))
+                            .background(SkyBlue.copy(alpha = 0.35f))
                     )
                     Spacer(Modifier.width(8.dp))
                     Box(
@@ -666,17 +639,17 @@ private fun GlassCardMain(modifier: Modifier) {
                             .height(4.dp)
                             .width(50.dp)
                             .clip(RoundedCornerShape(99.dp))
-                            .background(Color.White.copy(alpha = 0.20f))
+                            .background(White.copy(alpha = 0.20f))
                     )
                 }
 
-                Icon(TablerIcons.Star, null, tint = LandingColors.Accent, modifier = Modifier.size(18.dp))
+                Icon(TablerIcons.Star, null, tint = AccentYellow, modifier = Modifier.size(18.dp))
             }
         }
     }
 }
 
-/* ----------------------------- SERVICES (bounce cards + underline anim) ----------------------------- */
+/* ----------------------------- SERVICES ----------------------------- */
 
 @Composable
 private fun MissionsSection(
@@ -686,7 +659,7 @@ private fun MissionsSection(
     val categories = listOf(
         MissionCategory("Belleza", TablerIcons.Scissors, Color(0xFFE91E63), Color(0xFFFFE4EE)),
         MissionCategory("Hogar", TablerIcons.Home2, Color(0xFFFF9800), Color(0xFFFFE9D6)),
-        MissionCategory("Tecnología", TablerIcons.Command, Color(0xFF3B82F6), Color(0xFFDDEBFF)),
+        MissionCategory("Tecnología", TablerIcons.Command, AccentBlue, Color(0xFFDDEBFF)),
         MissionCategory("Cocina", TablerIcons.Tools, Color(0xFF22C55E), Color(0xFFDFF7E8)),
     )
 
@@ -695,7 +668,7 @@ private fun MissionsSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(White)
             .padding(horizontal = 20.dp)
             .padding(top = 18.dp, bottom = 18.dp)
     ) {
@@ -706,7 +679,7 @@ private fun MissionsSection(
         ) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(TablerIcons.Apps, null, tint = LandingColors.Secondary, modifier = Modifier.size(18.dp))
+                    Icon(TablerIcons.Apps, null, tint = BrandRed, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = "Nuestros\nservicios",
@@ -722,7 +695,7 @@ private fun MissionsSection(
                         .height(4.dp)
                         .width((54f * underline.alpha).coerceAtLeast(4f).dp)
                         .clip(RoundedCornerShape(99.dp))
-                        .background(LandingColors.Secondary)
+                        .background(BrandRed)
                 )
             }
 
@@ -736,8 +709,8 @@ private fun MissionsSection(
                     )
                 },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = LandingColors.Secondary.copy(alpha = 0.10f),
-                    labelColor = LandingColors.Secondary
+                    containerColor = BrandRed.copy(alpha = 0.10f),
+                    labelColor = BrandRed
                 ),
                 border = null
             )
@@ -769,8 +742,8 @@ private fun RowScope.CategoryCard(category: MissionCategory, onClick: () -> Unit
         Card(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(22.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            border = BorderStroke(1.dp, LandingColors.CardBorder),
+            colors = CardDefaults.cardColors(containerColor = White),
+            border = BorderStroke(1.dp, CardBorderLight),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
@@ -792,21 +765,21 @@ private fun RowScope.CategoryCard(category: MissionCategory, onClick: () -> Unit
                     text = category.title,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraBold),
-                    color = Color(0xFF3B3B46)
+                    color = NeutralTextStrong
                 )
             }
         }
     }
 }
 
-/* ----------------------------- HOW IT WORKS (tiles colores Amarillo/Rojo/Azul + anim) ----------------------------- */
+/* ----------------------------- HOW IT WORKS ----------------------------- */
 
 @Composable
 private fun HowItWorksSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LandingColors.SurfaceSoft)
+            .background(AppBackgroundAlt)
             .padding(horizontal = 20.dp)
             .padding(top = 26.dp, bottom = 26.dp)
     ) {
@@ -817,7 +790,7 @@ private fun HowItWorksSection() {
             style = MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.Black,
                 letterSpacing = 2.sp,
-                color = LandingColors.Secondary
+                color = BrandRed
             )
         )
         Spacer(Modifier.height(6.dp))
@@ -839,25 +812,25 @@ private fun HowItWorksSection() {
                     .padding(start = 26.dp, top = 10.dp, bottom = 10.dp)
                     .width(4.dp)
                     .fillMaxHeight()
-                    .dashedLine(color = Color(0xFFE1E4EF), strokeWidth = 4.dp, onLeft = true)
+                    .dashedLine(color = DividerLight, strokeWidth = 4.dp, onLeft = true)
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 StepCard(
                     icon = TablerIcons.Search,
-                    iconBg = LandingColors.Accent, // ✅ Amarillo
+                    iconBg = AccentYellow,
                     title = "Busca tu servicio",
                     desc = "Navega entre cientos de categorías y encuentra lo que necesitas."
                 )
                 StepCard(
                     icon = TablerIcons.Message,
-                    iconBg = LandingColors.Secondary, // ✅ Rojo
+                    iconBg = BrandRed,
                     title = "Elegí al experto",
                     desc = "Mira calificaciones, trabajos previos y chatea con el profesional."
                 )
                 StepCard(
                     icon = TablerIcons.CalendarEvent,
-                    iconBg = LandingColors.Primary, // ✅ Azul
+                    iconBg = BrandBlue,
                     title = "¡Listo!",
                     desc = "Agenda la cita y pagá de forma segura a través de nuestra App."
                 )
@@ -886,7 +859,7 @@ private fun StepCard(
             .fillMaxWidth()
             .bouncyClick { },
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -898,7 +871,7 @@ private fun StepCard(
                     .graphicsLayer { scaleX = pulse; scaleY = pulse },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, tint = Color.White, modifier = Modifier.size(22.dp))
+                Icon(icon, null, tint = White, modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.width(14.dp))
             Column {
@@ -907,7 +880,7 @@ private fun StepCard(
                 Text(
                     desc,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = LandingColors.Muted,
+                        color = TextSecondaryAlt,
                         fontWeight = FontWeight.Medium
                     )
                 )
@@ -923,20 +896,20 @@ private fun AboutSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(White)
             .padding(horizontal = 20.dp)
             .padding(top = 22.dp, bottom = 26.dp)
     ) {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(14.dp))
-                .background(LandingColors.Secondary.copy(alpha = 0.10f))
-                .border(1.dp, LandingColors.Secondary.copy(alpha = 0.20f), RoundedCornerShape(14.dp))
+                .background(BrandRed.copy(alpha = 0.10f))
+                .border(1.dp, BrandRed.copy(alpha = 0.20f), RoundedCornerShape(14.dp))
                 .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
             Text(
                 text = "Sobre nosotros",
-                color = LandingColors.Secondary,
+                color = BrandRed,
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold)
             )
         }
@@ -946,7 +919,7 @@ private fun AboutSection() {
         Text(
             text = "ServiYa nació con el propósito de conectar personas con talento con quienes necesitan soluciones prácticas en su día a día. Somos una plataforma moderna que une la oferta y la demanda local.",
             style = MaterialTheme.typography.bodyLarge.copy(
-                color = Color(0xFF475569),
+                color = NeutralText,
                 lineHeight = 24.sp
             )
         )
@@ -965,18 +938,18 @@ private fun MissionCard() {
             .clip(RoundedCornerShape(26.dp))
             .shimmerOverlay(alpha = 0.10f, durationMs = 2600),
         shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(containerColor = LandingColors.Primary),
+        colors = CardDefaults.cardColors(containerColor = BrandBlue),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(TablerIcons.Rocket, null, tint = LandingColors.Secondary, modifier = Modifier.size(22.dp))
+                Icon(TablerIcons.Rocket, null, tint = BrandRed, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(10.dp))
                 Text(
                     "Nuestra misión",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Black,
-                        color = Color.White
+                        color = White
                     )
                 )
             }
@@ -986,7 +959,7 @@ private fun MissionCard() {
             Text(
                 text = "Hacer tu vida más fácil, apoyando al mismo tiempo a emprendedores locales a crecer y destacar en su comunidad.",
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color(0xFFD7E7FF),
+                    color = BlueTextSoft,
                     fontWeight = FontWeight.Medium
                 )
             )
@@ -994,7 +967,7 @@ private fun MissionCard() {
     }
 }
 
-/* ----------------------------- FOOTER (más largo + shimmer) ----------------------------- */
+/* ----------------------------- FOOTER ----------------------------- */
 
 @Composable
 private fun FooterCTA(bottomSafeSpace: Dp) {
@@ -1008,23 +981,21 @@ private fun FooterCTA(bottomSafeSpace: Dp) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LandingColors.Primary)
+            .background(BrandBlue)
     ) {
-        // ola full width
         WaveDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(FOOTER_WAVE_H),
-            color = Color.White,
+            color = White,
             invert = true
         )
 
-        // glow suave detrás
         Box(
             modifier = Modifier
                 .size(260.dp)
                 .offset(x = (-150).dp, y = 120.dp)
-                .background(Color.White.copy(alpha = footerGlow), CircleShape)
+                .background(White.copy(alpha = footerGlow), CircleShape)
         )
 
         Column(
@@ -1037,7 +1008,7 @@ private fun FooterCTA(bottomSafeSpace: Dp) {
                 text = "¿Listo para empezar?",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Black,
-                    color = Color.White
+                    color = White
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -1047,7 +1018,7 @@ private fun FooterCTA(bottomSafeSpace: Dp) {
 
             Text(
                 text = "Únete a miles de personas que ya están confiando en los expertos de ServiYa.",
-                color = Color(0xFFCFE2FF).copy(alpha = 0.9f),
+                color = FooterBlueSoft.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                 modifier = Modifier.fillMaxWidth()
@@ -1070,8 +1041,8 @@ private fun FooterCTA(bottomSafeSpace: Dp) {
 
             Text(
                 text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Black)) { append("Servi") }
-                    withStyle(SpanStyle(color = LandingColors.Secondary, fontWeight = FontWeight.Black)) { append("Ya") }
+                    withStyle(SpanStyle(color = White, fontWeight = FontWeight.Black)) { append("Servi") }
+                    withStyle(SpanStyle(color = BrandRed, fontWeight = FontWeight.Black)) { append("Ya") }
                 },
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
@@ -1082,7 +1053,7 @@ private fun FooterCTA(bottomSafeSpace: Dp) {
 
             Text(
                 text = "© 2024 ServiYa App. Made for professionals.",
-                color = Color(0xFFCFE2FF).copy(alpha = 0.35f),
+                color = FooterBlueSoft.copy(alpha = 0.35f),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
@@ -1102,50 +1073,13 @@ private fun FooterIconButton(icon: ImageVector) {
         modifier = Modifier
             .size(52.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(Color.White.copy(alpha = 0.10f))
-            .border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(18.dp))
+            .background(White.copy(alpha = 0.10f))
+            .border(1.dp, White.copy(alpha = 0.18f), RoundedCornerShape(18.dp))
             .shimmerOverlay(alpha = 0.14f, durationMs = 2200),
         contentAlignment = Alignment.Center
     ) {
-        Icon(icon, null, tint = Color.White, modifier = Modifier.size(20.dp))
+        Icon(icon, null, tint = White, modifier = Modifier.size(20.dp))
     }
-}
-
-/* ----------------------------- BOTTOM BAR ----------------------------- */
-
-@Composable
-private fun LandingBottomBar(
-    onHome: () -> Unit,
-    onLogin: () -> Unit,
-    onRegister: () -> Unit
-) {
-    NavigationBar(
-        containerColor = Color.White.copy(alpha = 0.92f),
-        tonalElevation = 10.dp,
-        modifier = Modifier.border(1.dp, LandingColors.CardBorder)
-    ) {
-        BottomItem("INICIO", TablerIcons.Home, true, LandingColors.Primary, onHome)
-        BottomItem("INGRESAR", TablerIcons.Login, false, LandingColors.Primary, onLogin)
-        BottomItem("REGISTRAR", TablerIcons.UserPlus, false, LandingColors.Secondary, onRegister)
-    }
-}
-
-@Composable
-private fun RowScope.BottomItem(
-    label: String,
-    icon: ImageVector,
-    active: Boolean,
-    activeColor: Color,
-    onClick: () -> Unit
-) {
-    val color = if (active) activeColor else Color(0xFF94A3B8)
-    NavigationBarItem(
-        selected = active,
-        onClick = onClick,
-        icon = { Icon(icon, null, tint = color) },
-        label = { Text(label, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = color) },
-        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
-    )
 }
 
 /* ----------------------------- WAVES + HELPERS ----------------------------- */
@@ -1178,10 +1112,9 @@ private fun WaveDivider(
             }
             drawPath(path, color = color)
 
-            // ✅ highlight suave (efecto más pro)
             drawPath(
                 path = path,
-                color = Color.White.copy(alpha = 0.20f),
+                color = White.copy(alpha = 0.20f),
                 style = Stroke(width = 6f)
             )
         }
