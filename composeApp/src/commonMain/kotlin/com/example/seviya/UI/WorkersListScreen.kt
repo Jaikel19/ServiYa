@@ -5,22 +5,39 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,28 +52,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.seviya.theme.*
 import com.example.shared.domain.entity.WorkerListItemData
 import com.example.shared.presentation.workersList.WorkersListUiState
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import compose.icons.TablerIcons
-import compose.icons.tablericons.*
+import compose.icons.tablericons.MapPin
+import compose.icons.tablericons.Moon
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlin.math.round
-
-private object WorkersListColors {
-    val BrandBlue = Color(0xFF004AAD)
-    val BrandBlueDark = Color(0xFF083C8B)
-    val Surface = Color(0xFFF6F8FC)
-    val White = Color(0xFFFFFFFF)
-    val Border = Color(0xFFE8EDF5)
-    val TextPrimary = Color(0xFF111827)
-    val TextSecondary = Color(0xFF6B7280)
-    val Inactive = Color(0xFF98A2B3)
-    val Red = Color(0xFFEF4444)
-    val YellowBg = Color(0xFFFFF5D7)
-    val YellowText = Color(0xFFB7791F)
-}
 
 private enum class WorkerListSort {
     ALL,
@@ -161,21 +166,13 @@ fun WorkersListScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = WorkersListColors.BrandBlue,
-        bottomBar = {
-            WorkersListBottomBar(
-                onServices = onBottomServices,
-                onMap = onBottomMap,
-                onSearch = onBottomSearch,
-                onNotifications = onBottomNotifications,
-                onMenu = onBottomMenu
-            )
-        }
+        containerColor = BrandBlue,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(WorkersListColors.BrandBlue)
+                .background(BrandBlue)
                 .padding(innerPadding)
         ) {
             WorkersHeader(
@@ -187,7 +184,7 @@ fun WorkersListScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .offset(y = (-18).dp),
-                color = WorkersListColors.Surface,
+                color = AppBackgroundAlt,
                 shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -204,7 +201,7 @@ fun WorkersListScreen(
                             ) {
                                 Text(
                                     text = "Cargando trabajadores...",
-                                    color = WorkersListColors.TextSecondary,
+                                    color = TextSecondary,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -220,7 +217,7 @@ fun WorkersListScreen(
                             ) {
                                 Text(
                                     text = state.errorMessage ?: "Ocurrió un error.",
-                                    color = WorkersListColors.Red,
+                                    color = BrandRed,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -236,7 +233,7 @@ fun WorkersListScreen(
                             ) {
                                 Text(
                                     text = "No hay trabajadores disponibles para esta categoría.",
-                                    color = WorkersListColors.TextSecondary,
+                                    color = TextSecondary,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -301,10 +298,10 @@ private fun WorkersHeader(
                 modifier = Modifier
                     .size(52.dp)
                     .clip(RoundedCornerShape(18.dp))
-                    .background(Color.White.copy(alpha = 0.12f))
+                    .background(White.copy(alpha = 0.12f))
                     .border(
                         width = 1.dp,
-                        color = Color.White.copy(alpha = 0.16f),
+                        color = White.copy(alpha = 0.16f),
                         shape = RoundedCornerShape(18.dp)
                     )
                     .clickable(onClick = onThemeClick),
@@ -313,7 +310,7 @@ private fun WorkersHeader(
                 Icon(
                     imageVector = TablerIcons.Moon,
                     contentDescription = "Tema",
-                    tint = Color.White,
+                    tint = White,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -323,7 +320,7 @@ private fun WorkersHeader(
 
         Text(
             text = "Profesionales Disponibles",
-            color = Color.White,
+            color = White,
             fontSize = 24.sp,
             lineHeight = 30.sp,
             fontWeight = FontWeight.ExtraBold
@@ -333,7 +330,7 @@ private fun WorkersHeader(
 
         Text(
             text = subtitle,
-            color = Color.White.copy(alpha = 0.82f),
+            color = White.copy(alpha = 0.82f),
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium
         )
@@ -343,7 +340,7 @@ private fun WorkersHeader(
 @Composable
 private fun ServiYaPill() {
     Surface(
-        color = Color.White,
+        color = White,
         shape = RoundedCornerShape(14.dp),
         shadowElevation = 4.dp
     ) {
@@ -351,14 +348,14 @@ private fun ServiYaPill() {
             text = buildAnnotatedString {
                 withStyle(
                     SpanStyle(
-                        color = WorkersListColors.BrandBlue,
+                        color = BrandBlue,
                         fontWeight = FontWeight.ExtraBold
                     )
                 ) { append("SERVI") }
 
                 withStyle(
                     SpanStyle(
-                        color = WorkersListColors.Red,
+                        color = BrandRed,
                         fontWeight = FontWeight.ExtraBold
                     )
                 ) { append("YA") }
@@ -413,7 +410,7 @@ private fun SortChip(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(999.dp),
-        color = if (selected) WorkersListColors.BrandBlue else Color(0xFFF1F4F8),
+        color = if (selected) BrandBlue else SoftSurface,
         border = if (selected) null else androidx.compose.foundation.BorderStroke(
             1.dp,
             Color(0xFFE2E8F0)
@@ -423,7 +420,7 @@ private fun SortChip(
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
-            color = if (selected) Color.White else Color(0xFF5B6577),
+            color = if (selected) White else Color(0xFF5B6577),
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold
         )
@@ -445,7 +442,7 @@ private fun WorkerGridCard(
             .clickable(onClick = onClick)
             .shadow(4.dp, RoundedCornerShape(18.dp), clip = false),
         shape = RoundedCornerShape(18.dp),
-        color = Color.White,
+        color = White,
         border = androidx.compose.foundation.BorderStroke(
             1.dp,
             Color(0xFFE4ECF7)
@@ -467,7 +464,7 @@ private fun WorkerGridCard(
 
             Text(
                 text = worker.name.ifBlank { "Profesional" },
-                color = WorkersListColors.TextPrimary,
+                color = TextPrimaryAlt,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.ExtraBold,
                 maxLines = 2,
@@ -506,7 +503,7 @@ private fun WorkerProvinceInline(
         Icon(
             imageVector = TablerIcons.MapPin,
             contentDescription = null,
-            tint = WorkersListColors.Inactive,
+            tint = Inactive,
             modifier = Modifier.size(14.dp)
         )
 
@@ -514,7 +511,7 @@ private fun WorkerProvinceInline(
 
         Text(
             text = province,
-            color = WorkersListColors.TextSecondary,
+            color = TextSecondary,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
@@ -536,10 +533,10 @@ private fun WorkerCircularPhoto(
             modifier = Modifier
                 .size(96.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(White)
                 .border(
                     width = 4.dp,
-                    color = Color(0xFFBFD6FF),
+                    color = BorderBlueLight,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -548,7 +545,7 @@ private fun WorkerCircularPhoto(
                 modifier = Modifier
                     .size(86.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF3F6FA)),
+                    .background(ImageBlueSoftAlt),
                 contentAlignment = Alignment.Center
             ) {
                 when {
@@ -624,7 +621,7 @@ private fun WorkerRatingInline(
 
         Text(
             text = if (reviewCount != null) "$ratingText ($reviewCount)" else ratingText,
-            color = WorkersListColors.TextSecondary,
+            color = TextSecondary,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -639,7 +636,7 @@ private fun WorkerPriceText(
 
     Text(
         text = "Desde $text",
-        color = Color(0xFF004AAD),
+        color = BrandBlue,
         fontSize = 13.sp,
         fontWeight = FontWeight.ExtraBold
     )
@@ -709,7 +706,7 @@ private fun categoryBadge(name: String): CategoryBadgePalette {
         else -> CategoryBadgePalette(
             background = Color(0xFFF8FAFC),
             border = Color(0xFFE2E8F0),
-            text = Color(0xFF475569)
+            text = NeutralText
         )
     }
 }
@@ -720,118 +717,5 @@ private fun formatPrice(value: Double): String {
         "₡${rounded.toInt()}"
     } else {
         "₡$rounded"
-    }
-}
-
-@Composable
-private fun WorkersListBottomBar(
-    onServices: () -> Unit,
-    onMap: () -> Unit,
-    onSearch: () -> Unit,
-    onNotifications: () -> Unit,
-    onMenu: () -> Unit
-) {
-    Surface(
-        color = Color.White,
-        tonalElevation = 8.dp,
-        shadowElevation = 8.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column {
-            Divider(color = Color(0xFFE8ECF2), thickness = 1.dp)
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BottomNavItem(
-                    label = "Servicios",
-                    selected = true,
-                    onClick = onServices,
-                    icon = TablerIcons.Apps
-                )
-
-                BottomNavItem(
-                    label = "Mapa",
-                    selected = false,
-                    onClick = onMap,
-                    icon = TablerIcons.MapPin
-                )
-
-                BottomNavItem(
-                    label = "Buscar",
-                    selected = false,
-                    onClick = onSearch,
-                    icon = TablerIcons.Search
-                )
-
-                BottomNavItem(
-                    label = "Notif.",
-                    selected = false,
-                    onClick = onNotifications,
-                    icon = TablerIcons.Bell,
-                    showDot = true
-                )
-
-                BottomNavItem(
-                    label = "Menú",
-                    selected = false,
-                    onClick = onMenu,
-                    icon = TablerIcons.User
-                )
-            }
-
-            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    showDot: Boolean = false
-) {
-    Column(
-        modifier = Modifier
-            .width(64.dp)
-            .clickable(onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = if (selected) WorkersListColors.BrandBlue else WorkersListColors.Inactive,
-                modifier = Modifier.size(24.dp)
-            )
-
-            if (showDot) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 3.dp, y = (-2).dp)
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(WorkersListColors.Red)
-                        .border(2.dp, Color.White, CircleShape)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = label,
-            color = if (selected) WorkersListColors.BrandBlue else WorkersListColors.Inactive,
-            fontSize = 11.sp,
-            fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Bold,
-            maxLines = 1
-        )
     }
 }

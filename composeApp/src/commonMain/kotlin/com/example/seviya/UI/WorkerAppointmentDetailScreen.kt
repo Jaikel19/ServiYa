@@ -24,56 +24,32 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.seviya.theme.*
 import com.example.shared.domain.entity.Booking
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
-import compose.icons.tablericons.Bell
 import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.DotsVertical
-import compose.icons.tablericons.Globe
 import compose.icons.tablericons.MapPin
-import compose.icons.tablericons.Menu2
-import compose.icons.tablericons.Search
 import compose.icons.tablericons.Tool
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
-
-private object DetailColors {
-    val Blue = Color(0xFF0A4DB3)
-    val BlueDark = Color(0xFF083A86)
-    val BlueSoft = Color(0xFFEAF2FF)
-    val BlueBorder = Color(0xFFC9DAF8)
-
-    val Background = Color(0xFFF3F5F8)
-    val Surface = Color(0xFFFFFFFF)
-    val Border = Color(0xFFE4E8EF)
-
-    val Text = Color(0xFF18233A)
-    val Muted = Color(0xFF8A97AB)
-    val GreenSoft = Color(0xFFE4F7EC)
-    val GreenText = Color(0xFF18A55B)
-
-    val RedSoft = Color(0xFFFCE9E9)
-    val RedText = Color(0xFFE54848)
-}
 
 @Composable
 fun WorkerAppointmentDetailScreen(
@@ -95,22 +71,13 @@ fun WorkerAppointmentDetailScreen(
     val uriHandler = LocalUriHandler.current
 
     Scaffold(
-        containerColor = DetailColors.Background,
-        contentWindowInsets = WindowInsets.statusBars,
-        bottomBar = {
-            DetailBottomBar(
-                onGoServices = onGoServices,
-                onGoMap = onGoMap,
-                onGoSearch = onGoSearch,
-                onGoAlerts = onGoAlerts,
-                onGoMenu = onGoMenu
-            )
-        }
+        containerColor = Color(0xFFF3F5F8),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DetailColors.Background)
+                .background(Color(0xFFF3F5F8))
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -135,7 +102,7 @@ fun WorkerAppointmentDetailScreen(
                             Text(
                                 text = booking.services.firstOrNull()?.name ?: "Servicio",
                                 style = MaterialTheme.typography.headlineMedium.copy(
-                                    color = DetailColors.Text,
+                                    color = Color(0xFF18233A),
                                     fontWeight = FontWeight.ExtraBold
                                 )
                             )
@@ -168,8 +135,8 @@ fun WorkerAppointmentDetailScreen(
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(22.dp),
-                        color = Color(0xFFF1F4F8),
-                        border = BorderStroke(1.dp, DetailColors.Border)
+                        color = SoftSurface,
+                        border = BorderStroke(1.dp, Color(0xFFE4E8EF))
                     ) {
                         Row(
                             modifier = Modifier
@@ -181,7 +148,7 @@ fun WorkerAppointmentDetailScreen(
                                 modifier = Modifier
                                     .size(42.dp)
                                     .background(
-                                        color = DetailColors.Blue,
+                                        color = Color(0xFF0A4DB3),
                                         shape = CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
@@ -189,7 +156,7 @@ fun WorkerAppointmentDetailScreen(
                                 Icon(
                                     imageVector = TablerIcons.MapPin,
                                     contentDescription = null,
-                                    tint = Color.White
+                                    tint = White
                                 )
                             }
 
@@ -200,13 +167,13 @@ fun WorkerAppointmentDetailScreen(
                                     text = "${booking.location.alias}, ${booking.location.province}",
                                     style = MaterialTheme.typography.titleLarge.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = DetailColors.Text
+                                        color = Color(0xFF18233A)
                                     )
                                 )
                                 Text(
                                     text = "${booking.location.district} • ${booking.location.reference}",
                                     style = MaterialTheme.typography.bodyLarge.copy(
-                                        color = DetailColors.Muted
+                                        color = Color(0xFF8A97AB)
                                     )
                                 )
                             }
@@ -254,16 +221,16 @@ fun WorkerAppointmentDetailScreen(
                             Text(
                                 text = "Comprobante enviado",
                                 style = MaterialTheme.typography.bodyLarge.copy(
-                                    color = DetailColors.Text
+                                    color = Color(0xFF18233A)
                                 )
                             )
 
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
                                 color = if (isPaymentVerified(booking))
-                                    DetailColors.GreenSoft
+                                    Color(0xFFE4F7EC)
                                 else
-                                    DetailColors.RedSoft
+                                    Color(0xFFFCE9E9)
                             ) {
                                 Text(
                                     text = if (isPaymentVerified(booking))
@@ -271,9 +238,9 @@ fun WorkerAppointmentDetailScreen(
                                     else
                                         "PENDIENTE",
                                     color = if (isPaymentVerified(booking))
-                                        DetailColors.GreenText
+                                        Color(0xFF18A55B)
                                     else
-                                        DetailColors.RedText,
+                                        Color(0xFFE54848),
                                     style = MaterialTheme.typography.labelLarge.copy(
                                         fontWeight = FontWeight.Bold
                                     ),
@@ -288,7 +255,7 @@ fun WorkerAppointmentDetailScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(22.dp),
                             color = Color(0xFFF8FAFD),
-                            border = BorderStroke(1.dp, DetailColors.Border)
+                            border = BorderStroke(1.dp, Color(0xFFE4E8EF))
                         ) {
                             Column(
                                 modifier = Modifier
@@ -311,7 +278,7 @@ fun WorkerAppointmentDetailScreen(
                                         onClick = onVerifyPayment,
                                         modifier = Modifier.fillMaxWidth(),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = DetailColors.Blue
+                                            containerColor = Color(0xFF0A4DB3)
                                         ),
                                         shape = RoundedCornerShape(18.dp)
                                     ) {
@@ -366,7 +333,7 @@ private fun DetailHeader(
         modifier = Modifier
             .fillMaxWidth()
             .height(170.dp)
-            .background(DetailColors.Blue)
+            .background(Color(0xFF0A4DB3))
             .windowInsetsPadding(WindowInsets.statusBars)
     ) {
         Row(
@@ -387,14 +354,14 @@ private fun DetailHeader(
             ) {
                 Text(
                     text = "Guía Pre-Servicio",
-                    color = Color.White,
+                    color = White,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.ExtraBold
                     )
                 )
                 Text(
                     text = "PREPARACIÓN DETALLADA",
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = White.copy(alpha = 0.85f),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     )
@@ -411,14 +378,14 @@ private fun DetailHeader(
 
 @Composable
 private fun CircleIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(54.dp)
             .background(
-                color = Color.White.copy(alpha = 0.18f),
+                color = White.copy(alpha = 0.18f),
                 shape = CircleShape
             )
             .clickable { onClick() },
@@ -427,7 +394,7 @@ private fun CircleIconButton(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color.White
+            tint = White
         )
     }
 }
@@ -442,8 +409,8 @@ private fun StepCard(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, DetailColors.Border),
+            color = White,
+            border = BorderStroke(1.dp, Color(0xFFE4E8EF)),
             shadowElevation = 2.dp
         ) {
             Column(
@@ -457,7 +424,7 @@ private fun StepCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        color = DetailColors.Blue,
+                        color = Color(0xFF0A4DB3),
                         fontWeight = FontWeight.ExtraBold
                     )
                 )
@@ -473,13 +440,13 @@ private fun StepCard(
                 .padding(start = 6.dp, top = 4.dp)
                 .size(34.dp),
             shape = CircleShape,
-            color = DetailColors.Blue,
+            color = Color(0xFF0A4DB3),
             shadowElevation = 4.dp
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
                     text = step,
-                    color = Color.White,
+                    color = White,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -491,13 +458,11 @@ private fun StepCard(
 
 @Composable
 private fun StatusChip(status: String) {
-
     val text: String
     val background: Color
     val textColor: Color
 
     when (status.lowercase()) {
-
         "payment_pending" -> {
             text = "PAGO PENDIENTE"
             background = Color(0xFFFFF1E6)
@@ -531,7 +496,7 @@ private fun StatusChip(status: String) {
         else -> {
             text = status.uppercase()
             background = Color(0xFFEDEFF3)
-            textColor = Color(0xFF6B7280)
+            textColor = TextSecondaryAlt
         }
     }
 
@@ -554,7 +519,7 @@ private fun StatusChip(status: String) {
 private fun DetailInfoRow(
     label: String,
     value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector
+    icon: ImageVector
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -569,7 +534,7 @@ private fun DetailInfoRow(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = DetailColors.Muted,
+                    tint = Color(0xFF8A97AB),
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -581,14 +546,14 @@ private fun DetailInfoRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    color = DetailColors.Muted,
+                    color = Color(0xFF8A97AB),
                     fontWeight = FontWeight.Bold
                 )
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleLarge.copy(
-                    color = DetailColors.Text,
+                    color = Color(0xFF18233A),
                     fontWeight = FontWeight.ExtraBold
                 )
             )
@@ -607,14 +572,14 @@ private fun RouteButton(
             .height(128.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
-        color = DetailColors.BlueSoft,
-        border = BorderStroke(1.dp, DetailColors.BlueBorder)
+        color = SoftBlueSurface,
+        border = BorderStroke(1.dp, Color(0xFFC9DAF8))
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    color = DetailColors.Blue,
+                    color = Color(0xFF0A4DB3),
                     fontWeight = FontWeight.ExtraBold
                 )
             )
@@ -632,66 +597,11 @@ private fun PrimaryActionButton(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = DetailColors.Blue
+            containerColor = Color(0xFF0A4DB3)
         )
     ) {
         Text(text)
     }
-}
-
-@Composable
-private fun DetailBottomBar(
-    onGoServices: () -> Unit,
-    onGoMap: () -> Unit,
-    onGoSearch: () -> Unit,
-    onGoAlerts: () -> Unit,
-    onGoMenu: () -> Unit
-) {
-    NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 10.dp,
-        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)
-    ) {
-        DetailBottomItem("Servicios", TablerIcons.Tool, false, onGoServices)
-        DetailBottomItem("Mapa", TablerIcons.Globe, false, onGoMap)
-        DetailBottomItem("Buscar", TablerIcons.Search, false, onGoSearch)
-        DetailBottomItem("Alertas", TablerIcons.Bell, false, onGoAlerts)
-        DetailBottomItem("Menú", TablerIcons.Menu2, true, onGoMenu)
-    }
-}
-
-@Composable
-private fun androidx.compose.foundation.layout.RowScope.DetailBottomItem(
-    label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    active: Boolean,
-    onClick: () -> Unit
-) {
-    val color = if (active) DetailColors.Blue else DetailColors.Muted
-
-    NavigationBarItem(
-        selected = active,
-        onClick = onClick,
-        icon = {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = color
-            )
-        },
-        label = {
-            Text(
-                text = label,
-                color = color,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = if (active) FontWeight.ExtraBold else FontWeight.Medium
-                )
-            )
-        },
-        colors = NavigationBarItemDefaults.colors(
-            indicatorColor = Color.Transparent
-        )
-    )
 }
 
 private fun canShowPaymentReceipt(booking: Booking): Boolean {
