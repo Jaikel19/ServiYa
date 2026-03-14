@@ -94,6 +94,7 @@ import com.example.shared.presentation.services.ServicesViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import com.example.seviya.UI.ClientAppointmentDetailScreen
 import com.example.seviya.navigation.ClientAppointmentDetail
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
@@ -110,6 +111,8 @@ import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
 import org.koin.compose.viewmodel.koinViewModel
+import com.example.seviya.UI.ClientDashboardRoute
+import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 
 enum class SessionRole {
     GUEST,
@@ -123,6 +126,7 @@ fun App() {
 
     var sessionRole by rememberSaveable { mutableStateOf(SessionRole.GUEST) }
     var currentWorkerId by rememberSaveable { mutableStateOf("worker_demo_001") }
+    var currentClientId by rememberSaveable { mutableStateOf("client_demo_001") }
 
     var clientMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var workerMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -373,6 +377,7 @@ fun App() {
                             onGoRegister = { },
                             onPickClient = {
                                 sessionRole = SessionRole.CLIENT
+                                currentClientId = "client_demo_001"
                                 currentClientTab = ClientTab.SERVICES
                                 navController.navigateSingleTop(CategoriesCatalog)
                             },
@@ -398,6 +403,7 @@ fun App() {
                             },
                             onPickClient = {
                                 sessionRole = SessionRole.CLIENT
+                                currentClientId = "client_demo_001"
                                 currentClientTab = ClientTab.SERVICES
                                 navController.navigateSingleTop(ClientDashboard)
                             },
@@ -527,30 +533,42 @@ fun App() {
                     }
 
                     composable<ClientDashboard> {
-                        ClientDashboardPlaceholder(
-                            onBackToLanding = {
-                                sessionRole = SessionRole.GUEST
-                                clientMenuExpanded = false
-                                workerMenuExpanded = false
-                                navController.navigateSingleTop(Landing)
-                            },
-                            onGoToProfessionalProfile = {
+                        val viewModel: ClientDashboardViewModel = koinViewModel()
+
+                        ClientDashboardRoute(
+                            clientId = currentClientId,
+                            viewModel = viewModel,
+                            onOpenAppointmentDetail = { bookingId ->
                                 navController.navigate(
-                                    ProfessionalProfile(workerId = "worker_demo_001")
+                                    ClientAppointmentDetail(bookingId = bookingId)
                                 )
                             },
-                            onGoToCategories = {
+                            onOpenAgenda = {
+                                navController.navigateSingleTop(ClientAgenda)
+                            },
+                            onOpenMessages = {
+                                navController.navigateSingleTop(ClientMessages)
+                            },
+                            onOpenProfile = {
+                                navController.navigateSingleTop(ClientProfile)
+                            },
+                            onOpenLocations = {
+                                currentClientTab = ClientTab.MAP
+                                navController.navigateSingleTop(ClientMap)
+                            },
+                            onOpenReports = {
+                                navController.navigateSingleTop(ClientConfiguration)
+                            },
+                            onOpenRequests = {
+                                navController.navigateSingleTop(ClientConfiguration)
+                            },
+                            onOpenCategories = {
                                 currentClientTab = ClientTab.SERVICES
                                 navController.navigateSingleTop(CategoriesCatalog)
                             },
-                            onGoToServices = {
-                                sessionRole = SessionRole.GUEST
-                                navController.navigateSingleTop(Services)
-                            },
-                            onGoToClientAppointmentDetail = {
-                                navController.navigate(
-                                    ClientAppointmentDetail(bookingId = "appointment_demo_002")
-                                )
+                            onOpenMenu = {
+                                clientMenuExpanded = true
+                                workerMenuExpanded = false
                             }
                         )
                     }

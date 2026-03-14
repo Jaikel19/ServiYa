@@ -126,3 +126,16 @@ val HeaderBlueBorder = Color(0x33FFFFFF)
 val SoftRedSurface = Color(0xFFFFF1F0)
 val RingTrack = Color(0xFFE9EEF5)
 val CardBlueDeep = Color(0xFF002D69)
+
+val HeaderWaveBlue = Color(0xFF2B67C8)
+val MetricGreenSoft = Color(0xFFEAF7EE)
+val SoftAmberSurface = Color(0xFFFFF8E8)
+
+// Client Dashboard
+val ClientHeroCardBackground = Color(0xFFF7F9FE)
+val ClientQuickActionSurface = Color(0xFFEAF1FB)
+val ClientQuickActionBorder = Color(0xFFDDE7F8)
+val ClientSectionCardBorder = Color(0xFFEDF1F7)
+val ClientMutedDot = Color(0xFFC8D0DC)
+val ClientSoftBlueRow = Color(0xFFF2F7FF)
+val ClientSoftBlueRowBorder = Color(0xFFDDE8FA)
