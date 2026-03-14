@@ -1,5 +1,6 @@
 package com.example.shared.data.remote.professionalProfile
 
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.CancellationPolicy
 import com.example.shared.domain.entity.PortfolioItem
 import com.example.shared.domain.entity.WorkerProfile
@@ -18,4 +19,5 @@ interface IRemoteProfessionalProfileDataSource {
     suspend fun getWorkerPortfolios(workerId: String): List<PortfolioItem>
 
     suspend fun getWorkerReviews(workerId: String): List<WorkerReviewItem>
+    suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>>
 }

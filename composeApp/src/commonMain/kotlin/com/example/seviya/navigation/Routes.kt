@@ -26,6 +26,9 @@ data class ClientAppointmentDetail(
     val bookingId: String
 )
 
+@Serializable
+object RequestAppointment
+
 // Trabajador
 @Serializable object WorkerDashboard
 @Serializable object WorkerAgenda

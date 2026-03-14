@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
     id("com.google.gms.google-services")
-    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -67,6 +67,7 @@ kotlin {
             implementation(projects.shared)
 
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
             implementation(libs.compose.material)
             implementation(libs.composeIcons.tabler)
             implementation(libs.compose.animation)

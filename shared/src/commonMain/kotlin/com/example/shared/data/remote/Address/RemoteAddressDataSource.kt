@@ -10,45 +10,53 @@ class RemoteAddressDataSource : IRemoteAddressDataSource {
 
     private val db = Firebase.firestore
 
-    // GET ALL (realtime)
+    private val usersCollection = "users"
+    private val addressesSubcollection = "addresses"
+
     override suspend fun getAddressesByUser(userId: String): Flow<List<Address>> {
-        return db.collection("users")
+        return db.collection(usersCollection)
             .document(userId)
-            .collection("addresses")
+            .collection(addressesSubcollection)
             .snapshots
             .map { snapshot ->
-                snapshot.documents.map { doc ->
+                snapshot.documents.mapNotNull { doc ->
                     try {
                         doc.data<Address>().copy(id = doc.id)
                     } catch (e: Exception) {
-                        Address(id = doc.id)
+                        println("ERROR parsing address ${doc.id}: ${e.message}")
+                        null
                     }
                 }
             }
     }
 
-    // GET ONE
     override suspend fun getAddressById(userId: String, addressId: String): Address? {
         return try {
-            val doc = db.collection("users")
+            val doc = db.collection(usersCollection)
                 .document(userId)
-                .collection("addresses")
+                .collection(addressesSubcollection)
                 .document(addressId)
                 .get()
-            if (doc.exists) doc.data<Address>().copy(id = doc.id) else null
+
+            if (doc.exists) {
+                doc.data<Address>().copy(id = doc.id)
+            } else {
+                null
+            }
         } catch (e: Exception) {
             println("ERROR getAddressById: ${e.message}")
             null
         }
     }
 
-    // CREATE
     override suspend fun createAddress(userId: String, address: Address): String {
         return try {
-            val ref = db.collection("users")
+            val ref = db.collection(usersCollection)
                 .document(userId)
-                .collection("addresses")
-                .add(address)
+                .collection(addressesSubcollection)
+                .add(address.copy(id = ""))
+
+            ref.set(address.copy(id = ref.id))
             ref.id
         } catch (e: Exception) {
             println("ERROR createAddress: ${e.message}")
@@ -56,12 +64,11 @@ class RemoteAddressDataSource : IRemoteAddressDataSource {
         }
     }
 
-    // UPDATE
     override suspend fun updateAddress(userId: String, address: Address) {
         try {
-            db.collection("users")
+            db.collection(usersCollection)
                 .document(userId)
-                .collection("addresses")
+                .collection(addressesSubcollection)
                 .document(address.id)
                 .set(address)
         } catch (e: Exception) {
@@ -69,12 +76,11 @@ class RemoteAddressDataSource : IRemoteAddressDataSource {
         }
     }
 
-    // DELETE
     override suspend fun deleteAddress(userId: String, addressId: String) {
         try {
-            db.collection("users")
+            db.collection(usersCollection)
                 .document(userId)
-                .collection("addresses")
+                .collection(addressesSubcollection)
                 .document(addressId)
                 .delete()
         } catch (e: Exception) {

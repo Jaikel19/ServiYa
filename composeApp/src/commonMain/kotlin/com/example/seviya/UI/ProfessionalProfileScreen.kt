@@ -75,6 +75,7 @@ import kotlin.time.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import com.example.shared.domain.entity.Appointment
 
 private enum class ProfileTab {
     INFO, SERVICES, REVIEWS, PORTFOLIO
@@ -84,13 +85,15 @@ private enum class ReviewFilterType {
     ALL, FIVE, FOUR, THREE
 }
 
+private val COSTA_RICA_TIME_ZONE = TimeZone.of("America/Costa_Rica")
+
 @Composable
 fun ProfessionalProfileRoute(
     workerId: String,
     viewModel: ProfessionalProfileViewModel,
     avatarPainter: Painter? = null,
     onBack: () -> Unit = {},
-    onProcessAppointment: (List<Service>) -> Unit = {},
+    onProcessAppointment: (ProfessionalProfileData, List<Service>, List<com.example.shared.domain.entity.Appointment>) -> Unit = { _, _, _ -> },
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
     onBottomSearch: () -> Unit = {},
@@ -122,7 +125,7 @@ fun ProfessionalProfileScreen(
     avatarPainter: Painter? = null,
     state: ProfessionalProfileUiState,
     onBack: () -> Unit = {},
-    onProcessAppointment: (List<Service>) -> Unit = {},
+    onProcessAppointment: (ProfessionalProfileData, List<Service>, List<Appointment>) -> Unit = { _, _, _ -> },
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
     onBottomSearch: () -> Unit = {},
@@ -141,7 +144,9 @@ fun ProfessionalProfileScreen(
     val selectedServicesTotal = selectedServices.fold(0.0) { acc, service -> acc + service.cost }
 
     val showProcessAppointmentButton =
-        selectedTab == ProfileTab.SERVICES && selectedServices.isNotEmpty()
+        selectedTab == ProfileTab.SERVICES &&
+                selectedServices.isNotEmpty() &&
+                profile != null
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -289,11 +294,11 @@ fun ProfessionalProfileScreen(
                             }
                         }
 
-                        if (showProcessAppointmentButton) {
+                        if (showProcessAppointmentButton && profile != null) {
                             ProcessAppointmentBar(
                                 selectedCount = selectedServicesCount,
                                 total = selectedServicesTotal,
-                                onClick = { onProcessAppointment(selectedServices) },
+                                onClick = { onProcessAppointment(profile, selectedServices, state.workerAppointments) },
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .padding(horizontal = 20.dp, vertical = 16.dp)

@@ -6,6 +6,7 @@ import com.example.shared.domain.entity.ProfessionalProfileData
 import com.example.shared.domain.entity.WorkerSchedule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import com.example.shared.domain.entity.Appointment
 
 class ProfessionalProfileRepository(
     private val remoteProfile: IRemoteProfessionalProfileDataSource,
@@ -48,5 +49,9 @@ class ProfessionalProfileRepository(
                 reviews = reviews
             )
         }
+    }
+
+    override suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>> {
+        return remoteProfile.getWorkerAppointments(workerId)
     }
 }
