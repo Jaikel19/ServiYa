@@ -1,6 +1,7 @@
 package com.example.seviya.UI
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -145,7 +146,6 @@ fun DashboardWorkerScreen(
 
     LaunchedEffect(sortedBookings, currentQueueBookingId) {
         val currentStillExists = sortedBookings.any { it.id == currentQueueBookingId }
-
         if (!currentStillExists) {
             currentQueueBookingId = firstConfirmedBooking?.id
         }
@@ -255,9 +255,9 @@ private fun WorkerDashboardHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(158.dp)
+            .height(118.dp)
             .background(BrandBlue)
-            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets(0, 30, 0, 0))
     ) {
         Row(
             modifier = Modifier
@@ -268,37 +268,10 @@ private fun WorkerDashboardHeader(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box {
-                    if (avatarUrl.isNotBlank()) {
-                        KamelImage(
-                            resource = asyncPainterResource(data = avatarUrl),
-                            contentDescription = workerName,
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                                .border(
-                                    width = 2.dp,
-                                    color = White.copy(alpha = 0.18f),
-                                    shape = RoundedCornerShape(18.dp)
-                                ),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                                .background(White.copy(alpha = 0.14f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = initialsFromName(workerName),
-                                color = White,
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                            )
-                        }
-                    }
+                    WorkerProfileAvatar(
+                        imageUrl = avatarUrl,
+                        workerName = workerName
+                    )
 
                     Box(
                         modifier = Modifier
@@ -310,7 +283,7 @@ private fun WorkerDashboardHeader(
                     )
                 }
 
-                Spacer(modifier = Modifier.size(12.dp))
+                Spacer(modifier = Modifier.width(12.dp))
 
                 Column(verticalArrangement = Arrangement.Center) {
                     Text(
@@ -333,6 +306,89 @@ private fun WorkerDashboardHeader(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun WorkerProfileAvatar(
+    imageUrl: String?,
+    workerName: String
+) {
+    Box(
+        modifier = Modifier.size(74.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(82.dp)
+                .clip(CircleShape)
+                .background(White.copy(alpha = 0.22f))
+                .border(
+                    width = 2.dp,
+                    color = White,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(66.dp)
+                    .clip(CircleShape)
+                    .background(White.copy(alpha = 0.14f))
+                    .border(
+                        width = 1.5.dp,
+                        color = White.copy(alpha = 0.30f),
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                when {
+                    !imageUrl.isNullOrBlank() -> {
+                        val painterResource = asyncPainterResource(data = imageUrl)
+
+                        KamelImage(
+                            resource = painterResource,
+                            contentDescription = "Foto del trabajador",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            onFailure = {
+                                WorkerAvatarFallback(
+                                    workerInitials = initialsFromName(workerName)
+                                )
+                            }
+                        )
+                    }
+
+                    else -> {
+                        WorkerAvatarFallback(
+                            workerInitials = initialsFromName(workerName)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkerAvatarFallback(
+    workerInitials: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(White.copy(alpha = 0.10f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = workerInitials,
+            color = White,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.ExtraBold
+            )
+        )
     }
 }
 

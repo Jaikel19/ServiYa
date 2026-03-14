@@ -8,6 +8,7 @@ import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
+import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 
 val presentationModule = module {
@@ -21,4 +22,5 @@ val presentationModule = module {
     factory { WorkersListViewModel(get()) }
     viewModel { ClientAppointmentDetailViewModel(get()) }
     factory { WorkerDashboardViewModel(get(), get()) }
+    factory { ClientDashboardViewModel(get()) }
 }
