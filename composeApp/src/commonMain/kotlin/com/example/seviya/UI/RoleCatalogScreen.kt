@@ -49,17 +49,7 @@ import androidx.compose.ui.draw.scale
 // ✅ Tabler Icons (Compose Icons)
 import compose.icons.TablerIcons
 import compose.icons.tablericons.*
-
-private object RoleUI {
-    val Blue = Color(0xFF004AAD)
-    val Blue2 = Color(0xFF3B82F6)
-    val Red = Color(0xFFEF4444)
-
-    val SoftBlue = Color(0xFFEBF4FF)
-    val Border = Color(0xFFF1F5F9)
-    val Muted = Color(0xFF64748B)
-    val Muted2 = Color(0xFF94A3B8)
-}
+import com.example.seviya.theme.*
 
 private enum class RolesTab { HOME, LOGIN, REGISTER }
 private enum class SelectedRole { CLIENT, WORKER }
@@ -71,6 +61,7 @@ private data class RoleEnterAnim(
     val offsetY: Dp,
     val scale: Float
 )
+
 @Composable
 private fun rememberRoleEnterAnim(
     delayMs: Int,
@@ -120,6 +111,7 @@ private fun RoleAnimatedSection(
         content()
     }
 }
+
 private fun Modifier.shimmerOverlay(alpha: Float = 0.16f, durationMs: Int = 1600): Modifier = composed {
     val inf = rememberInfiniteTransition(label = "shimmer")
     val x by inf.animateFloat(
@@ -140,7 +132,7 @@ private fun Modifier.shimmerOverlay(alpha: Float = 0.16f, durationMs: Int = 1600
         val startX = x * w
 
         val brush = Brush.linearGradient(
-            colors = listOf(Color.Transparent, Color.White.copy(alpha = alpha), Color.Transparent),
+            colors = listOf(Color.Transparent, White.copy(alpha = alpha), Color.Transparent),
             start = Offset(startX, 0f),
             end = Offset(startX + shimmerW, h)
         )
@@ -180,15 +172,8 @@ fun RoleCatalogScreen(
     var selected by rememberSaveable { mutableStateOf<SelectedRole?>(null) }
 
     Scaffold(
-        containerColor = Color.White,
-        bottomBar = {
-            RolesBottomBar(
-                active = RolesTab.REGISTER,
-                onHome = onGoHome,
-                onLogin = onGoLogin,
-                onRegister = onGoRegister
-            )
-        }
+        containerColor = White,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         BoxWithConstraints(
             modifier = Modifier
@@ -199,18 +184,13 @@ fun RoleCatalogScreen(
             val bottomH = maxHeight - topH
 
             Column(Modifier.fillMaxSize()) {
+                RoleHeaderAnimated(height = topH)
 
-                /* ---------------- TOP (HEADER) ---------------- */
-                RoleHeaderAnimated(
-                    height = topH
-                )
-
-                /* ---------------- BOTTOM (ROLES) ---------------- */
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(bottomH)
-                        .background(Color.White)
+                        .background(White)
                         .padding(horizontal = 22.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
@@ -219,7 +199,7 @@ fun RoleCatalogScreen(
                         Text(
                             text = "Elige tu rol",
                             style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.ExtraBold),
-                            color = Color(0xFF0F172A),
+                            color = TextPrimary,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -230,7 +210,7 @@ fun RoleCatalogScreen(
                         Text(
                             text = "Selecciona cómo usarás la plataforma para\ncontinuar",
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                color = RoleUI.Muted,
+                                color = TextSecondary,
                                 lineHeight = 22.sp
                             ),
                             textAlign = TextAlign.Center
@@ -281,7 +261,6 @@ fun RoleCatalogScreen(
 private fun RoleHeaderAnimated(height: Dp) {
     val inf = rememberInfiniteTransition(label = "header_inf")
 
-    // Gradiente “moviéndose”
     val gradT by inf.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -292,15 +271,12 @@ private fun RoleHeaderAnimated(height: Dp) {
         label = "gradT"
     )
 
-    // Glows pulsantes
     val glowA by inf.animateFloat(0.10f, 0.18f, infiniteRepeatable(tween(2400, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "glowA")
     val glowB by inf.animateFloat(0.08f, 0.15f, infiniteRepeatable(tween(2800, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "glowB")
-
-    // Float de tiles
     val floatY by inf.animateFloat(0f, 10f, infiniteRepeatable(tween(2600, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "floatY")
 
     val headerBrush = Brush.linearGradient(
-        colors = listOf(RoleUI.Blue, RoleUI.Blue2),
+        colors = listOf(BrandBlue, AccentBlue),
         start = Offset(0f, 0f),
         end = Offset(1000f + 400f * gradT, 1300f - 250f * gradT)
     )
@@ -311,18 +287,17 @@ private fun RoleHeaderAnimated(height: Dp) {
             .height(height)
             .background(headerBrush)
     ) {
-        // Glows animados
         Box(
             modifier = Modifier
                 .size(260.dp)
                 .offset((-110).dp, (-110).dp)
-                .background(RoleUI.Red.copy(alpha = glowA), CircleShape)
+                .background(BrandRed.copy(alpha = glowA), CircleShape)
         )
         Box(
             modifier = Modifier
                 .size(200.dp)
                 .offset(x = 260.dp, y = 210.dp)
-                .background(Color.White.copy(alpha = glowB), CircleShape)
+                .background(White.copy(alpha = glowB), CircleShape)
         )
 
         Column(
@@ -339,7 +314,7 @@ private fun RoleHeaderAnimated(height: Dp) {
             RoleAnimatedSection(80) {
                 Text(
                     text = "Conectamos soluciones con\nnecesidades de forma segura",
-                    color = Color.White,
+                    color = White,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold,
@@ -350,7 +325,6 @@ private fun RoleHeaderAnimated(height: Dp) {
 
             Spacer(Modifier.height(14.dp))
 
-            // Tiles con float + shimmer
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.widthIn(max = 320.dp)
@@ -390,14 +364,13 @@ private fun RoleHeaderAnimated(height: Dp) {
             }
         }
 
-        // Wave + highlight animado
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .height(92.dp)
         ) {
-            PrettyWaveAnimated(modifier = Modifier.fillMaxSize(), baseColor = Color.White)
+            PrettyWaveAnimated(modifier = Modifier.fillMaxSize(), baseColor = White)
         }
     }
 }
@@ -408,7 +381,7 @@ private fun RoleHeaderAnimated(height: Dp) {
 private fun LogoPillCompact() {
     Card(
         shape = RoundedCornerShape(999.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
@@ -422,13 +395,13 @@ private fun LogoPillCompact() {
                 modifier = Modifier
                     .size(28.dp)
                     .clip(CircleShape)
-                    .background(RoleUI.Red.copy(alpha = 0.14f)),
+                    .background(BrandRed.copy(alpha = 0.14f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = TablerIcons.MapPin,
                     contentDescription = null,
-                    tint = RoleUI.Red,
+                    tint = BrandRed,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -437,8 +410,8 @@ private fun LogoPillCompact() {
 
             Text(
                 text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = RoleUI.Blue, fontWeight = FontWeight.ExtraBold)) { append("Servi") }
-                    withStyle(SpanStyle(color = RoleUI.Red, fontWeight = FontWeight.ExtraBold)) { append("Ya") }
+                    withStyle(SpanStyle(color = BrandBlue, fontWeight = FontWeight.ExtraBold)) { append("Servi") }
+                    withStyle(SpanStyle(color = BrandRed, fontWeight = FontWeight.ExtraBold)) { append("Ya") }
                 },
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
             )
@@ -469,19 +442,19 @@ private fun FeatureGlassTileSmall(
             .clip(RoundedCornerShape(20.dp))
             .shimmerOverlay(alpha = 0.12f, durationMs = 2000),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.12f)),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f))
+        colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.12f)),
+        border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
     ) {
         Column(
             Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, null, tint = Color.White, modifier = Modifier.size(20.dp))
+            Icon(icon, null, tint = White, modifier = Modifier.size(20.dp))
             Spacer(Modifier.height(6.dp))
             Text(
                 label,
-                color = Color.White.copy(alpha = 0.78f),
+                color = White.copy(alpha = 0.78f),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Black,
                     letterSpacing = 1.6.sp
@@ -501,17 +474,16 @@ private fun RolePickCardAnimated(
     onClick: () -> Unit
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (selected) RoleUI.Blue else RoleUI.Border,
+        targetValue = if (selected) BrandBlue else BorderUltraSoft,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "border"
     )
     val bgColor by animateColorAsState(
-        targetValue = if (selected) RoleUI.SoftBlue.copy(alpha = 0.34f) else Color.White,
+        targetValue = if (selected) SoftBlueRole.copy(alpha = 0.34f) else White,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "bg"
     )
 
-    // micro-float solo cuando está seleccionado
     val inf = rememberInfiniteTransition(label = "role_float_$title")
     val floatY by inf.animateFloat(
         initialValue = 0f,
@@ -542,11 +514,11 @@ private fun RolePickCardAnimated(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(22.dp))
-                    .background(RoleUI.SoftBlue)
+                    .background(SoftBlueRole)
                     .shimmerOverlay(alpha = if (selected) 0.14f else 0.08f, durationMs = 2200),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, tint = RoleUI.Blue, modifier = Modifier.size(28.dp))
+                Icon(icon, null, tint = BrandBlue, modifier = Modifier.size(28.dp))
             }
 
             Spacer(Modifier.height(16.dp))
@@ -554,14 +526,14 @@ private fun RolePickCardAnimated(
             Text(
                 title,
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
-                color = Color(0xFF0F172A)
+                color = TextPrimary
             )
 
             Spacer(Modifier.height(6.dp))
 
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodyMedium.copy(color = RoleUI.Muted),
+                style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary),
                 textAlign = TextAlign.Center
             )
         }
@@ -634,90 +606,6 @@ private fun PrettyWaveAnimated(
         )
 
         drawPath(path = base, color = baseColor)
-        drawPath(path = highlight, color = Color.White.copy(alpha = a))
-    }
-}
-
-/* ---------------- BOTTOM BAR ---------------- */
-
-@Composable
-private fun RolesBottomBar(
-    active: RolesTab,
-    onHome: () -> Unit,
-    onLogin: () -> Unit,
-    onRegister: () -> Unit
-) {
-    Surface(
-        color = Color.White,
-        tonalElevation = 6.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, RoleUI.Border)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp, bottom = 20.dp)
-                .padding(horizontal = 34.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BottomBtn(
-                label = "INICIO",
-                icon = TablerIcons.Home,
-                active = active == RolesTab.HOME,
-                activeColor = RoleUI.Blue,
-                onClick = onHome
-            )
-            BottomBtn(
-                label = "INGRESAR",
-                icon = TablerIcons.Login,
-                active = active == RolesTab.LOGIN,
-                activeColor = RoleUI.Blue,
-                onClick = onLogin
-            )
-            BottomBtn(
-                label = "REGISTRAR",
-                icon = TablerIcons.UserPlus,
-                active = active == RolesTab.REGISTER,
-                activeColor = RoleUI.Red,
-                onClick = onRegister
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomBtn(
-    label: String,
-    icon: ImageVector,
-    active: Boolean,
-    activeColor: Color,
-    onClick: () -> Unit
-) {
-    val color by animateColorAsState(
-        targetValue = if (active) activeColor else RoleUI.Muted2,
-        animationSpec = tween(200, easing = FastOutSlowInEasing),
-        label = "bottom_color"
-    )
-
-    Column(
-        modifier = Modifier
-            .widthIn(min = 78.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .bouncyClick(onClick)
-            .padding(vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(icon, null, tint = color, modifier = Modifier.size(22.dp))
-        Spacer(Modifier.height(6.dp))
-        Text(
-            text = label,
-            color = color,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = if (active) FontWeight.ExtraBold else FontWeight.Bold,
-                letterSpacing = 1.4.sp
-            )
-        )
+        drawPath(path = highlight, color = White.copy(alpha = a))
     }
 }

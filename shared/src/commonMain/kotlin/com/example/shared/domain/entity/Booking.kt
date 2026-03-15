@@ -17,5 +17,7 @@ data class Booking(
     val paymentReceiptUrl: String = "",
     val cancellationReason: String = "",
     val cancellationBy: String = "",
-    val ratingToClientDone: Boolean = false
+    val ratingToClientDone: Boolean = false,
+    val ratingToWorkerDone: Boolean = false,
+    val otpCode: String = ""
 )

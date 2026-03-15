@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -79,17 +80,7 @@ import compose.icons.tablericons.ShieldCheck
 import compose.icons.tablericons.User
 import compose.icons.tablericons.UserPlus
 import kotlinx.coroutines.delay
-
-private object RoleAdmissionUI {
-    val Blue = Color(0xFF004AAD)
-    val Blue2 = Color(0xFF3B82F6)
-    val Red = Color(0xFFEF4444)
-
-    val SoftBlue = Color(0xFFEBF4FF)
-    val Border = Color(0xFFF1F5F9)
-    val Muted = Color(0xFF64748B)
-    val Muted2 = Color(0xFF94A3B8)
-}
+import com.example.seviya.theme.*
 
 private enum class RolesAdmissionTab { HOME, LOGIN, REGISTER }
 private enum class SelectedRoleAdmission { CLIENT, WORKER }
@@ -181,7 +172,7 @@ private fun Modifier.shimmerOverlay(
         val brush = Brush.linearGradient(
             colors = listOf(
                 Color.Transparent,
-                Color.White.copy(alpha = alpha),
+                White.copy(alpha = alpha),
                 Color.Transparent
             ),
             start = Offset(startX, 0f),
@@ -226,15 +217,8 @@ fun RoleAdmissionCatalogScreen(
     var selected by rememberSaveable { mutableStateOf<SelectedRoleAdmission?>(null) }
 
     Scaffold(
-        containerColor = Color.White,
-        bottomBar = {
-            RolesAdmissionBottomBar(
-                active = RolesAdmissionTab.LOGIN,
-                onHome = onGoHome,
-                onLogin = onGoLogin,
-                onRegister = onGoRegister
-            )
-        }
+        containerColor = White,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         BoxWithConstraints(
             modifier = Modifier
@@ -245,14 +229,13 @@ fun RoleAdmissionCatalogScreen(
             val bottomH = maxHeight - topH
 
             Column(Modifier.fillMaxSize()) {
-
                 RoleAdmissionHeaderAnimated(height = topH)
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(bottomH)
-                        .background(Color.White)
+                        .background(White)
                         .padding(horizontal = 22.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
@@ -263,7 +246,7 @@ fun RoleAdmissionCatalogScreen(
                             style = MaterialTheme.typography.headlineLarge.copy(
                                 fontWeight = FontWeight.ExtraBold
                             ),
-                            color = Color(0xFF0F172A),
+                            color = TextPrimary,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -274,7 +257,7 @@ fun RoleAdmissionCatalogScreen(
                         Text(
                             text = "Selecciona el tipo de cuenta con el que\nquieres continuar",
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                color = RoleAdmissionUI.Muted,
+                                color = TextSecondary,
                                 lineHeight = 22.sp
                             ),
                             textAlign = TextAlign.Center
@@ -366,7 +349,7 @@ private fun RoleAdmissionHeaderAnimated(height: Dp) {
     )
 
     val headerBrush = Brush.linearGradient(
-        colors = listOf(RoleAdmissionUI.Blue, RoleAdmissionUI.Blue2),
+        colors = listOf(BrandBlue, AccentBlue),
         start = Offset(0f, 0f),
         end = Offset(1000f + 400f * gradT, 1300f - 250f * gradT)
     )
@@ -381,14 +364,14 @@ private fun RoleAdmissionHeaderAnimated(height: Dp) {
             modifier = Modifier
                 .size(260.dp)
                 .offset(x = (-110).dp, y = (-110).dp)
-                .background(RoleAdmissionUI.Red.copy(alpha = glowA), CircleShape)
+                .background(BrandRed.copy(alpha = glowA), CircleShape)
         )
 
         Box(
             modifier = Modifier
                 .size(200.dp)
                 .offset(x = 260.dp, y = 210.dp)
-                .background(Color.White.copy(alpha = glowB), CircleShape)
+                .background(White.copy(alpha = glowB), CircleShape)
         )
 
         Column(
@@ -405,7 +388,7 @@ private fun RoleAdmissionHeaderAnimated(height: Dp) {
             RoleAdmissionAnimatedSection(80) {
                 Text(
                     text = "Conectamos soluciones con\nnecesidades de forma segura",
-                    color = Color.White,
+                    color = White,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold,
@@ -464,7 +447,7 @@ private fun RoleAdmissionHeaderAnimated(height: Dp) {
         ) {
             RoleAdmissionPrettyWaveAnimated(
                 modifier = Modifier.fillMaxSize(),
-                baseColor = Color.White
+                baseColor = White
             )
         }
     }
@@ -476,7 +459,7 @@ private fun RoleAdmissionHeaderAnimated(height: Dp) {
 private fun RoleAdmissionLogoPillCompact() {
     Card(
         shape = RoundedCornerShape(999.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
@@ -490,13 +473,13 @@ private fun RoleAdmissionLogoPillCompact() {
                 modifier = Modifier
                     .size(28.dp)
                     .clip(CircleShape)
-                    .background(RoleAdmissionUI.Red.copy(alpha = 0.14f)),
+                    .background(BrandRed.copy(alpha = 0.14f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = TablerIcons.MapPin,
                     contentDescription = null,
-                    tint = RoleAdmissionUI.Red,
+                    tint = BrandRed,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -507,14 +490,14 @@ private fun RoleAdmissionLogoPillCompact() {
                 text = buildAnnotatedString {
                     withStyle(
                         SpanStyle(
-                            color = RoleAdmissionUI.Blue,
+                            color = BrandBlue,
                             fontWeight = FontWeight.ExtraBold
                         )
                     ) { append("Servi") }
 
                     withStyle(
                         SpanStyle(
-                            color = RoleAdmissionUI.Red,
+                            color = BrandRed,
                             fontWeight = FontWeight.ExtraBold
                         )
                     ) { append("Ya") }
@@ -557,9 +540,9 @@ private fun RoleAdmissionFeatureGlassTileSmall(
             .shimmerOverlay(alpha = 0.12f, durationMs = 2000),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.12f)
+            containerColor = White.copy(alpha = 0.12f)
         ),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f))
+        border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -569,7 +552,7 @@ private fun RoleAdmissionFeatureGlassTileSmall(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
+                tint = White,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -577,7 +560,7 @@ private fun RoleAdmissionFeatureGlassTileSmall(
 
             Text(
                 text = label,
-                color = Color.White.copy(alpha = 0.78f),
+                color = White.copy(alpha = 0.78f),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Black,
                     letterSpacing = 1.6.sp
@@ -597,13 +580,13 @@ private fun RoleAdmissionPickCardAnimated(
     onClick: () -> Unit
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (selected) RoleAdmissionUI.Blue else RoleAdmissionUI.Border,
+        targetValue = if (selected) BrandBlue else BorderUltraSoft,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "border"
     )
 
     val bgColor by animateColorAsState(
-        targetValue = if (selected) RoleAdmissionUI.SoftBlue.copy(alpha = 0.34f) else Color.White,
+        targetValue = if (selected) SoftBlueRole.copy(alpha = 0.34f) else White,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "bg"
     )
@@ -643,7 +626,7 @@ private fun RoleAdmissionPickCardAnimated(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(22.dp))
-                    .background(RoleAdmissionUI.SoftBlue)
+                    .background(SoftBlueRole)
                     .shimmerOverlay(
                         alpha = if (selected) 0.14f else 0.08f,
                         durationMs = 2200
@@ -653,7 +636,7 @@ private fun RoleAdmissionPickCardAnimated(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = RoleAdmissionUI.Blue,
+                    tint = BrandBlue,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -665,7 +648,7 @@ private fun RoleAdmissionPickCardAnimated(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.ExtraBold
                 ),
-                color = Color(0xFF0F172A)
+                color = TextPrimary
             )
 
             Spacer(Modifier.height(6.dp))
@@ -673,7 +656,7 @@ private fun RoleAdmissionPickCardAnimated(
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = RoleAdmissionUI.Muted
+                    color = TextSecondary
                 ),
                 textAlign = TextAlign.Center
             )
@@ -750,99 +733,6 @@ private fun RoleAdmissionPrettyWaveAnimated(
         )
 
         drawPath(path = base, color = baseColor)
-        drawPath(path = highlight, color = Color.White.copy(alpha = a))
-    }
-}
-
-/* ---------------- BOTTOM BAR ---------------- */
-
-@Composable
-private fun RolesAdmissionBottomBar(
-    active: RolesAdmissionTab,
-    onHome: () -> Unit,
-    onLogin: () -> Unit,
-    onRegister: () -> Unit
-) {
-    Surface(
-        color = Color.White,
-        tonalElevation = 6.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, RoleAdmissionUI.Border)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp, bottom = 20.dp)
-                .padding(horizontal = 34.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RoleAdmissionBottomBtn(
-                label = "INICIO",
-                icon = TablerIcons.Home,
-                active = active == RolesAdmissionTab.HOME,
-                activeColor = RoleAdmissionUI.Blue,
-                onClick = onHome
-            )
-
-            RoleAdmissionBottomBtn(
-                label = "INGRESAR",
-                icon = TablerIcons.Login,
-                active = active == RolesAdmissionTab.LOGIN,
-                activeColor = RoleAdmissionUI.Blue,
-                onClick = onLogin
-            )
-
-            RoleAdmissionBottomBtn(
-                label = "REGISTRAR",
-                icon = TablerIcons.UserPlus,
-                active = active == RolesAdmissionTab.REGISTER,
-                activeColor = RoleAdmissionUI.Red,
-                onClick = onRegister
-            )
-        }
-    }
-}
-
-@Composable
-private fun RoleAdmissionBottomBtn(
-    label: String,
-    icon: ImageVector,
-    active: Boolean,
-    activeColor: Color,
-    onClick: () -> Unit
-) {
-    val color by animateColorAsState(
-        targetValue = if (active) activeColor else RoleAdmissionUI.Muted2,
-        animationSpec = tween(200, easing = FastOutSlowInEasing),
-        label = "bottom_color"
-    )
-
-    Column(
-        modifier = Modifier
-            .widthIn(min = 78.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .bouncyClick(onClick)
-            .padding(vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(22.dp)
-        )
-
-        Spacer(Modifier.height(6.dp))
-
-        Text(
-            text = label,
-            color = color,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = if (active) FontWeight.ExtraBold else FontWeight.Bold,
-                letterSpacing = 1.4.sp
-            )
-        )
+        drawPath(path = highlight, color = White.copy(alpha = a))
     }
 }

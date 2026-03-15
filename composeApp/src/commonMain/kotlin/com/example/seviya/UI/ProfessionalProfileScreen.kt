@@ -20,10 +20,8 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -32,8 +30,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -52,54 +48,33 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.seviya.theme.*
+import com.example.shared.domain.entity.CancellationPolicy
+import com.example.shared.domain.entity.PortfolioItem
 import com.example.shared.domain.entity.ProfessionalProfileData
 import com.example.shared.domain.entity.Service
-import com.example.shared.presentation.professionalProfile.ProfessionalProfileUiState
-import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
-import com.example.shared.domain.entity.CancellationPolicy
-
-import kotlin.math.round
-import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.graphics.graphicsLayer
-import com.example.shared.domain.entity.PortfolioItem
 import com.example.shared.domain.entity.WorkerReviewItem
 import com.example.shared.domain.entity.WorkerSchedule
+import com.example.shared.presentation.professionalProfile.ProfessionalProfileUiState
+import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
+import compose.icons.TablerIcons
+import compose.icons.tablericons.*
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
+import kotlin.math.round
 import kotlin.time.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-
-// ✅ Tabler Icons (compose-icons)
-import compose.icons.TablerIcons
-import compose.icons.tablericons.*
-
-private object ProfileWFColors {
-    val BrandBlue = Color(0xFF004AAD)
-    val BrandBlueDark = Color(0xFF083C8B)
-    val BrandBlueSoft = Color(0xFF2E6FD1)
-    val Surface = Color(0xFFF5F6F8)
-    val SurfaceCard = Color(0xFFFFFFFF)
-    val SurfaceSoft = Color(0xFFF1F4F8)
-    val Border = Color(0xFFE6EAF0)
-    val TextPrimary = Color(0xFF0F172A)
-    val TextSecondary = Color(0xFF64748B)
-    val TabInactive = Color(0xFFA2AEC2)
-    val Yellow = Color(0xFFF9D33D)
-    val Red = Color(0xFFEF4444)
-    val White = Color(0xFFFFFFFF)
-}
 
 private enum class ProfileTab {
     INFO, SERVICES, REVIEWS, PORTFOLIO
@@ -170,21 +145,13 @@ fun ProfessionalProfileScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = ProfileWFColors.BrandBlue,
-        bottomBar = {
-            ProfessionalProfileBottomBar(
-                onServices = onBottomServices,
-                onMap = onBottomMap,
-                onSearch = onBottomSearch,
-                onNotifications = onBottomNotifications,
-                onMenu = onBottomMenu
-            )
-        }
+        containerColor = BrandBlue,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ProfileWFColors.BrandBlue)
+                .background(BrandBlue)
                 .padding(innerPadding)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -195,7 +162,7 @@ fun ProfessionalProfileScreen(
                 )
 
                 Surface(
-                    color = ProfileWFColors.Surface,
+                    color = AppBackground,
                     shape = RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp),
                     modifier = Modifier
                         .fillMaxSize()
@@ -213,7 +180,7 @@ fun ProfessionalProfileScreen(
                                 state.isLoading -> {
                                     Text(
                                         text = "Cargando perfil...",
-                                        color = ProfileWFColors.TextSecondary,
+                                        color = TextSecondary,
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -222,7 +189,7 @@ fun ProfessionalProfileScreen(
                                 state.errorMessage != null -> {
                                     Text(
                                         text = "Error: ${state.errorMessage}",
-                                        color = ProfileWFColors.Red,
+                                        color = BrandRed,
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
@@ -231,7 +198,7 @@ fun ProfessionalProfileScreen(
                                 profile == null -> {
                                     Text(
                                         text = "No se encontró la información del profesional.",
-                                        color = ProfileWFColors.TextSecondary,
+                                        color = TextSecondary,
                                         fontSize = 15.sp
                                     )
                                 }
@@ -248,7 +215,7 @@ fun ProfessionalProfileScreen(
                                             fontSize = 15.sp,
                                             lineHeight = 20.sp,
                                             fontWeight = FontWeight.Normal,
-                                            color = Color(0xFF44556F)
+                                            color = BlueTextMuted
                                         )
                                     )
 
@@ -353,7 +320,7 @@ private fun HeaderSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(ProfileWFColors.BrandBlue)
+            .background(BrandBlue)
             .systemBarsPadding()
             .padding(horizontal = 20.dp)
             .padding(top = 2.dp, bottom = 6.dp)
@@ -364,7 +331,7 @@ private fun HeaderSection(
                 Icon(
                     imageVector = TablerIcons.ChevronRight,
                     contentDescription = "Volver",
-                    tint = Color.White,
+                    tint = White,
                     modifier = Modifier
                         .size(24.dp)
                         .rotate(180f)
@@ -387,7 +354,7 @@ private fun HeaderSection(
 
             Text(
                 text = name,
-                color = Color.White,
+                color = White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
@@ -404,13 +371,13 @@ private fun HeaderSection(
                 Icon(
                     imageVector = TablerIcons.MapPin,
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.88f),
+                    tint = White.copy(alpha = 0.88f),
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
                     text = subtitle,
-                    color = Color.White.copy(alpha = 0.88f),
+                    color = White.copy(alpha = 0.88f),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center
@@ -440,10 +407,10 @@ private fun SquareGlassButton(
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(Color.White.copy(alpha = 0.12f))
+            .background(White.copy(alpha = 0.12f))
             .border(
                 width = 1.5.dp,
-                color = Color.White.copy(alpha = 0.16f),
+                color = White.copy(alpha = 0.16f),
                 shape = RoundedCornerShape(18.dp)
             )
             .clickable(onClick = onClick),
@@ -465,14 +432,14 @@ private fun ServicesSelectionSection(
         Column {
             Text(
                 text = "Servicios Disponibles",
-                color = ProfileWFColors.TextPrimary,
+                color = TextPrimary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(3.dp))
             Text(
                 text = "Selecciona los que deseas incluir en tu cita",
-                color = ProfileWFColors.TextSecondary.copy(alpha = 0.82f),
+                color = TextSecondary.copy(alpha = 0.82f),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -483,7 +450,7 @@ private fun ServicesSelectionSection(
         if (services.isEmpty()) {
             Text(
                 text = "Este profesional no tiene servicios registrados.",
-                color = ProfileWFColors.TextSecondary,
+                color = TextSecondary,
                 fontSize = 14.sp
             )
         } else {
@@ -524,11 +491,11 @@ private fun SelectableServiceCard(
     Card(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) Color(0xFFF7FAFF) else Color.White
+            containerColor = if (selected) Color(0xFFF7FAFF) else White
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = if (selected) ProfileWFColors.BrandBlue.copy(alpha = 0.35f) else Color(0xFFE7EDF5)
+            color = if (selected) BrandBlue.copy(alpha = 0.35f) else BorderSoftAlt
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (selected) 1.dp else 1.5.dp
@@ -557,7 +524,7 @@ private fun SelectableServiceCard(
                 ) {
                     Text(
                         text = service.name,
-                        color = ProfileWFColors.TextPrimary,
+                        color = TextPrimary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         lineHeight = 20.sp,
@@ -571,13 +538,13 @@ private fun SelectableServiceCard(
                         Icon(
                             imageVector = TablerIcons.Clock,
                             contentDescription = null,
-                            tint = Color(0xFF7B8AA0),
+                            tint = BlueGrayText,
                             modifier = Modifier.size(15.dp)
                         )
                         Spacer(Modifier.width(5.dp))
                         Text(
                             text = service.duration,
-                            color = Color(0xFF7B8AA0),
+                            color = BlueGrayText,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -592,7 +559,7 @@ private fun SelectableServiceCard(
                 ) {
                     Text(
                         text = formatPrice(service.cost),
-                        color = ProfileWFColors.BrandBlue,
+                        color = BrandBlue,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -604,7 +571,7 @@ private fun SelectableServiceCard(
                             .size(28.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .background(
-                                if (selected) ProfileWFColors.BrandBlue.copy(alpha = 0.10f)
+                                if (selected) BrandBlue.copy(alpha = 0.10f)
                                 else Color(0xFFF4F7FA)
                             ),
                         contentAlignment = Alignment.Center
@@ -612,7 +579,7 @@ private fun SelectableServiceCard(
                         Icon(
                             imageVector = TablerIcons.ChevronDown,
                             contentDescription = if (expanded) "Contraer" else "Expandir",
-                            tint = Color(0xFF8C9AAF),
+                            tint = BlueGrayTextSoft,
                             modifier = Modifier
                                 .size(18.dp)
                                 .graphicsLayer {
@@ -627,7 +594,7 @@ private fun SelectableServiceCard(
                 Spacer(Modifier.height(12.dp))
 
                 Divider(
-                    color = Color(0xFFEAEFF5),
+                    color = DividerSoft,
                     thickness = 1.dp
                 )
 
@@ -635,7 +602,7 @@ private fun SelectableServiceCard(
 
                 Text(
                     text = service.description,
-                    color = ProfileWFColors.TextSecondary,
+                    color = TextSecondary,
                     fontSize = 13.sp,
                     lineHeight = 18.sp,
                     fontWeight = FontWeight.Normal
@@ -654,10 +621,10 @@ private fun ServiceSelectorBox(
         modifier = Modifier
             .size(28.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(if (selected) ProfileWFColors.BrandBlue else Color.Transparent)
+            .background(if (selected) BrandBlue else Color.Transparent)
             .border(
                 width = if (selected) 0.dp else 2.dp,
-                color = if (selected) Color.Transparent else Color(0xFFC7D0DE),
+                color = if (selected) Color.Transparent else BorderBlueLightAlt,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable(onClick = onClick),
@@ -667,7 +634,7 @@ private fun ServiceSelectorBox(
             Icon(
                 imageVector = TablerIcons.Check,
                 contentDescription = "Seleccionado",
-                tint = Color.White,
+                tint = White,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -686,7 +653,7 @@ private fun ProcessAppointmentBar(
             .fillMaxWidth()
             .shadow(18.dp, RoundedCornerShape(26.dp), clip = false)
             .clickable(onClick = onClick),
-        color = ProfileWFColors.BrandBlue,
+        color = BrandBlue,
         shape = RoundedCornerShape(26.dp)
     ) {
         Row(
@@ -696,19 +663,17 @@ private fun ProcessAppointmentBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
                         .size(42.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(Color.White.copy(alpha = 0.15f)),
+                        .background(White.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = selectedCount.toString(),
-                        color = Color.White,
+                        color = White,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -718,7 +683,7 @@ private fun ProcessAppointmentBar(
 
                 Text(
                     text = "Procesar cita",
-                    color = Color.White,
+                    color = White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
@@ -726,7 +691,7 @@ private fun ProcessAppointmentBar(
 
             Text(
                 text = formatPrice(total),
-                color = Color.White,
+                color = White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.End
@@ -748,10 +713,10 @@ private fun ProfileAvatar(
             modifier = Modifier
                 .size(132.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.22f))
+                .background(White.copy(alpha = 0.22f))
                 .border(
                     width = 2.dp,
-                    color = Color.White,
+                    color = White,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -760,10 +725,10 @@ private fun ProfileAvatar(
                 modifier = Modifier
                     .size(112.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.14f))
+                    .background(White.copy(alpha = 0.14f))
                     .border(
                         width = 1.5.dp,
-                        color = Color.White.copy(alpha = 0.30f),
+                        color = White.copy(alpha = 0.30f),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -832,20 +797,20 @@ private fun RatingPill(rating: Double) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(ProfileWFColors.Yellow)
+            .background(BrandYellow)
             .padding(horizontal = 10.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = TablerIcons.Star,
             contentDescription = null,
-            tint = ProfileWFColors.TextPrimary,
+            tint = TextPrimary,
             modifier = Modifier.size(18.dp)
         )
         Spacer(Modifier.width(5.dp))
         Text(
             text = ratingText,
-            color = ProfileWFColors.TextPrimary,
+            color = TextPrimary,
             fontWeight = FontWeight.ExtraBold,
             fontSize = 13.sp
         )
@@ -857,12 +822,12 @@ private fun ProfessionPill(text: String) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(9.dp))
-            .background(Color.White.copy(alpha = 0.18f))
+            .background(White.copy(alpha = 0.18f))
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
             text = text,
-            color = Color.White,
+            color = White,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold
         )
@@ -903,7 +868,7 @@ private fun ProfileTabs(
 
         Spacer(Modifier.height(12.dp))
 
-        Divider(color = ProfileWFColors.Border, thickness = 1.dp)
+        Divider(color = BorderSoft, thickness = 1.dp)
     }
 }
 
@@ -919,7 +884,7 @@ private fun ProfileTabItem(
     ) {
         Text(
             text = title,
-            color = if (selected) ProfileWFColors.BrandBlue else ProfileWFColors.TabInactive,
+            color = if (selected) BrandBlue else TextMuted,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
             fontSize = 14.sp
         )
@@ -931,7 +896,7 @@ private fun ProfileTabItem(
                 .height(3.dp)
                 .width(94.dp)
                 .background(
-                    if (selected) ProfileWFColors.BrandBlue else Color.Transparent
+                    if (selected) BrandBlue else Color.Transparent
                 )
         )
     }
@@ -943,26 +908,24 @@ private fun CancellationPoliciesCard(
 ) {
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = ProfileWFColors.SurfaceSoft),
-        border = BorderStroke(1.dp, ProfileWFColors.Border),
+        colors = CardDefaults.cardColors(containerColor = SoftSurface),
+        border = BorderStroke(1.dp, BorderSoft),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = TablerIcons.ShieldCheck,
                     contentDescription = null,
-                    tint = ProfileWFColors.BrandBlue,
+                    tint = BrandBlue,
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
                     text = "Políticas de cancelación",
-                    color = ProfileWFColors.BrandBlue,
+                    color = BrandBlue,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
@@ -973,7 +936,7 @@ private fun CancellationPoliciesCard(
             if (policy == null) {
                 Text(
                     text = "No hay políticas de cancelación registradas.",
-                    color = ProfileWFColors.TextSecondary,
+                    color = TextSecondary,
                     fontSize = 14.sp
                 )
             } else {
@@ -1003,7 +966,7 @@ private fun PortfolioSection(
         if (portfolios.isEmpty()) {
             Text(
                 text = "Aún no hay elementos en el portafolio.",
-                color = ProfileWFColors.TextSecondary,
+                color = TextSecondary,
                 fontSize = 14.sp
             )
         } else {
@@ -1028,8 +991,8 @@ private fun PortfolioCard(
 ) {
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, ProfileWFColors.Border),
+        colors = CardDefaults.cardColors(containerColor = White),
+        border = BorderStroke(1.dp, BorderSoft),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -1050,12 +1013,12 @@ private fun PortfolioCard(
                             .align(Alignment.TopStart)
                             .padding(12.dp)
                             .clip(RoundedCornerShape(999.dp))
-                            .background(ProfileWFColors.BrandBlue)
+                            .background(BrandBlue)
                             .padding(horizontal = 10.dp, vertical = 5.dp)
                     ) {
                         Text(
                             text = categoryLabel.uppercase(),
-                            color = Color.White,
+                            color = White,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
@@ -1068,7 +1031,7 @@ private fun PortfolioCard(
             ) {
                 Text(
                     text = item.services.firstOrNull() ?: "Trabajo realizado",
-                    color = ProfileWFColors.TextPrimary,
+                    color = TextPrimary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 24.sp
@@ -1078,7 +1041,7 @@ private fun PortfolioCard(
 
                 Text(
                     text = item.description,
-                    color = ProfileWFColors.TextSecondary,
+                    color = TextSecondary,
                     fontSize = 14.sp,
                     lineHeight = 21.sp,
                     fontWeight = FontWeight.Normal
@@ -1124,13 +1087,13 @@ private fun PortfolioImage(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color(0xFFEFF3F8)),
+                                .background(ImageBlueSoft),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = TablerIcons.Photo,
                                 contentDescription = null,
-                                tint = Color(0xFF9AA6B2),
+                                tint = BlueGrayTextLight,
                                 modifier = Modifier.size(36.dp)
                             )
                         }
@@ -1142,13 +1105,13 @@ private fun PortfolioImage(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFFEFF3F8)),
+                        .background(ImageBlueSoft),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = TablerIcons.Photo,
                         contentDescription = null,
-                        tint = Color(0xFF9AA6B2),
+                        tint = BlueGrayTextLight,
                         modifier = Modifier.size(36.dp)
                     )
                 }
@@ -1162,17 +1125,17 @@ private fun PortfolioServiceChip(text: String) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(ProfileWFColors.BrandBlue.copy(alpha = 0.08f))
+            .background(BrandBlue.copy(alpha = 0.08f))
             .border(
                 width = 1.dp,
-                color = ProfileWFColors.BrandBlue.copy(alpha = 0.16f),
+                color = BrandBlue.copy(alpha = 0.16f),
                 shape = RoundedCornerShape(999.dp)
             )
             .padding(horizontal = 12.dp, vertical = 7.dp)
     ) {
         Text(
             text = text,
-            color = ProfileWFColors.BrandBlue,
+            color = BrandBlue,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -1190,12 +1153,12 @@ private fun BulletLine(text: String) {
                 .padding(top = 8.dp)
                 .size(8.dp)
                 .clip(CircleShape)
-                .background(ProfileWFColors.Red)
+                .background(BrandRed)
         )
         Spacer(Modifier.width(14.dp))
         Text(
             text = text,
-            color = ProfileWFColors.TextSecondary,
+            color = TextSecondary,
             fontSize = 15.sp,
             lineHeight = 22.sp,
             fontWeight = FontWeight.Medium
@@ -1240,7 +1203,7 @@ private fun ReviewsSection(
         if (filteredReviews.isEmpty()) {
             Text(
                 text = "Aún no hay reseñas disponibles.",
-                color = ProfileWFColors.TextSecondary,
+                color = TextSecondary,
                 fontSize = 14.sp
             )
         } else {
@@ -1262,8 +1225,8 @@ private fun ReviewsSummaryCard(
 ) {
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, ProfileWFColors.Border),
+        colors = CardDefaults.cardColors(containerColor = White),
+        border = BorderStroke(1.dp, BorderSoft),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
@@ -1277,7 +1240,7 @@ private fun ReviewsSummaryCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = formatAverageRating(averageRating),
-                        color = ProfileWFColors.TextPrimary,
+                        color = TextPrimary,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -1289,7 +1252,7 @@ private fun ReviewsSummaryCard(
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = "${reviews.size} RESEÑAS",
-                            color = ProfileWFColors.TextSecondary,
+                            color = TextSecondary,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -1299,13 +1262,13 @@ private fun ReviewsSummaryCard(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(999.dp))
-                        .background(ProfileWFColors.Red)
+                        .background(BrandRed)
                         .clickable { }
                         .padding(horizontal = 14.dp, vertical = 9.dp)
                 ) {
                     Text(
                         text = "Escribir Reseña",
-                        color = Color.White,
+                        color = White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -1340,7 +1303,7 @@ private fun ReviewStarsRow(rating: Double) {
         repeat(5) { index ->
             Text(
                 text = "★",
-                color = if (index < fullStars) ProfileWFColors.Yellow else Color(0xFFD7DEE8),
+                color = if (index < fullStars) BrandYellow else Color(0xFFD7DEE8),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1359,7 +1322,7 @@ private fun ReviewDistributionRow(
     ) {
         Text(
             text = label,
-            color = ProfileWFColors.TextSecondary,
+            color = TextSecondary,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.width(16.dp)
@@ -1379,7 +1342,7 @@ private fun ReviewDistributionRow(
                     .fillMaxHeight()
                     .fillMaxWidth(percentage / 100f)
                     .clip(RoundedCornerShape(999.dp))
-                    .background(ProfileWFColors.BrandBlue)
+                    .background(BrandBlue)
             )
         }
 
@@ -1387,7 +1350,7 @@ private fun ReviewDistributionRow(
 
         Text(
             text = "$percentage%",
-            color = ProfileWFColors.TextSecondary,
+            color = TextSecondary,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.width(34.dp),
@@ -1440,11 +1403,11 @@ private fun ReviewFilterChip(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
             .background(
-                if (selected) ProfileWFColors.BrandBlue else Color.White
+                if (selected) BrandBlue else White
             )
             .border(
                 width = 1.dp,
-                color = if (selected) ProfileWFColors.BrandBlue else Color(0xFFE3E8F0),
+                color = if (selected) BrandBlue else Color(0xFFE3E8F0),
                 shape = RoundedCornerShape(999.dp)
             )
             .clickable(onClick = onClick)
@@ -1452,7 +1415,7 @@ private fun ReviewFilterChip(
     ) {
         Text(
             text = text,
-            color = if (selected) Color.White else ProfileWFColors.TextSecondary,
+            color = if (selected) White else TextSecondary,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold
         )
@@ -1474,7 +1437,7 @@ private fun WorkerReviewCard(
 
     Card(
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = White),
         border = BorderStroke(1.dp, Color(0xFFF0F3F8)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.fillMaxWidth()
@@ -1498,7 +1461,7 @@ private fun WorkerReviewCard(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = clientName,
-                            color = ProfileWFColors.TextPrimary,
+                            color = TextPrimary,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
@@ -1509,7 +1472,7 @@ private fun WorkerReviewCard(
 
                         Text(
                             text = if (hasServiceName) serviceName else "Calificación registrada",
-                            color = ProfileWFColors.TextSecondary,
+                            color = TextSecondary,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             maxLines = 1,
@@ -1528,7 +1491,7 @@ private fun WorkerReviewCard(
 
                 Text(
                     text = commentText,
-                    color = ProfileWFColors.TextSecondary,
+                    color = TextSecondary,
                     fontSize = 14.sp,
                     lineHeight = 21.sp,
                     fontWeight = FontWeight.Normal
@@ -1556,12 +1519,12 @@ private fun ReviewAvatar(
         modifier = Modifier
             .size(38.dp)
             .clip(CircleShape)
-            .background(Color(0xFFE8F0FF)),
+            .background(AvatarBlueSoft),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = initials,
-            color = ProfileWFColors.BrandBlue,
+            color = BrandBlue,
             fontSize = 12.sp,
             fontWeight = FontWeight.ExtraBold
         )
@@ -1576,7 +1539,7 @@ private fun ReviewStarsCompact(
         repeat(5) { index ->
             Text(
                 text = "★",
-                color = if (index < rating) ProfileWFColors.Yellow else Color(0xFFD7DEE8),
+                color = if (index < rating) BrandYellow else Color(0xFFD7DEE8),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1607,13 +1570,13 @@ private fun ReviewImagePreview(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFFEFF3F8)),
+                        .background(ImageBlueSoft),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = TablerIcons.Photo,
                         contentDescription = null,
-                        tint = Color(0xFF9AA6B2),
+                        tint = BlueGrayTextLight,
                         modifier = Modifier.size(34.dp)
                     )
                 }
@@ -1629,17 +1592,17 @@ private fun ReviewServiceTag(
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(ProfileWFColors.BrandBlue.copy(alpha = 0.08f))
+            .background(BrandBlue.copy(alpha = 0.08f))
             .border(
                 width = 1.dp,
-                color = ProfileWFColors.BrandBlue.copy(alpha = 0.16f),
+                color = BrandBlue.copy(alpha = 0.16f),
                 shape = RoundedCornerShape(999.dp)
             )
             .padding(horizontal = 12.dp, vertical = 7.dp)
     ) {
         Text(
             text = text,
-            color = ProfileWFColors.BrandBlue,
+            color = BrandBlue,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
         )
@@ -1681,13 +1644,13 @@ private fun SectionTitleWithAction(
     ) {
         Text(
             text = title,
-            color = ProfileWFColors.TextPrimary,
+            color = TextPrimary,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
             text = action,
-            color = ProfileWFColors.BrandBlue,
+            color = BrandBlue,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold
         )
@@ -1698,7 +1661,7 @@ private fun SectionTitleWithAction(
 private fun SectionTitle(title: String) {
     Text(
         text = title,
-        color = ProfileWFColors.TextPrimary,
+        color = TextPrimary,
         fontSize = 22.sp,
         fontWeight = FontWeight.Bold
     )
@@ -1708,8 +1671,8 @@ private fun SectionTitle(title: String) {
 private fun FeaturedServiceCard(service: Service) {
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, ProfileWFColors.Border),
+        colors = CardDefaults.cardColors(containerColor = White),
+        border = BorderStroke(1.dp, BorderSoft),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -1726,14 +1689,14 @@ private fun FeaturedServiceCard(service: Service) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = service.name,
-                        color = ProfileWFColors.TextPrimary,
+                        color = TextPrimary,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
                         text = "Duración: ${service.duration}",
-                        color = ProfileWFColors.TextSecondary.copy(alpha = 0.75f),
+                        color = TextSecondary.copy(alpha = 0.75f),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -1744,13 +1707,13 @@ private fun FeaturedServiceCard(service: Service) {
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "₡${service.cost}",
-                        color = ProfileWFColors.BrandBlue,
+                        color = BrandBlue,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
                     Text(
                         text = "Base",
-                        color = ProfileWFColors.TextSecondary.copy(alpha = 0.75f),
+                        color = TextSecondary.copy(alpha = 0.75f),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -1761,7 +1724,7 @@ private fun FeaturedServiceCard(service: Service) {
                 Spacer(Modifier.height(12.dp))
                 Text(
                     text = service.description,
-                    color = ProfileWFColors.TextSecondary,
+                    color = TextSecondary,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                     fontWeight = FontWeight.Medium
@@ -1770,6 +1733,7 @@ private fun FeaturedServiceCard(service: Service) {
         }
     }
 }
+
 @Composable
 private fun CategoryChips(categories: List<String>) {
     Row(
@@ -1781,17 +1745,17 @@ private fun CategoryChips(categories: List<String>) {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(999.dp))
-                    .background(ProfileWFColors.BrandBlue.copy(alpha = 0.10f))
+                    .background(BrandBlue.copy(alpha = 0.10f))
                     .border(
                         width = 1.dp,
-                        color = ProfileWFColors.BrandBlue.copy(alpha = 0.16f),
+                        color = BrandBlue.copy(alpha = 0.16f),
                         shape = RoundedCornerShape(999.dp)
                     )
                     .padding(horizontal = 14.dp, vertical = 8.dp)
             ) {
                 Text(
                     text = category,
-                    color = ProfileWFColors.BrandBlue,
+                    color = BrandBlue,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
                 )
@@ -1817,8 +1781,8 @@ private fun ProfileScheduleCard(
 
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, ProfileWFColors.Border),
+        colors = CardDefaults.cardColors(containerColor = White),
+        border = BorderStroke(1.dp, BorderSoft),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
@@ -1831,7 +1795,7 @@ private fun ProfileScheduleCard(
             ) {
                 Text(
                     text = "Horario de Atención",
-                    color = ProfileWFColors.BrandBlue,
+                    color = BrandBlue,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
@@ -1840,8 +1804,8 @@ private fun ProfileScheduleCard(
                     modifier = Modifier
                         .clip(RoundedCornerShape(999.dp))
                         .background(
-                            if (isOpenNow) ProfileWFColors.BrandBlue.copy(alpha = 0.10f)
-                            else Color(0xFFF1F4F8)
+                            if (isOpenNow) BrandBlue.copy(alpha = 0.10f)
+                            else SoftSurface
                         )
                         .padding(horizontal = 12.dp, vertical = 7.dp)
                 ) {
@@ -1851,14 +1815,14 @@ private fun ProfileScheduleCard(
                                 .size(8.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    if (isOpenNow) ProfileWFColors.BrandBlue
-                                    else Color(0xFF9AA6B2)
+                                    if (isOpenNow) BrandBlue
+                                    else BlueGrayTextLight
                                 )
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
                             text = if (isOpenNow) "ABIERTO AHORA" else "CERRADO",
-                            color = if (isOpenNow) ProfileWFColors.BrandBlue else Color(0xFF7C8798),
+                            color = if (isOpenNow) BrandBlue else Color(0xFF7C8798),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
@@ -1871,7 +1835,7 @@ private fun ProfileScheduleCard(
             if (sortedSchedule.isEmpty()) {
                 Text(
                     text = "Este trabajador no tiene horario registrado.",
-                    color = ProfileWFColors.TextSecondary,
+                    color = TextSecondary,
                     fontSize = 14.sp
                 )
             } else {
@@ -1898,13 +1862,13 @@ private fun ScheduleDayRow(
     val dayLabel = dayLabelFromKey(item.dayKey)
     val timeText = formatDayTimeBlocks(item)
 
-    val backgroundColor = if (highlighted) Color(0xFFF4F8FF) else Color(0xFFF8FAFC)
-    val borderColor = if (highlighted) Color(0xFFBFD6FF) else Color(0xFFE7ECF3)
-    val dayTextColor = if (highlighted) ProfileWFColors.BrandBlue else Color(0xFF5C6778)
+    val backgroundColor = if (highlighted) SoftBlueSurfaceAlt else Color(0xFFF8FAFC)
+    val borderColor = if (highlighted) BorderBlueLight else BorderSoftAlt
+    val dayTextColor = if (highlighted) BrandBlue else BlueGrayTextDark
     val timeColor = if (item.enabled && item.timeBlocks.isNotEmpty()) {
-        if (highlighted) ProfileWFColors.BrandBlue else Color(0xFF4B5565)
+        if (highlighted) BrandBlue else BlueGrayTextDarkAlt
     } else {
-        Color(0xFFB7C0CC)
+        BlueGrayTextLighter
     }
 
     Box(
@@ -2019,12 +1983,12 @@ private fun ToggleChip(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
             .background(
-                if (selected) ProfileWFColors.BrandBlue.copy(alpha = 0.10f)
+                if (selected) BrandBlue.copy(alpha = 0.10f)
                 else Color(0xFFF0F3F7)
             )
             .border(
                 width = 1.dp,
-                color = if (selected) ProfileWFColors.BrandBlue.copy(alpha = 0.16f)
+                color = if (selected) BrandBlue.copy(alpha = 0.16f)
                 else Color(0xFFE3E7EE),
                 shape = RoundedCornerShape(999.dp)
             )
@@ -2032,152 +1996,9 @@ private fun ToggleChip(
     ) {
         Text(
             text = text,
-            color = if (selected) ProfileWFColors.BrandBlue else ProfileWFColors.TextSecondary,
+            color = if (selected) BrandBlue else TextSecondary,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp
-        )
-    }
-}
-
-@Composable
-private fun ProfessionalProfileBottomBar(
-    onServices: () -> Unit,
-    onMap: () -> Unit,
-    onSearch: () -> Unit,
-    onNotifications: () -> Unit,
-    onMenu: () -> Unit
-) {
-    Surface(
-        color = Color.White,
-        tonalElevation = 8.dp,
-        shadowElevation = 8.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column {
-            Divider(color = Color(0xFFE8ECF2), thickness = 1.dp)
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BottomNavItem(
-                    label = "SERVICIOS",
-                    selected = true,
-                    onClick = onServices,
-                    content = {
-                        Icon(
-                            imageVector = TablerIcons.Apps,
-                            contentDescription = null,
-                            tint = ProfileWFColors.BrandBlue,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                )
-
-                BottomNavItem(
-                    label = "Mapa",
-                    selected = false,
-                    onClick = onMap,
-                    content = {
-                        Icon(
-                            imageVector = TablerIcons.MapPin,
-                            contentDescription = null,
-                            tint = ProfileWFColors.TabInactive,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                )
-
-                BottomNavItem(
-                    label = "Buscar",
-                    selected = false,
-                    onClick = onSearch,
-                    content = {
-                        Icon(
-                            imageVector = TablerIcons.Search,
-                            contentDescription = null,
-                            tint = ProfileWFColors.TabInactive,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                )
-
-                BottomNavItem(
-                    label = "Notif.",
-                    selected = false,
-                    onClick = onNotifications,
-                    showDot = true,
-                    content = {
-                        Icon(
-                            imageVector = TablerIcons.Mail,
-                            contentDescription = null,
-                            tint = ProfileWFColors.TabInactive,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                )
-
-                BottomNavItem(
-                    label = "Menu",
-                    selected = false,
-                    onClick = onMenu,
-                    content = {
-                        Icon(
-                            imageVector = TablerIcons.User,
-                            contentDescription = null,
-                            tint = ProfileWFColors.TabInactive,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                )
-            }
-
-            Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    showDot: Boolean = false,
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .width(64.dp)
-            .clickable(onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box {
-            content()
-
-            if (showDot) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 3.dp, y = (-2).dp)
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(ProfileWFColors.Red)
-                        .border(2.dp, Color.White, CircleShape)
-                )
-            }
-        }
-
-        Spacer(Modifier.height(6.dp))
-
-        Text(
-            text = label,
-            color = if (selected) ProfileWFColors.BrandBlue else ProfileWFColors.TabInactive,
-            fontSize = 11.sp,
-            fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Bold,
-            maxLines = 1
         )
     }
 }
