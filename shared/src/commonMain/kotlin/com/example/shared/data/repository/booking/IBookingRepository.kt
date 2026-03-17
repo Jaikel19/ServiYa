@@ -13,9 +13,12 @@ interface IBookingRepository {
     suspend fun getCancellationPolicyByWorkerId(workerId: String): CancellationPolicy?
     suspend fun getWorkerProfile(workerId: String): WorkerProfile?
 
+    suspend fun approvedAppointment(bookingId: String)
     suspend fun confirmPayment(bookingId: String)
     suspend fun startAppointment(bookingId: String)
     suspend fun completeAppointment(bookingId: String)
+
+    suspend fun rejectAppointmentByWorker(bookingId: String)
     suspend fun cancelAppointmentByWorker(bookingId: String)
     suspend fun cancelAppointmentByClient(bookingId: String)
 }

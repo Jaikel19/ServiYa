@@ -123,6 +123,16 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
+import com.example.seviya.UI.ClientDashboardRoute
+import com.example.seviya.UI.WorkerPaymentDetailScreen
+import com.example.seviya.UI.WorkerRequestDetailScreen
+import com.example.seviya.navigation.WorkerPaymentDetail
+import com.example.seviya.navigation.WorkerRequestDetail
+import com.example.seviya.ui.WorkerRequestsScreen
+import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
+import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
+import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
+import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 
 enum class SessionRole {
     GUEST,
@@ -853,9 +863,79 @@ fun App() {
                     }
 
                     composable<WorkerRequests> {
-                        FeaturePlaceholder(
-                            title = "Solicitudes",
-                            subtitle = "Aquí irán las solicitudes de citas y validación de pagos del trabajador."
+                        val viewModel: WorkerRequestsViewModel = koinViewModel()
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(currentWorkerId) {
+                            viewModel.loadRequests(currentWorkerId)
+                        }
+
+                        WorkerRequestsScreen(
+                            uiState = uiState,
+                            onAccept = { booking -> viewModel.acceptRequest(booking) },
+                            onReject = { booking -> viewModel.rejectRequest(booking) },
+                            onConfirm = { booking -> viewModel.confirmPayment(booking) },
+                            onCancel = { booking -> viewModel.cancelPayment(booking) },
+                            onOpenRequestDetail = { bookingId ->
+                                navController.navigate(WorkerRequestDetail(bookingId = bookingId))
+                            },
+                            onOpenPaymentDetail = { bookingId ->
+                                navController.navigate(WorkerPaymentDetail(bookingId = bookingId))
+                            }
+                        )
+                    }
+                    composable<WorkerRequestDetail> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerRequestDetail>()
+                        val viewModel: WorkerRequestDetailViewModel = koinViewModel()
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(route.bookingId) {
+                            viewModel.loadBooking(route.bookingId)
+                        }
+
+                        uiState.booking?.let { booking ->
+                            WorkerRequestDetailScreen(
+                                booking = booking,
+                                onBack = { navController.popBackStack() },
+                                onAccept = {
+                                    viewModel.acceptRequest()
+                                    navController.popBackStack()
+                                },
+                                onReject = {
+                                    viewModel.rejectRequest()
+                                    navController.popBackStack()
+                                }
+                            )
+                        } ?: FeaturePlaceholder(
+                            title = "Solicitud",
+                            subtitle = "No se encontró la solicitud."
+                        )
+                    }
+                    composable<WorkerPaymentDetail> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerPaymentDetail>()
+                        val viewModel: WorkerPaymentDetailViewModel = koinViewModel()
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(route.bookingId) {
+                            viewModel.loadBooking(route.bookingId)
+                        }
+
+                        uiState.booking?.let { booking ->
+                            WorkerPaymentDetailScreen(
+                                booking = booking,
+                                onBack = { navController.popBackStack() },
+                                onVerifyPayment = {
+                                    viewModel.verifyPayment()
+                                    navController.popBackStack()
+                                },
+                                onReportProblem = {
+                                    viewModel.reportProblem()
+                                    navController.popBackStack()
+                                }
+                            )
+                        } ?: FeaturePlaceholder(
+                            title = "Comprobante",
+                            subtitle = "No se encontró el pago."
                         )
                     }
 
