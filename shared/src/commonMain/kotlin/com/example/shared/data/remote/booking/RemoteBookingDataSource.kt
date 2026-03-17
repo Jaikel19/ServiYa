@@ -114,6 +114,13 @@ class RemoteBookingDataSource : IRemoteBookingDataSource {
                 "status" to "confirmed"
             )
     }
+    override suspend fun approvedAppointment(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "approved"
+            )
+    }
 
     override suspend fun startAppointment(bookingId: String) {
         db.collection("appointments")
@@ -136,6 +143,15 @@ class RemoteBookingDataSource : IRemoteBookingDataSource {
             .document(bookingId)
             .update(
                 "status" to "cancelled",
+                "cancellationReason" to "Cancelada por trabajador",
+                "cancellationBy" to "worker"
+            )
+    }
+    override suspend fun rejectAppointmentByWorker(bookingId: String) {
+        db.collection("appointments")
+            .document(bookingId)
+            .update(
+                "status" to "reject",
                 "cancellationReason" to "Cancelada por trabajador",
                 "cancellationBy" to "worker"
             )

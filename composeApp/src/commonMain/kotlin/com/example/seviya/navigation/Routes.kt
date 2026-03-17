@@ -30,6 +30,11 @@ data class ClientAppointmentDetail(
 @Serializable object WorkerDashboard
 @Serializable object WorkerAgenda
 @Serializable object WorkerRequests
+@Serializable
+data class WorkerRequestDetail(val bookingId: String)
+
+@Serializable
+data class WorkerPaymentDetail(val bookingId: String)
 @Serializable object WorkerAlerts
 @Serializable object WorkerProfile
 @Serializable object WorkerMessages
