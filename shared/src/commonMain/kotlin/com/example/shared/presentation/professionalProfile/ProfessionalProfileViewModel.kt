@@ -6,6 +6,7 @@ import com.example.shared.data.repository.professionalProfile.IProfessionalProfi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class ProfessionalProfileViewModel(
@@ -20,15 +21,20 @@ class ProfessionalProfileViewModel(
             _uiState.value = ProfessionalProfileUiState(isLoading = true)
 
             try {
-                repository.getProfessionalProfile(workerId).collect { profile ->
-                    _uiState.value = ProfessionalProfileUiState(
-                        isLoading = false,
-                        profile = profile,
-                        errorMessage = if (profile == null) {
-                            "No se encontró un perfil válido para este worker."
-                        } else null
-                    )
-                }
+                repository.getProfessionalProfile(workerId)
+                    .combine(repository.getWorkerAppointments(workerId)) { profile, appointments ->
+                        ProfessionalProfileUiState(
+                            isLoading = false,
+                            profile = profile,
+                            workerAppointments = appointments,
+                            errorMessage = if (profile == null) {
+                                "No se encontró un perfil válido para este worker."
+                            } else null
+                        )
+                    }
+                    .collect { newState ->
+                        _uiState.value = newState
+                    }
             } catch (e: Exception) {
                 _uiState.value = ProfessionalProfileUiState(
                     isLoading = false,

@@ -10,6 +10,7 @@ import org.koin.compose.viewmodel.dsl.viewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
+import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
 import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
@@ -19,14 +20,15 @@ val presentationModule = module {
     // ViewModels: LoginViewModel, RegisterViewModel, etc...
 
     factory { ServicesViewModel(get()) }
-    viewModel { MonthlyCalendarViewModel(get()) }
+    factory { MonthlyCalendarViewModel(get()) }
     factory { ProfessionalProfileViewModel(get()) }
     factory { CategoriesViewModel(get()) }
     factory { WorkersListViewModel(get()) }
-    viewModel { ClientAppointmentDetailViewModel(get()) }
+    factory { ClientAppointmentDetailViewModel(get()) }
     factory { WorkerDashboardViewModel(get(), get()) }
     factory { ClientDashboardViewModel(get()) }
-    viewModel { WorkerRequestsViewModel(get()) }
-    viewModel { WorkerRequestDetailViewModel(get()) }
-    viewModel { WorkerPaymentDetailViewModel(get()) }
+    factory { RequestAppointmentViewModel(get(), get()) }
+    factory { WorkerRequestsViewModel(get()) }
+    factory { WorkerRequestDetailViewModel(get()) }
+    factory { WorkerPaymentDetailViewModel(get()) }
 }

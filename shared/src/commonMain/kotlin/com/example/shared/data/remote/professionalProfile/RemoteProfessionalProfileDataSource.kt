@@ -11,6 +11,8 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.example.shared.domain.entity.Appointment
+import kotlinx.coroutines.flow.flowOf
 
 class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource {
 
@@ -129,6 +131,28 @@ class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource
                 }
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    override suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>> {
+        return try {
+            val appointments = db.collection("appointments")
+                .get()
+                .documents
+                .mapNotNull { document ->
+                    try {
+                        document.data<Appointment>().copy(id = document.id)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                .filter { appointment ->
+                    appointment.workerId == workerId
+                }
+
+            flowOf(appointments)
+        } catch (e: Exception) {
+            flowOf(emptyList())
         }
     }
 }

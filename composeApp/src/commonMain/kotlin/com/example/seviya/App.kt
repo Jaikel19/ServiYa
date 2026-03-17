@@ -20,12 +20,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
@@ -38,9 +41,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.seviya.UI.CategoriesCatalogRoute
+import com.example.seviya.UI.ClientAppointmentDetailScreen
+import com.example.seviya.UI.ClientDashboardRoute
+import com.example.seviya.UI.CurrentTimeSnapshot
 import com.example.seviya.UI.LandingScreen
 import com.example.seviya.UI.MonthlyCalendarScreen
 import com.example.seviya.UI.ProfessionalProfileRoute
+import com.example.seviya.UI.RequestAppointmentDraft
+import com.example.seviya.UI.RequestAppointmentRoute
 import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
@@ -58,6 +66,7 @@ import com.example.seviya.components.WorkerTab
 import com.example.seviya.navigation.CategoriesCatalog
 import com.example.seviya.navigation.ClientAgenda
 import com.example.seviya.navigation.ClientAlerts
+import com.example.seviya.navigation.ClientAppointmentDetail
 import com.example.seviya.navigation.ClientConfiguration
 import com.example.seviya.navigation.ClientDashboard
 import com.example.seviya.navigation.ClientMap
@@ -67,6 +76,7 @@ import com.example.seviya.navigation.ClientSearch
 import com.example.seviya.navigation.ClientSettings
 import com.example.seviya.navigation.Landing
 import com.example.seviya.navigation.ProfessionalProfile
+import com.example.seviya.navigation.RequestAppointment
 import com.example.seviya.navigation.RoleAdmissionCatalog
 import com.example.seviya.navigation.RoleCatalog
 import com.example.seviya.navigation.Services
@@ -89,15 +99,13 @@ import com.example.seviya.theme.AppTheme
 import com.example.seviya.ui.ServicesScreen
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.categories.CategoriesViewModel
+import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
+import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
+import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import com.example.seviya.UI.ClientAppointmentDetailScreen
-import com.example.seviya.navigation.ClientAppointmentDetail
-import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Briefcase
@@ -110,6 +118,10 @@ import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.UI.ClientDashboardRoute
 import com.example.seviya.UI.WorkerPaymentDetailScreen
@@ -135,6 +147,11 @@ fun App() {
     var sessionRole by rememberSaveable { mutableStateOf(SessionRole.GUEST) }
     var currentWorkerId by rememberSaveable { mutableStateOf("worker_demo_001") }
     var currentClientId by rememberSaveable { mutableStateOf("client_demo_001") }
+    var currentClientName by rememberSaveable { mutableStateOf("Cliente Demo") }
+
+    var requestAppointmentDraft by remember {
+        mutableStateOf<RequestAppointmentDraft?>(null)
+    }
 
     var clientMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var workerMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -170,7 +187,8 @@ fun App() {
                                 currentDestination.isRoute<ClientProfile>() ||
                                 currentDestination.isRoute<ClientMessages>() ||
                                 currentDestination.isRoute<ClientConfiguration>() ||
-                                currentDestination.isRoute<ClientSettings>()
+                                currentDestination.isRoute<ClientSettings>() ||
+                                currentDestination.isRoute<RequestAppointment>()
                         )
 
     val showWorkerBottomBar =
@@ -200,7 +218,7 @@ fun App() {
         }
 
     AppTheme {
-        Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.background,
                 bottomBar = {
@@ -212,6 +230,7 @@ fun App() {
                                     sessionRole = SessionRole.GUEST
                                     clientMenuExpanded = false
                                     workerMenuExpanded = false
+                                    requestAppointmentDraft = null
                                     navController.navigateSingleTop(Landing)
                                 },
                                 onLogin = {
@@ -304,7 +323,7 @@ fun App() {
                 NavHost(
                     navController = navController,
                     startDestination = Landing,
-                    modifier = androidx.compose.ui.Modifier.padding(innerPadding),
+                    modifier = Modifier.padding(innerPadding),
                     enterTransition = {
                         slideIntoContainer(
                             towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -359,6 +378,7 @@ fun App() {
                             onSave = { navController.popBackStack() },
                             onGoHome = {
                                 sessionRole = SessionRole.GUEST
+                                requestAppointmentDraft = null
                                 navController.navigateSingleTop(Landing)
                             },
                             onGoServices = {
@@ -376,6 +396,7 @@ fun App() {
                         RoleCatalogScreen(
                             onGoHome = {
                                 sessionRole = SessionRole.GUEST
+                                requestAppointmentDraft = null
                                 navController.navigateSingleTop(Landing)
                             },
                             onGoLogin = {
@@ -386,13 +407,16 @@ fun App() {
                             onPickClient = {
                                 sessionRole = SessionRole.CLIENT
                                 currentClientId = "client_demo_001"
+                                currentClientName = "Cliente Demo"
                                 currentClientTab = ClientTab.SERVICES
+                                requestAppointmentDraft = null
                                 navController.navigateSingleTop(CategoriesCatalog)
                             },
                             onPickWorker = {
                                 sessionRole = SessionRole.WORKER
                                 currentWorkerTab = WorkerTab.DASHBOARD
                                 currentWorkerId = "worker_demo_001"
+                                requestAppointmentDraft = null
                                 navController.navigateSingleTop(WorkerDashboard)
                             }
                         )
@@ -402,6 +426,7 @@ fun App() {
                         RoleAdmissionCatalogScreen(
                             onGoHome = {
                                 sessionRole = SessionRole.GUEST
+                                requestAppointmentDraft = null
                                 navController.navigateSingleTop(Landing)
                             },
                             onGoLogin = { },
@@ -412,13 +437,16 @@ fun App() {
                             onPickClient = {
                                 sessionRole = SessionRole.CLIENT
                                 currentClientId = "client_demo_001"
+                                currentClientName = "Cliente Demo"
                                 currentClientTab = ClientTab.SERVICES
+                                requestAppointmentDraft = null
                                 navController.navigateSingleTop(ClientDashboard)
                             },
                             onPickWorker = {
                                 sessionRole = SessionRole.WORKER
                                 currentWorkerTab = WorkerTab.DASHBOARD
                                 currentWorkerId = "worker_demo_001"
+                                requestAppointmentDraft = null
                                 navController.navigateSingleTop(WorkerDashboard)
                             }
                         )
@@ -536,8 +564,69 @@ fun App() {
                             onBottomMenu = {
                                 clientMenuExpanded = true
                                 workerMenuExpanded = false
+                            },
+                            onProcessAppointment = { profile, selectedServices, workerAppointments ->
+                                val appTimeZone = TimeZone.of("America/Costa_Rica")
+                                val nowInstant = kotlin.time.Clock.System.now()
+                                val nowLocal = nowInstant.toLocalDateTime(appTimeZone)
+
+                                requestAppointmentDraft = RequestAppointmentDraft(
+                                    clientId = currentClientId,
+                                    clientName = currentClientName,
+                                    workerId = profile.workerId.ifBlank { route.workerId },
+                                    workerName = profile.name,
+                                    workerImageUrl = profile.profilePictureLink,
+                                    workerProvince = profile.locationProvince,
+                                    selectedServices = selectedServices,
+                                    schedule = profile.schedule,
+                                    travelTimeMinutes = profile.travelTime,
+                                    workerAppointments = workerAppointments,
+                                    currentTime = CurrentTimeSnapshot(
+                                        epochMillis = nowInstant.toEpochMilliseconds(),
+                                        currentDayKey = when (nowLocal.date.dayOfWeek) {
+                                            DayOfWeek.MONDAY -> "monday"
+                                            DayOfWeek.TUESDAY -> "tuesday"
+                                            DayOfWeek.WEDNESDAY -> "wednesday"
+                                            DayOfWeek.THURSDAY -> "thursday"
+                                            DayOfWeek.FRIDAY -> "friday"
+                                            DayOfWeek.SATURDAY -> "saturday"
+                                            DayOfWeek.SUNDAY -> "sunday"
+                                        },
+                                        currentMinutes = (nowLocal.hour * 60) + nowLocal.minute,
+                                        todayYear = nowLocal.year,
+                                        todayMonth = nowLocal.monthNumber,
+                                        todayDay = nowLocal.dayOfMonth
+                                    )
+                                )
+
+                                navController.navigateSingleTop(RequestAppointment)
                             }
                         )
+                    }
+
+                    composable<RequestAppointment> {
+                        val viewModel: RequestAppointmentViewModel = koinViewModel()
+                        val draft = requestAppointmentDraft
+
+                        if (draft == null) {
+                            FeaturePlaceholder(
+                                title = "Solicitud de cita",
+                                subtitle = "No hay servicios seleccionados para procesar."
+                            )
+                        } else {
+                            RequestAppointmentRoute(
+                                draft = draft,
+                                viewModel = viewModel,
+                                onBack = { navController.popBackStack() },
+                                onOpenRequests = {
+                                    navController.navigateSingleTop(ClientDashboard)
+                                },
+                                onOpenHome = {
+                                    currentClientTab = ClientTab.SERVICES
+                                    navController.navigateSingleTop(CategoriesCatalog)
+                                }
+                            )
+                        }
                     }
 
                     composable<ClientDashboard> {
@@ -745,7 +834,7 @@ fun App() {
                                 onFinishAppointment = {
                                     monthlyCalendarViewModel.completeAppointment(booking.id)
                                 },
-                                onRateClient = { },
+                                onRateClient = {},
                                 onCancelAppointment = {
                                     monthlyCalendarViewModel.cancelAppointmentByWorker(booking.id)
                                 },
@@ -753,7 +842,7 @@ fun App() {
                                     currentWorkerTab = WorkerTab.DASHBOARD
                                     navController.navigateSingleTop(WorkerDashboard)
                                 },
-                                onGoMap = { },
+                                onGoMap = {},
                                 onGoSearch = {
                                     currentWorkerTab = WorkerTab.REQUESTS
                                     navController.navigateSingleTop(WorkerRequests)
@@ -942,6 +1031,7 @@ fun App() {
                             workerMenuExpanded = false
                             sessionRole = SessionRole.GUEST
                             currentClientTab = ClientTab.SERVICES
+                            requestAppointmentDraft = null
                             navController.navigateToLandingClearingStack()
                         }
                     ),
@@ -976,6 +1066,7 @@ fun App() {
                             clientMenuExpanded = false
                             sessionRole = SessionRole.GUEST
                             currentWorkerTab = WorkerTab.DASHBOARD
+                            requestAppointmentDraft = null
                             navController.navigateToLandingClearingStack()
                         }
                     ),
@@ -1167,11 +1258,11 @@ private fun ClientDashboardPlaceholder(
     onGoToClientAppointmentDetail: () -> Unit
 ) {
     Surface(
-        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = androidx.compose.ui.Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -1185,26 +1276,26 @@ private fun ClientDashboardPlaceholder(
             Text(
                 text = "Pantalla temporal para pruebas del flujo de ingreso.",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = androidx.compose.ui.Modifier.padding(top = 12.dp, bottom = 24.dp)
+                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
             )
 
             Button(
                 onClick = onGoToCategories,
-                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a categorías")
             }
 
             Button(
                 onClick = onGoToProfessionalProfile,
-                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir al perfil profesional")
             }
 
             Button(
                 onClick = onGoToServices,
-                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a servicios")
             }
@@ -1229,11 +1320,11 @@ private fun WorkerDashboardPlaceholder(
     onGoToMonthlyCalendar: () -> Unit
 ) {
     Surface(
-        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = androidx.compose.ui.Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -1247,12 +1338,12 @@ private fun WorkerDashboardPlaceholder(
             Text(
                 text = "Pantalla temporal para pruebas del flujo de ingreso.",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = androidx.compose.ui.Modifier.padding(top = 12.dp, bottom = 24.dp)
+                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
             )
 
             Button(
                 onClick = onGoToMonthlyCalendar,
-                modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Text("Ir a la agenda")
             }
@@ -1270,11 +1361,11 @@ private fun FeaturePlaceholder(
     subtitle: String
 ) {
     Surface(
-        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = androidx.compose.ui.Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -1288,7 +1379,7 @@ private fun FeaturePlaceholder(
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = androidx.compose.ui.Modifier.padding(top = 12.dp),
+                modifier = Modifier.padding(top = 12.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
