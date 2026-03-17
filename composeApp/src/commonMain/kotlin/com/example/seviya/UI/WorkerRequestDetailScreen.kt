@@ -2,6 +2,7 @@ package com.example.seviya.UI
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -50,7 +51,8 @@ fun WorkerRequestDetailScreen(
             Surface(
                 modifier = Modifier
                     .padding(start = 20.dp, top = 24.dp)
-                    .clip(RoundedCornerShape(999.dp)),
+                    .clip(RoundedCornerShape(999.dp))
+                    .clickable { onBack() },  // agrega esto
                 shape = RoundedCornerShape(999.dp),
                 color = White.copy(alpha = 0.13f),
                 border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
