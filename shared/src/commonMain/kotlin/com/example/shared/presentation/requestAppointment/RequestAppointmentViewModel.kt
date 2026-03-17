@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Address.IAddressRepository
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
+import com.example.shared.domain.entity.Address
 import com.example.shared.domain.entity.Appointment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,17 +33,24 @@ class RequestAppointmentViewModel(
 
             try {
                 addressRepository.getAddressesByUser(clientId).collect { addresses ->
+                    val orderedAddresses = addresses.sortedWith(
+                        compareByDescending<Address> { it.isDefault }
+                            .thenBy { it.alias.lowercase() }
+                    )
+
                     val currentSelected = _uiState.value.selectedAddressId
+                    val defaultAddressId = orderedAddresses.firstOrNull { it.isDefault }?.id.orEmpty()
 
                     val selectedId = when {
-                        currentSelected.isNotBlank() && addresses.any { it.id == currentSelected } -> currentSelected
-                        addresses.isNotEmpty() -> addresses.first().id
+                        currentSelected.isNotBlank() && orderedAddresses.any { it.id == currentSelected } -> currentSelected
+                        defaultAddressId.isNotBlank() -> defaultAddressId
+                        orderedAddresses.isNotEmpty() -> orderedAddresses.first().id
                         else -> ""
                     }
 
                     _uiState.value = _uiState.value.copy(
                         isLoadingAddresses = false,
-                        savedAddresses = addresses,
+                        savedAddresses = orderedAddresses,
                         selectedAddressId = selectedId,
                         errorMessage = null
                     )

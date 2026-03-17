@@ -6,5 +6,8 @@ import kotlinx.serialization.Serializable
 data class AppointmentService(
     val id: String = "",
     val name: String = "",
-    val cost: Double = 0.0
+    val description: String = "",
+    val cost: Int = 0,
+    val durationMinutes: Int = 0,
+    val subtotal: Int = 0
 )

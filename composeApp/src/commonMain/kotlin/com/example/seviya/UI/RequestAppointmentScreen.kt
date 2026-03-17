@@ -195,7 +195,7 @@ fun RequestAppointmentScreen(
     onOpenHome: () -> Unit = {}
 ) {
     val totalCost = remember(draft.selectedServices) {
-        draft.selectedServices.sumOf { it.cost }
+        draft.selectedServices.sumOf { it.cost.toDouble() }
     }
 
     val totalDurationMinutes = remember(draft.selectedServices) {
@@ -281,6 +281,7 @@ fun RequestAppointmentScreen(
 
     val selectedAddress = remember(uiState.savedAddresses, uiState.selectedAddressId) {
         uiState.savedAddresses.firstOrNull { it.id == uiState.selectedAddressId }
+            ?: uiState.savedAddresses.firstOrNull { it.isDefault }
     }
 
     val formValid = draft.clientId.isNotBlank() &&
@@ -427,25 +428,59 @@ fun RequestAppointmentScreen(
 
                                     if (!chosenTime.enabled) return@Button
 
-                                    val appointmentMillis = toAppointmentEpochMillis(
+                                    val serviceStartEpochMillis = toAppointmentEpochMillis(
                                         date = chosenDay.date,
                                         time = chosenTime
                                     )
 
-                                    val appointmentEndEpochMillis = toAppointmentEndEpochMillis(
-                                        date = chosenDay.date,
-                                        time = chosenTime,
-                                        blockingDurationMinutes = blockingDurationMinutes
-                                    )
+                                    val serviceStartMinutes = (chosenTime.hour * 60) + chosenTime.minute
 
-                                    val appointmentEndDateTime = Instant
-                                        .fromEpochMilliseconds(appointmentEndEpochMillis)
+                                    val existingServiceStarts = draft.workerAppointments
+                                        .filter { appointment ->
+                                            appointmentBlocksSchedule(appointment.status) &&
+                                                    appointmentBelongsToDate(appointment, chosenDay.date)
+                                        }
+                                        .mapNotNull { resolveAppointmentServiceStartMinutes(it) }
+
+                                    val hasEarlierAppointment = existingServiceStarts.any { it < serviceStartMinutes }
+
+                                    val effectiveBufferBefore = if (hasEarlierAppointment) {
+                                        draft.travelTimeMinutes.coerceAtLeast(0)
+                                    } else {
+                                        0
+                                    }
+
+                                    val serviceEndEpochMillis =
+                                        serviceStartEpochMillis + (totalDurationMinutes.coerceAtLeast(0) * 60_000L)
+
+                                    val blockedStartEpochMillis =
+                                        serviceStartEpochMillis - (effectiveBufferBefore * 60_000L)
+
+                                    val blockedEndEpochMillis =
+                                        serviceEndEpochMillis
+
+                                    val serviceStartDateTime = Instant
+                                        .fromEpochMilliseconds(serviceStartEpochMillis)
+                                        .toLocalDateTime(APPOINTMENT_TIME_ZONE)
+
+                                    val serviceEndDateTime = Instant
+                                        .fromEpochMilliseconds(serviceEndEpochMillis)
+                                        .toLocalDateTime(APPOINTMENT_TIME_ZONE)
+
+                                    val blockedStartDateTime = Instant
+                                        .fromEpochMilliseconds(blockedStartEpochMillis)
+                                        .toLocalDateTime(APPOINTMENT_TIME_ZONE)
+
+                                    val blockedEndDateTime = Instant
+                                        .fromEpochMilliseconds(blockedEndEpochMillis)
                                         .toLocalDateTime(APPOINTMENT_TIME_ZONE)
 
                                     val now = safeEpochMillis(
                                         snapshot = draft.currentTime,
-                                        fallback = appointmentMillis
+                                        fallback = serviceStartEpochMillis
                                     )
+
+                                    val nowIso = epochMillisToIsoLocalDateTime(now)
 
                                     onSubmitAppointment(
                                         Appointment(
@@ -453,37 +488,58 @@ fun RequestAppointmentScreen(
                                             clientName = draft.clientName,
                                             workerId = draft.workerId,
                                             workerName = draft.workerName,
-                                            date = appointmentMillis,
-                                            startTime = format24Hour(chosenTime.hour, chosenTime.minute),
-                                            endTime = format24Hour(
-                                                appointmentEndDateTime.hour,
-                                                appointmentEndDateTime.minute
-                                            ),
-                                            endDate = appointmentEndEpochMillis,
                                             status = "pending",
-                                            clientAddressId = chosenAddress.id,
-                                            location = AppointmentLocation(
-                                                alias = chosenAddress.alias,
-                                                province = chosenAddress.province,
-                                                district = chosenAddress.district,
-                                                canton = chosenAddress.canton,
-                                                latitude = chosenAddress.latitude,
-                                                longitude = chosenAddress.longitude,
-                                                reference = chosenAddress.reference
-                                            ),
+
+                                            timeZone = "America/Costa_Rica",
+                                            dateKey = formatDateKey(chosenDay.date),
+                                            monthKey = formatMonthKey(chosenDay.date),
+                                            dayKey = dayKeyFromWeekday(chosenDay.date.dayOfWeek),
+
+                                            serviceStartAt = formatIsoLocalDateTime(serviceStartDateTime),
+                                            serviceEndAt = formatIsoLocalDateTime(serviceEndDateTime),
+                                            serviceDurationMinutes = totalDurationMinutes,
+
+                                            travelTimeMinutesSnapshot = draft.travelTimeMinutes,
+                                            bufferBeforeMinutes = effectiveBufferBefore,
+                                            bufferAfterMinutes = 0,
+                                            blockedStartAt = formatIsoLocalDateTime(blockedStartDateTime),
+                                            blockedEndAt = formatIsoLocalDateTime(blockedEndDateTime),
+                                            blockedTotalMinutes = totalDurationMinutes + effectiveBufferBefore,
+
                                             services = draft.selectedServices.map {
                                                 AppointmentService(
                                                     id = it.id,
                                                     name = it.name,
-                                                    cost = it.cost
+                                                    description = "",
+                                                    cost = moneyToInt(it.cost.toDouble()),
+                                                    durationMinutes = parseDurationToMinutes(it.duration),
+                                                    subtotal = moneyToInt(it.cost.toDouble())
                                                 )
                                             },
-                                            totalCost = totalCost,
-                                            totalDurationMinutes = totalDurationMinutes,
-                                            blockingDurationMinutes = blockingDurationMinutes,
-                                            travelTimeMinutesSnapshot = draft.travelTimeMinutes,
-                                            createdAt = now,
-                                            updatedAt = now
+                                            totalCost = moneyToInt(totalCost),
+                                            currency = "CRC",
+
+                                            clientAddressId = chosenAddress.id,
+                                            location = AppointmentLocation(
+                                                id = chosenAddress.id,
+                                                alias = chosenAddress.alias,
+                                                province = chosenAddress.province,
+                                                canton = chosenAddress.canton,
+                                                district = chosenAddress.district,
+                                                latitude = chosenAddress.latitude,
+                                                longitude = chosenAddress.longitude,
+                                                reference = chosenAddress.reference
+                                            ),
+
+                                            clientToWorkerReviewDone = false,
+                                            workerToClientReviewDone = false,
+
+                                            cancellationBy = null,
+                                            cancellationReason = null,
+                                            cancelledAt = null,
+
+                                            createdAt = nowIso,
+                                            updatedAt = nowIso
                                         )
                                     )
                                 },
@@ -972,7 +1028,7 @@ private fun ServiceSummaryItem(
             }
 
             Text(
-                text = formatPrice(service.cost),
+                text = formatPrice(service.cost.toDouble()),
                 color = BrandBlue,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.ExtraBold
@@ -1772,6 +1828,10 @@ private fun formatPrice(value: Double): String {
     return if (rounded % 1.0 == 0.0) "₡${rounded.toInt()}" else "₡$rounded"
 }
 
+private fun moneyToInt(value: Double): Int {
+    return round(value).toInt()
+}
+
 private fun isWorkerAvailable(schedule: List<WorkerSchedule>): Boolean {
     return schedule.any { it.enabled && it.timeBlocks.isNotEmpty() }
 }
@@ -1877,16 +1937,22 @@ private fun buildAvailableDays(
     var cursor = startDate
 
     while (cursor <= monthEnd) {
-        val slotsForDay = buildAvailableTimes(
-            date = cursor,
-            schedule = schedule,
-            existingAppointments = existingAppointments,
-            currentTime = currentTime,
-            requestedServiceDurationMinutes = requestedServiceDurationMinutes,
-            requestedTravelTimeMinutes = requestedTravelTimeMinutes
-        )
+        val hasWorkerSchedule = workerHasScheduleForDate(cursor, schedule)
 
-        val shouldShowDay = slotsForDay.any { it.enabled } || cursor == today
+        val slotsForDay = if (hasWorkerSchedule) {
+            buildAvailableTimes(
+                date = cursor,
+                schedule = schedule,
+                existingAppointments = existingAppointments,
+                currentTime = currentTime,
+                requestedServiceDurationMinutes = requestedServiceDurationMinutes,
+                requestedTravelTimeMinutes = requestedTravelTimeMinutes
+            )
+        } else {
+            emptyList()
+        }
+
+        val shouldShowDay = hasWorkerSchedule && slotsForDay.any { it.enabled }
 
         if (shouldShowDay) {
             result.add(
@@ -1903,6 +1969,16 @@ private fun buildAvailableDays(
     }
 
     return result
+}
+
+private fun workerHasScheduleForDate(
+    date: LocalDate,
+    schedule: List<WorkerSchedule>
+): Boolean {
+    val scheduleForDay = findScheduleForDate(date, schedule) ?: return false
+    return scheduleForDay.enabled && scheduleForDay.timeBlocks.any {
+        it.start.isNotBlank() && it.end.isNotBlank()
+    }
 }
 
 private fun safeEpochMillis(
@@ -1939,6 +2015,14 @@ private fun buildAvailableTimes(
         appointments = existingAppointments
     )
 
+    val existingServiceStarts = existingAppointments
+        .filter { appointment ->
+            appointmentBlocksSchedule(appointment.status) &&
+                    appointmentBelongsToDate(appointment, date)
+        }
+        .mapNotNull { resolveAppointmentServiceStartMinutes(it) }
+        .sorted()
+
     val serviceDuration = requestedServiceDurationMinutes.coerceAtLeast(30)
     val requestedTravel = requestedTravelTimeMinutes.coerceAtLeast(0)
 
@@ -1955,9 +2039,6 @@ private fun buildAvailableTimes(
             val serviceStart = cursor
             val serviceEnd = serviceStart + serviceDuration
 
-            val candidateBusyStart = (serviceStart - requestedTravel).coerceAtLeast(0)
-            val candidateBusyEnd = serviceEnd + requestedTravel
-
             val isFutureTime = if (isToday) {
                 serviceStart > currentMinutes
             } else {
@@ -1965,7 +2046,18 @@ private fun buildAvailableTimes(
             }
 
             val fitsInsideWorkerSchedule =
-                candidateBusyStart >= blockStart && candidateBusyEnd <= blockEnd
+                serviceStart >= blockStart && serviceEnd <= blockEnd
+
+            val hasEarlierAppointment = existingServiceStarts.any { it < serviceStart }
+
+            val effectiveBufferBefore = if (hasEarlierAppointment) {
+                requestedTravel
+            } else {
+                0
+            }
+
+            val candidateBusyStart = (serviceStart - effectiveBufferBefore).coerceAtLeast(0)
+            val candidateBusyEnd = serviceEnd
 
             val overlapsExistingAppointment = busyRanges.any { busy ->
                 rangesOverlap(
@@ -2000,70 +2092,88 @@ private fun buildBusyRangesForDate(
     date: LocalDate,
     appointments: List<Appointment>
 ): List<BusyAppointmentRange> {
-    return appointments
+    val serviceAppointments = appointments
         .filter { appointment ->
             appointmentBlocksSchedule(appointment.status) &&
                     appointmentBelongsToDate(appointment, date)
         }
         .mapNotNull { appointment ->
-            val startMinutes = resolveAppointmentStartMinutes(appointment) ?: return@mapNotNull null
-            val busyEndMinutes = resolveAppointmentBusyEndMinutes(appointment, startMinutes) ?: return@mapNotNull null
-            val travelBuffer = appointment.travelTimeMinutesSnapshot.coerceAtLeast(0)
+            val serviceStart = resolveAppointmentServiceStartMinutes(appointment) ?: return@mapNotNull null
+            val serviceEnd = resolveAppointmentServiceEndMinutes(appointment, serviceStart) ?: return@mapNotNull null
 
-            val busyStart = (startMinutes - travelBuffer).coerceAtLeast(0)
-            val busyEnd = busyEndMinutes.coerceAtMost(24 * 60)
-
-            if (busyEnd <= busyStart) {
-                null
-            } else {
-                BusyAppointmentRange(
-                    startMinutes = busyStart,
-                    endMinutes = busyEnd
-                )
-            }
+            ExistingAppointmentSlot(
+                serviceStartMinutes = serviceStart,
+                serviceEndMinutes = serviceEnd,
+                travelBeforeMinutes = appointment.travelTimeMinutesSnapshot.coerceAtLeast(0)
+            )
         }
-        .distinctBy { "${it.startMinutes}-${it.endMinutes}" }
-        .sortedBy { it.startMinutes }
+        .sortedBy { it.serviceStartMinutes }
+
+    return serviceAppointments.mapIndexed { index, item ->
+        val effectiveBufferBefore = if (index == 0) 0 else item.travelBeforeMinutes
+
+        BusyAppointmentRange(
+            startMinutes = (item.serviceStartMinutes - effectiveBufferBefore).coerceAtLeast(0),
+            endMinutes = item.serviceEndMinutes.coerceAtMost(24 * 60)
+        )
+    }
 }
 
-private fun resolveAppointmentBusyEndMinutes(
+private fun resolveAppointmentServiceStartMinutes(
+    appointment: Appointment
+): Int? {
+    return when {
+        appointment.serviceStartAt.isNotBlank() -> parseMinutes(appointment.serviceStartAt)
+        else -> null
+    }
+}
+
+private fun resolveAppointmentServiceEndMinutes(
     appointment: Appointment,
     startMinutes: Int
 ): Int? {
-    if (appointment.blockingDurationMinutes > 0) {
-        return startMinutes + appointment.blockingDurationMinutes
+    if (appointment.serviceEndAt.isNotBlank()) {
+        return parseMinutes(appointment.serviceEndAt)
     }
 
-    if (appointment.endTime.isNotBlank()) {
-        return parseMinutes(appointment.endTime)
-    }
-
-    if (appointment.endDate > 0L) {
-        val endMinutes = epochMillisToMinutesOfDay(appointment.endDate)
-        if (endMinutes != null) return endMinutes
-    }
-
-    if (appointment.totalDurationMinutes > 0) {
-        return startMinutes + appointment.totalDurationMinutes
+    if (appointment.serviceDurationMinutes > 0) {
+        return startMinutes + appointment.serviceDurationMinutes
     }
 
     return startMinutes + 30
 }
 
+private data class ExistingAppointmentSlot(
+    val serviceStartMinutes: Int,
+    val serviceEndMinutes: Int,
+    val travelBeforeMinutes: Int
+)
+
 private fun appointmentBelongsToDate(
     appointment: Appointment,
     selectedDate: LocalDate
 ): Boolean {
-    appointment.startTime
+    if (appointment.dateKey.isNotBlank()) {
+        return appointment.dateKey == formatDateKey(selectedDate)
+    }
+
+    appointment.serviceStartAt
         .takeIf { it.isNotBlank() }
-        ?.let { startTimeText ->
-            extractLocalDateFromText(startTimeText)?.let { parsedDate ->
+        ?.let { startText ->
+            extractLocalDateFromText(startText)?.let { parsedDate ->
                 return parsedDate == selectedDate
             }
         }
 
-    val appointmentDate = epochMillisToLocalDate(appointment.date) ?: return false
-    return appointmentDate == selectedDate
+    appointment.blockedStartAt
+        .takeIf { it.isNotBlank() }
+        ?.let { startText ->
+            extractLocalDateFromText(startText)?.let { parsedDate ->
+                return parsedDate == selectedDate
+            }
+        }
+
+    return false
 }
 
 private fun extractLocalDateFromText(value: String): LocalDate? {
@@ -2088,37 +2198,40 @@ private fun extractLocalDateFromText(value: String): LocalDate? {
     }
 }
 
-private fun resolveAppointmentStartMinutes(
+private fun resolveAppointmentBlockedStartMinutes(
     appointment: Appointment
 ): Int? {
-    return when {
-        appointment.startTime.isNotBlank() -> parseMinutes(appointment.startTime)
-        else -> epochMillisToMinutesOfDay(appointment.date)
+    if (appointment.blockedStartAt.isNotBlank()) {
+        return parseMinutes(appointment.blockedStartAt)
     }
+
+    if (appointment.serviceStartAt.isNotBlank()) {
+        val serviceStartMinutes = parseMinutes(appointment.serviceStartAt) ?: return null
+        return (serviceStartMinutes - appointment.bufferBeforeMinutes.coerceAtLeast(0)).coerceAtLeast(0)
+    }
+
+    return null
 }
 
-private fun resolveAppointmentEndMinutes(
-    appointment: Appointment,
-    startMinutes: Int
+private fun resolveAppointmentBlockedEndMinutes(
+    appointment: Appointment
 ): Int? {
-    if (appointment.endTime.isNotBlank()) {
-        return parseMinutes(appointment.endTime)
+    if (appointment.blockedEndAt.isNotBlank()) {
+        return parseMinutes(appointment.blockedEndAt)
     }
 
-    if (appointment.endDate > 0L) {
-        val endMinutes = epochMillisToMinutesOfDay(appointment.endDate)
-        if (endMinutes != null) return endMinutes
+    if (appointment.serviceEndAt.isNotBlank()) {
+        val serviceEndMinutes = parseMinutes(appointment.serviceEndAt) ?: return null
+        return serviceEndMinutes + appointment.bufferAfterMinutes.coerceAtLeast(0)
     }
 
-    if (appointment.totalDurationMinutes > 0) {
-        return startMinutes + appointment.totalDurationMinutes
+    if (appointment.serviceStartAt.isNotBlank()) {
+        val serviceStartMinutes = parseMinutes(appointment.serviceStartAt) ?: return null
+        val blockedTotal = appointment.blockedTotalMinutes.coerceAtLeast(30)
+        return serviceStartMinutes + blockedTotal
     }
 
-    if (appointment.blockingDurationMinutes > 0) {
-        return startMinutes + appointment.blockingDurationMinutes
-    }
-
-    return startMinutes + 30
+    return null
 }
 
 private fun appointmentBlocksSchedule(status: String): Boolean {
@@ -2135,22 +2248,6 @@ private fun rangesOverlap(
     endB: Int
 ): Boolean {
     return startA < endB && endA > startB
-}
-
-private fun epochMillisToLocalDate(epochMillis: Long): LocalDate? {
-    if (epochMillis <= 0L) return null
-    return Instant
-        .fromEpochMilliseconds(epochMillis)
-        .toLocalDateTime(APPOINTMENT_TIME_ZONE)
-        .date
-}
-
-private fun epochMillisToMinutesOfDay(epochMillis: Long): Int? {
-    if (epochMillis <= 0L) return null
-    val localDateTime = Instant
-        .fromEpochMilliseconds(epochMillis)
-        .toLocalDateTime(APPOINTMENT_TIME_ZONE)
-    return (localDateTime.hour * 60) + localDateTime.minute
 }
 
 private fun findScheduleForDate(
@@ -2205,10 +2302,6 @@ private fun formatAmPm(hour24: Int, minute: Int): String {
     }
     val minuteText = minute.toString().padStart(2, '0')
     return "${hour12.toString().padStart(2, '0')}:$minuteText $suffix"
-}
-
-private fun format24Hour(hour24: Int, minute: Int): String {
-    return "${hour24.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
 }
 
 private fun dayKeyFromWeekday(dayOfWeek: DayOfWeek): String {
@@ -2297,14 +2390,36 @@ private fun toAppointmentEpochMillis(
         .toEpochMilliseconds()
 }
 
-private fun toAppointmentEndEpochMillis(
-    date: LocalDate,
-    time: AppointmentTimeOption,
-    blockingDurationMinutes: Int
-): Long {
-    val startEpochMillis = toAppointmentEpochMillis(date, time)
-    val durationMillis = blockingDurationMinutes.coerceAtLeast(0) * 60_000L
-    return startEpochMillis + durationMillis
+private fun formatIsoLocalDateTime(dateTime: LocalDateTime): String {
+    val year = dateTime.year.toString().padStart(4, '0')
+    val month = dateTime.monthNumber.toString().padStart(2, '0')
+    val day = dateTime.dayOfMonth.toString().padStart(2, '0')
+    val hour = dateTime.hour.toString().padStart(2, '0')
+    val minute = dateTime.minute.toString().padStart(2, '0')
+    return "${year}-${month}-${day}T${hour}:${minute}"
+}
+
+private fun epochMillisToIsoLocalDateTime(epochMillis: Long): String {
+    if (epochMillis <= 0L) return ""
+
+    val localDateTime = Instant
+        .fromEpochMilliseconds(epochMillis)
+        .toLocalDateTime(APPOINTMENT_TIME_ZONE)
+
+    return formatIsoLocalDateTime(localDateTime)
+}
+
+private fun formatDateKey(date: LocalDate): String {
+    val year = date.year.toString().padStart(4, '0')
+    val month = date.monthNumber.toString().padStart(2, '0')
+    val day = date.dayOfMonth.toString().padStart(2, '0')
+    return "$year-$month-$day"
+}
+
+private fun formatMonthKey(date: LocalDate): String {
+    val year = date.year.toString().padStart(4, '0')
+    val month = date.monthNumber.toString().padStart(2, '0')
+    return "$year-$month"
 }
 
 private fun calculateTotalServiceDurationMinutes(services: List<Service>): Int {

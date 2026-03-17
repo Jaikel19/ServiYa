@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppointmentLocation(
+    val id: String = "",
     val alias: String = "",
     val province: String = "",
     val district: String = "",
