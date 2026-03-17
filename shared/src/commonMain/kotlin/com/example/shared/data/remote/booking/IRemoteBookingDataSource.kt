@@ -14,8 +14,10 @@ interface IRemoteBookingDataSource {
     suspend fun getWorkerProfile(workerId: String): WorkerProfile?
 
     suspend fun confirmPayment(bookingId: String)
+     suspend fun approvedAppointment(bookingId: String)
     suspend fun startAppointment(bookingId: String)
     suspend fun completeAppointment(bookingId: String)
+    suspend fun rejectAppointmentByWorker(bookingId: String)
     suspend fun cancelAppointmentByWorker(bookingId: String)
     suspend fun cancelAppointmentByClient(bookingId: String)
 }

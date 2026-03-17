@@ -37,6 +37,10 @@ class BookingRepository(
         return remote.getWorkerProfile(workerId)
     }
 
+    override suspend fun approvedAppointment(bookingId: String) {
+        remote.approvedAppointment(bookingId)
+    }
+
     override suspend fun confirmPayment(bookingId: String) {
         remote.confirmPayment(bookingId)
     }
@@ -47,6 +51,10 @@ class BookingRepository(
 
     override suspend fun completeAppointment(bookingId: String) {
         remote.completeAppointment(bookingId)
+    }
+
+    override suspend fun rejectAppointmentByWorker(bookingId: String) {
+        remote.rejectAppointmentByWorker(bookingId)
     }
 
     override suspend fun cancelAppointmentByWorker(bookingId: String) {
