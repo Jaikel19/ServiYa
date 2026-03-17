@@ -51,4 +51,32 @@ class AppointmentRepository(
         } catch (e: Exception) {
             println("ERROR deleteAppointment: ${e.message}")
         }
+
+    override suspend fun approveAppointment(appointmentId: String) {
+        remote.approveAppointment(appointmentId)
+    }
+
+    override suspend fun confirmPayment(appointmentId: String) {
+        remote.confirmPayment(appointmentId)
+    }
+
+    override suspend fun startAppointment(appointmentId: String) {
+        remote.startAppointment(appointmentId)
+    }
+
+    override suspend fun completeAppointment(appointmentId: String) {
+        remote.completeAppointment(appointmentId)
+    }
+
+    override suspend fun rejectAppointmentByWorker(appointmentId: String) {
+        remote.rejectAppointmentByWorker(appointmentId)
+    }
+
+    override suspend fun cancelAppointmentByWorker(appointmentId: String) {
+        remote.cancelAppointmentByWorker(appointmentId)
+    }
+
+    override suspend fun cancelAppointmentByClient(appointmentId: String) {
+        remote.cancelAppointmentByClient(appointmentId)
+    }
 }
