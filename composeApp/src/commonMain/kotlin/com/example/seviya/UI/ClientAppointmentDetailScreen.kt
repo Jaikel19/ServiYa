@@ -61,14 +61,13 @@ import com.example.seviya.theme.TextBluePrimary
 import com.example.seviya.theme.TextOnBlueSubtitle
 import com.example.seviya.theme.TextSecondary
 import com.example.seviya.theme.White
-import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.CancellationPolicy
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailUiState
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.DotsVertical
-import compose.icons.tablericons.FileInvoice
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.MessageCircle
 import compose.icons.tablericons.ShieldLock
@@ -91,10 +90,9 @@ fun ClientAppointmentDetailScreen(
     onGoAlerts: () -> Unit = {},
     onGoMenu: () -> Unit = {}
 ) {
-    val booking = uiState.booking
+    val appointment = uiState.appointment
     val worker = uiState.worker
     val errorMessage = uiState.errorMessage
-    var showReceiptImage by remember(booking?.id) { mutableStateOf(false) }
 
     Scaffold(
         containerColor = AppBackground,
@@ -139,7 +137,7 @@ fun ClientAppointmentDetailScreen(
                     )
                 }
 
-                booking != null -> {
+                appointment != null -> {
                     if (!uiState.canShowClientSummary) {
                         Surface(
                             modifier = Modifier
@@ -164,14 +162,14 @@ fun ClientAppointmentDetailScreen(
                                 )
 
                                 Text(
-                                    text = "Esta vista solo está disponible cuando la cita está confirmada y el comprobante ya fue subido.",
+                                    text = "Esta vista solo está disponible cuando la cita está confirmada.",
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         color = TextSecondary
                                     )
                                 )
 
                                 Text(
-                                    text = "Estado actual: ${booking.status}",
+                                    text = "Estado actual: ${appointment.status}",
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         color = BlueGrayText,
                                         fontWeight = FontWeight.SemiBold
@@ -204,12 +202,12 @@ fun ClientAppointmentDetailScreen(
                                         verticalAlignment = Alignment.Top
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
-                                            ClientStatusChip(status = booking.status)
+                                            ClientStatusChip(status = appointment.status)
 
                                             Spacer(modifier = Modifier.height(12.dp))
 
                                             Text(
-                                                text = booking.services.firstOrNull()?.name ?: "Servicio",
+                                                text = appointment.services.firstOrNull()?.name ?: "Servicio",
                                                 style = MaterialTheme.typography.headlineMedium.copy(
                                                     color = TextBluePrimary,
                                                     fontWeight = FontWeight.ExtraBold
@@ -243,7 +241,7 @@ fun ClientAppointmentDetailScreen(
                                     ClientInfoBlock(
                                         icon = TablerIcons.User,
                                         label = "TRABAJADOR",
-                                        value = worker?.name ?: booking.workerName
+                                        value = worker?.name ?: appointment.workerName
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -251,7 +249,7 @@ fun ClientAppointmentDetailScreen(
                                     ClientInfoBlock(
                                         icon = TablerIcons.CalendarEvent,
                                         label = "FECHA Y HORA",
-                                        value = "${extractDateOnlyClient(booking.date)} • ${extractTimeFromDateTimeClient(booking.date)}"
+                                        value = "${extractDateOnlyClient(appointment.serviceStartAt)} • ${extractTimeFromDateTimeClient(appointment.serviceStartAt)}"
                                     )
 
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -259,7 +257,7 @@ fun ClientAppointmentDetailScreen(
                                     ClientInfoBlock(
                                         icon = TablerIcons.MapPin,
                                         label = "UBICACIÓN",
-                                        value = formatFullLocation(booking)
+                                        value = formatFullLocation(appointment)
                                     )
                                 }
                             }
@@ -321,7 +319,7 @@ fun ClientAppointmentDetailScreen(
                                                 .padding(horizontal = 18.dp, vertical = 18.dp),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            ClientOtpRow(code = booking.otpCode)
+                                            ClientOtpRow(code = uiState.otp?.code.orEmpty())
                                         }
                                     }
                                 }
@@ -363,84 +361,6 @@ fun ClientAppointmentDetailScreen(
                                     enabled = uiState.canCancel,
                                     onClick = onCancelAppointment
                                 )
-                            }
-
-                            if (uiState.hasReceipt) {
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(22.dp),
-                                    color = White,
-                                    border = BorderStroke(1.dp, BorderSoft)
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 16.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Surface(
-                                            modifier = Modifier.size(34.dp),
-                                            shape = RoundedCornerShape(10.dp),
-                                            color = SoftSurface
-                                        ) {
-                                            Box(contentAlignment = Alignment.Center) {
-                                                Icon(
-                                                    imageVector = TablerIcons.FileInvoice,
-                                                    contentDescription = null,
-                                                    tint = BlueGrayText,
-                                                    modifier = Modifier.size(18.dp)
-                                                )
-                                            }
-                                        }
-
-                                        Spacer(modifier = Modifier.width(10.dp))
-
-                                        Text(
-                                            text = "Comprobante enviado",
-                                            modifier = Modifier.weight(1f),
-                                            color = TextBluePrimary,
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                fontWeight = FontWeight.SemiBold
-                                            )
-                                        )
-
-                                        Text(
-                                            text = if (showReceiptImage) "Ocultar imagen" else "Ver imagen",
-                                            color = BrandBlue,
-                                            style = MaterialTheme.typography.bodyMedium.copy(
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            modifier = Modifier.clickable {
-                                                showReceiptImage = !showReceiptImage
-                                            }
-                                        )
-                                    }
-                                }
-
-                                if (showReceiptImage) {
-                                    Surface(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(22.dp),
-                                        color = White,
-                                        border = BorderStroke(1.dp, BorderSoft)
-                                    ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp)
-                                        ) {
-                                            KamelImage(
-                                                resource = asyncPainterResource(data = booking.paymentReceiptUrl),
-                                                contentDescription = "Comprobante",
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(180.dp)
-                                                    .clip(RoundedCornerShape(18.dp)),
-                                                contentScale = ContentScale.Crop
-                                            )
-                                        }
-                                    }
-                                }
                             }
 
                             Surface(
@@ -663,19 +583,20 @@ private fun ClientActionButton(
 @Composable
 private fun ClientOtpRow(code: String) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(14.dp)
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         code.forEach { digit ->
             Surface(
-                modifier = Modifier.size(54.dp),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.size(44.dp),
+                shape = RoundedCornerShape(14.dp),
                 color = White,
                 border = BorderStroke(1.dp, Color(0xFFE4EDF8))
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = digit.toString(),
-                        style = MaterialTheme.typography.headlineMedium.copy(
+                        style = MaterialTheme.typography.titleLarge.copy(
                             color = BrandBlue,
                             fontWeight = FontWeight.ExtraBold
                         )
@@ -791,9 +712,9 @@ private fun ClientPolicyLine(
     }
 }
 
-private fun formatFullLocation(booking: Booking): String {
+private fun formatFullLocation(appointment: Appointment): String {
     return listOf(
-        booking.location.reference
+        appointment.location.reference
     ).filter { it.isNotBlank() }
         .joinToString(", ")
 }

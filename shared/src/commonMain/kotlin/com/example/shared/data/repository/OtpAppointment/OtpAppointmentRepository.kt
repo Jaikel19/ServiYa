@@ -24,7 +24,7 @@ class OtpAppointmentRepository(
             ""
         }
 
-    override suspend fun markOtpAsUsed(appointmentId: String, otpId: String, usedAt: Long) =
+    override suspend fun markOtpAsUsed(appointmentId: String, otpId: String, usedAt: String) =
         try {
             remote.markOtpAsUsed(appointmentId, otpId, usedAt)
         } catch (e: Exception) {
