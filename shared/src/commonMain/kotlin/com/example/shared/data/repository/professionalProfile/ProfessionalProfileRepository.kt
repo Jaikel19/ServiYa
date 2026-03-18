@@ -2,11 +2,10 @@ package com.example.shared.data.repository.professionalProfile
 
 import com.example.shared.data.remote.professionalProfile.IRemoteProfessionalProfileDataSource
 import com.example.shared.data.repository.Service.IServiceRepository
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.ProfessionalProfileData
-import com.example.shared.domain.entity.WorkerSchedule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import com.example.shared.domain.entity.Appointment
 
 class ProfessionalProfileRepository(
     private val remoteProfile: IRemoteProfessionalProfileDataSource,
@@ -53,5 +52,17 @@ class ProfessionalProfileRepository(
 
     override suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>> {
         return remoteProfile.getWorkerAppointments(workerId)
+    }
+
+    override suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>> {
+        return remoteProfile.getFavoriteWorkerIds(clientId)
+    }
+
+    override suspend fun addFavorite(clientId: String, workerId: String) {
+        remoteProfile.addFavorite(clientId, workerId)
+    }
+
+    override suspend fun removeFavorite(clientId: String, workerId: String) {
+        remoteProfile.removeFavorite(clientId, workerId)
     }
 }

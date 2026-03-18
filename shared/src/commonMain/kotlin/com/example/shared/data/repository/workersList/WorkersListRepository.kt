@@ -45,4 +45,16 @@ class WorkersListRepository(
             }.sortedByDescending { it.stars }
         }
     }
+
+    override suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>> {
+        return remote.getFavoriteWorkerIds(clientId)
+    }
+
+    override suspend fun addFavorite(clientId: String, workerId: String) {
+        remote.addFavorite(clientId, workerId)
+    }
+
+    override suspend fun removeFavorite(clientId: String, workerId: String) {
+        remote.removeFavorite(clientId, workerId)
+    }
 }

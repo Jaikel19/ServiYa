@@ -20,4 +20,8 @@ interface IRemoteProfessionalProfileDataSource {
 
     suspend fun getWorkerReviews(workerId: String): List<WorkerReviewItem>
     suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>>
+
+    suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>>
+    suspend fun addFavorite(clientId: String, workerId: String)
+    suspend fun removeFavorite(clientId: String, workerId: String)
 }

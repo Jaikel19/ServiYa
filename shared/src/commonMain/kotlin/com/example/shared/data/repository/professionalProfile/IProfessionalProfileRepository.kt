@@ -7,4 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface IProfessionalProfileRepository {
     suspend fun getProfessionalProfile(workerId: String): Flow<ProfessionalProfileData?>
     suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>>
+
+    suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>>
+    suspend fun addFavorite(clientId: String, workerId: String)
+    suspend fun removeFavorite(clientId: String, workerId: String)
 }

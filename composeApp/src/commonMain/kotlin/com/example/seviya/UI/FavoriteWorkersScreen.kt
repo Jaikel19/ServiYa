@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.seviya.theme.AppBackgroundAlt
 import com.example.seviya.theme.BorderBlueLight
 import com.example.seviya.theme.BrandBlue
@@ -62,20 +63,20 @@ import com.example.seviya.theme.TextPrimaryAlt
 import com.example.seviya.theme.TextSecondary
 import com.example.seviya.theme.White
 import com.example.shared.domain.entity.WorkerListItemData
-import com.example.shared.presentation.workersList.WorkersListUiState
-import com.example.shared.presentation.workersList.WorkersListViewModel
+import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersUiState
+import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
 import compose.icons.TablerIcons
-import compose.icons.tablericons.Heart
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Moon
+import compose.icons.tablericons.Trash
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlin.math.round
 
 @Composable
-fun WorkersListRoute(
+fun FavoriteWorkersRoute(
     clientId: String,
-    viewModel: WorkersListViewModel,
+    viewModel: FavoriteWorkersViewModel,
     selectedCategoryId: String? = null,
     selectedCategoryName: String? = null,
     avatarPainter: Painter? = null,
@@ -90,18 +91,20 @@ fun WorkersListRoute(
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(clientId) {
-        viewModel.loadWorkers()
-        viewModel.loadFavoriteWorkerIds(clientId)
+        viewModel.loadFavoriteWorkers(clientId)
     }
 
-    WorkersListScreen(
+    FavoriteWorkersScreen(
         state = state,
         selectedCategoryId = selectedCategoryId,
         selectedCategoryName = selectedCategoryName,
         avatarPainter = avatarPainter,
         onWorkerClick = onWorkerClick,
-        onFavoriteClick = { workerId ->
-            viewModel.toggleFavorite(clientId, workerId)
+        onConfirmRemoveFavorite = { workerId ->
+            viewModel.removeFavoriteByWorkerId(
+                clientId = clientId,
+                workerId = workerId
+            )
         },
         onThemeClick = onThemeClick,
         onBottomServices = onBottomServices,
@@ -113,13 +116,13 @@ fun WorkersListRoute(
 }
 
 @Composable
-fun WorkersListScreen(
-    state: WorkersListUiState,
+fun FavoriteWorkersScreen(
+    state: FavoriteWorkersUiState,
     selectedCategoryId: String? = null,
     selectedCategoryName: String? = null,
     avatarPainter: Painter? = null,
     onWorkerClick: (String) -> Unit = {},
-    onFavoriteClick: (String) -> Unit = {},
+    onConfirmRemoveFavorite: (String) -> Unit = {},
     onThemeClick: () -> Unit = {},
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
@@ -128,6 +131,7 @@ fun WorkersListScreen(
     onBottomMenu: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var workerPendingDelete by remember { mutableStateOf<WorkerListItemData?>(null) }
 
     val visibleWorkers = remember(
         state.workers,
@@ -141,11 +145,22 @@ fun WorkersListScreen(
                 val matchCategoryName = selectedCategoryName?.let { categoryName ->
                     worker.categoryNames.any { it.equals(categoryName, ignoreCase = true) }
                 } ?: true
-                val matchSearch = matchesWorkerSearch(worker, searchQuery)
+                val matchSearch = matchesSearch(worker, searchQuery)
 
                 matchCategoryId && matchCategoryName && matchSearch
             }
             .sortedByDescending { it.stars }
+    }
+
+    workerPendingDelete?.let { worker ->
+        FavoriteDeleteDialog(
+            workerName = worker.name.ifBlank { "este trabajador" },
+            onDismiss = { workerPendingDelete = null },
+            onConfirm = {
+                onConfirmRemoveFavorite(worker.workerId)
+                workerPendingDelete = null
+            }
+        )
     }
 
     Scaffold(
@@ -159,7 +174,7 @@ fun WorkersListScreen(
                 .background(BrandBlue)
                 .padding(innerPadding)
         ) {
-            WorkersHeader(
+            FavoriteWorkersHeader(
                 selectedCategoryName = selectedCategoryName,
                 onThemeClick = onThemeClick
             )
@@ -172,7 +187,7 @@ fun WorkersListScreen(
                 shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    WorkerSearchBar(
+                    FavoriteSearchBar(
                         query = searchQuery,
                         onQueryChange = { searchQuery = it }
                     )
@@ -184,7 +199,7 @@ fun WorkersListScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Cargando trabajadores...",
+                                    text = "Cargando favoritos...",
                                     color = TextSecondary,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Medium
@@ -203,8 +218,7 @@ fun WorkersListScreen(
                                     text = state.errorMessage ?: "Ocurrió un error.",
                                     color = BrandRed,
                                     fontSize = 15.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    textAlign = TextAlign.Center
+                                    fontWeight = FontWeight.SemiBold
                                 )
                             }
                         }
@@ -216,13 +230,19 @@ fun WorkersListScreen(
                                     .padding(24.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "No hay trabajadores disponibles para esta categoría.",
-                                    color = TextSecondary,
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    textAlign = TextAlign.Center
-                                )
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = if (searchQuery.isNotBlank() || !selectedCategoryName.isNullOrBlank()) {
+                                            "No se encontraron trabajadores favoritos con esos criterios."
+                                        } else {
+                                            "Aún no tienes trabajadores favoritos."
+                                        },
+                                        color = TextSecondary,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
 
@@ -243,12 +263,11 @@ fun WorkersListScreen(
                                     items = visibleWorkers,
                                     key = { it.workerId }
                                 ) { worker ->
-                                    WorkerGridCard(
+                                    FavoriteWorkerGridCard(
                                         worker = worker,
-                                        isFavorite = state.favoriteWorkerIds.contains(worker.workerId),
                                         avatarPainter = avatarPainter,
                                         onClick = { onWorkerClick(worker.workerId) },
-                                        onFavoriteClick = { onFavoriteClick(worker.workerId) }
+                                        onRemoveClick = { workerPendingDelete = worker }
                                     )
                                 }
                             }
@@ -260,12 +279,11 @@ fun WorkersListScreen(
     }
 }
 
-private fun matchesWorkerSearch(
+private fun matchesSearch(
     worker: WorkerListItemData,
     query: String
 ): Boolean {
     if (query.isBlank()) return true
-
     val normalized = query.trim()
 
     return worker.name.contains(normalized, ignoreCase = true) ||
@@ -273,7 +291,7 @@ private fun matchesWorkerSearch(
 }
 
 @Composable
-private fun WorkerSearchBar(
+private fun FavoriteSearchBar(
     query: String,
     onQueryChange: (String) -> Unit
 ) {
@@ -287,7 +305,7 @@ private fun WorkerSearchBar(
         shape = RoundedCornerShape(18.dp),
         placeholder = {
             Text(
-                text = "Buscar trabajador o servicio",
+                text = "Buscar trabajador o categoría",
                 color = TextSecondary
             )
         }
@@ -295,13 +313,129 @@ private fun WorkerSearchBar(
 }
 
 @Composable
-private fun WorkersHeader(
+private fun FavoriteDeleteDialog(
+    workerName: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(30.dp),
+            color = White,
+            shadowElevation = 10.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 22.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(58.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFFBEAEA))
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFFF6D4D4),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.Trash,
+                        contentDescription = "Eliminar favorito",
+                        tint = BrandRed,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text(
+                    text = "Quitar de favoritos",
+                    color = TextPrimaryAlt,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Se eliminará a $workerName de tu lista de favoritos.",
+                    color = TextSecondary,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(22.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(18.dp))
+                            .clickable(onClick = onDismiss),
+                        color = Color(0xFFF7F8FA),
+                        border = BorderStroke(1.dp, Color(0xFFE6EAF0))
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 13.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Cancelar",
+                                color = TextPrimaryAlt,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(18.dp))
+                            .clickable(onClick = onConfirm),
+                        color = BrandRed
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 13.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Eliminar",
+                                color = White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FavoriteWorkersHeader(
     selectedCategoryName: String?,
     onThemeClick: () -> Unit
 ) {
     val subtitle = selectedCategoryName?.takeIf { it.isNotBlank() }?.let {
-        "Explora profesionales en $it"
-    } ?: "Encuentra el experto ideal para hoy"
+        "Tus profesionales favoritos en $it"
+    } ?: "Revisa los trabajadores que guardaste como favoritos"
 
     Box(
         modifier = Modifier
@@ -316,7 +450,7 @@ private fun WorkersHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ServiYaPill()
+                FavoriteServiYaPill()
 
                 Box(
                     modifier = Modifier
@@ -343,7 +477,7 @@ private fun WorkersHeader(
             Spacer(modifier = Modifier.height(22.dp))
 
             Text(
-                text = "Profesionales Disponibles",
+                text = "Trabajadores Favoritos",
                 color = White,
                 fontSize = 24.sp,
                 lineHeight = 30.sp,
@@ -363,7 +497,7 @@ private fun WorkersHeader(
 }
 
 @Composable
-private fun ServiYaPill() {
+private fun FavoriteServiYaPill() {
     Surface(
         color = White,
         shape = RoundedCornerShape(14.dp),
@@ -392,12 +526,11 @@ private fun ServiYaPill() {
 }
 
 @Composable
-private fun WorkerGridCard(
+private fun FavoriteWorkerGridCard(
     worker: WorkerListItemData,
-    isFavorite: Boolean,
     avatarPainter: Painter?,
     onClick: () -> Unit,
-    onFavoriteClick: () -> Unit
+    onRemoveClick: () -> Unit
 ) {
     val provinceText = worker.province.ifBlank { "Ubicación no disponible" }
 
@@ -409,42 +542,28 @@ private fun WorkerGridCard(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(18.dp),
         color = White,
-        border = BorderStroke(
-            1.dp,
-            Color(0xFFE4ECF7)
-        )
+        border = BorderStroke(1.dp, Color(0xFFE4ECF7))
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(top = 10.dp, end = 10.dp)
-                    .size(36.dp)
+                    .size(34.dp)
                     .clip(CircleShape)
-                    .background(
-                        if (isFavorite) BrandRed.copy(alpha = 0.14f)
-                        else Color(0xFFF7F8FA)
-                    )
+                    .background(BrandRed.copy(alpha = 0.12f))
                     .border(
                         width = 1.dp,
-                        color = if (isFavorite) {
-                            BrandRed.copy(alpha = 0.25f)
-                        } else {
-                            Color(0xFFE4EAF2)
-                        },
+                        color = BrandRed.copy(alpha = 0.22f),
                         shape = CircleShape
                     )
-                    .clickable(onClick = onFavoriteClick),
+                    .clickable(onClick = onRemoveClick),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = TablerIcons.Heart,
-                    contentDescription = if (isFavorite) {
-                        "Quitar de favoritos"
-                    } else {
-                        "Agregar a favoritos"
-                    },
-                    tint = if (isFavorite) BrandRed else TextSecondary,
+                    imageVector = TablerIcons.Trash,
+                    contentDescription = "Eliminar favorito",
+                    tint = BrandRed,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -456,7 +575,7 @@ private fun WorkerGridCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                WorkerCircularPhoto(
+                FavoriteWorkerCircularPhoto(
                     imageUrl = worker.profilePictureLink,
                     avatarPainter = avatarPainter
                 )
@@ -475,19 +594,19 @@ private fun WorkerGridCard(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                WorkerProvinceInline(
+                FavoriteWorkerProvinceInline(
                     province = provinceText
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                WorkerRatingInline(
+                FavoriteWorkerRatingInline(
                     rating = worker.stars
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                WorkerPriceText(
+                FavoriteWorkerPriceText(
                     price = worker.startingPrice
                 )
             }
@@ -496,7 +615,7 @@ private fun WorkerGridCard(
 }
 
 @Composable
-private fun WorkerProvinceInline(
+private fun FavoriteWorkerProvinceInline(
     province: String
 ) {
     Row(
@@ -524,7 +643,7 @@ private fun WorkerProvinceInline(
 }
 
 @Composable
-private fun WorkerCircularPhoto(
+private fun FavoriteWorkerCircularPhoto(
     imageUrl: String?,
     avatarPainter: Painter?
 ) {
@@ -600,7 +719,7 @@ private fun WorkerCircularPhoto(
 }
 
 @Composable
-private fun WorkerRatingInline(
+private fun FavoriteWorkerRatingInline(
     rating: Double,
     reviewCount: Int? = null
 ) {
@@ -632,10 +751,10 @@ private fun WorkerRatingInline(
 }
 
 @Composable
-private fun WorkerPriceText(
+private fun FavoriteWorkerPriceText(
     price: Double
 ) {
-    val text = if (price > 0.0) formatPrice(price) else "Consultar"
+    val text = if (price > 0.0) formatFavoritePrice(price) else "Consultar"
 
     Text(
         text = "Desde $text",
@@ -645,7 +764,7 @@ private fun WorkerPriceText(
     )
 }
 
-private fun formatPrice(value: Double): String {
+private fun formatFavoritePrice(value: Double): String {
     val rounded = round(value * 100) / 100.0
     return if (rounded % 1.0 == 0.0) {
         "₡${rounded.toInt()}"

@@ -62,5 +62,33 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
         }
     }
 
+    override suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>> {
+        return db.collection("users")
+            .document(clientId)
+            .collection("favorites")
+            .snapshots
+            .map { querySnapshot ->
+                querySnapshot.documents.map { it.id }.toSet()
+            }
+    }
 
+    override suspend fun addFavorite(clientId: String, workerId: String) {
+        db.collection("users")
+            .document(clientId)
+            .collection("favorites")
+            .document(workerId)
+            .set(
+                mapOf(
+                    "workerId" to workerId
+                )
+            )
+    }
+
+    override suspend fun removeFavorite(clientId: String, workerId: String) {
+        db.collection("users")
+            .document(clientId)
+            .collection("favorites")
+            .document(workerId)
+            .delete()
+    }
 }
