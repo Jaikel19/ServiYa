@@ -140,6 +140,7 @@ import com.example.shared.domain.entity.AppointmentLocation
 import com.example.shared.domain.entity.AppointmentService
 import com.example.shared.domain.entity.Booking
 import com.example.shared.domain.entity.Service
+import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 
 enum class SessionRole {
     GUEST,
@@ -823,10 +824,20 @@ fun App() {
                     }
 
                     composable<WorkerAppointmentDetail> {
+                        val detailViewModel: WorkerAppointmentDetailViewModel = koinViewModel()
+                        val detailUiState by detailViewModel.uiState.collectAsState()
+
                         calendarState.selectedAppointment?.let { appointment ->
+
+                            LaunchedEffect(appointment.id) {
+                                detailViewModel.loadPaymentReceipt(appointment.id)
+                            }
+
                             WorkerAppointmentDetailScreen(
-                                booking = appointment.toBooking(),
+                                appointment = appointment,
+                                paymentReceipt = detailUiState.paymentReceipt,
                                 onBack = {
+                                    detailViewModel.clearState()
                                     monthlyCalendarViewModel.clearSelectedAppointment()
                                     navController.popBackStack()
                                 },

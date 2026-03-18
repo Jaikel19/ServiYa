@@ -10,6 +10,8 @@ import com.example.shared.data.remote.Service.IRemoteServicesDataSource
 import com.example.shared.data.remote.Service.RemoteServicesDataSource
 import com.example.shared.data.remote.Address.IRemoteAddressDataSource
 import com.example.shared.data.remote.Address.RemoteAddressDataSource
+import com.example.shared.data.remote.PaymentReceipt.IRemotePaymentReceiptDataSource
+import com.example.shared.data.remote.PaymentReceipt.RemotePaymentReceiptDataSource
 import com.example.shared.data.remote.appointment.IRemoteAppointmentDataSource
 import com.example.shared.data.remote.appointment.RemoteAppointmentDataSource
 import com.example.shared.data.remote.cancellationPolicy.IRemoteCancellationPolicyDataSource
@@ -28,6 +30,8 @@ import com.example.shared.data.repository.Address.AddressRepository
 import com.example.shared.data.repository.Address.IAddressRepository
 import com.example.shared.data.repository.Appointment.AppointmentRepository
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
+import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
+import com.example.shared.data.repository.PaymentReceipt.PaymentReceiptRepository
 import com.example.shared.data.repository.categories.CategoryRepository
 import com.example.shared.data.repository.categories.ICategoryRepository
 import com.example.shared.data.repository.professionalProfile.IProfessionalProfileRepository
@@ -69,6 +73,10 @@ val dataModule = module {
     // Appointments
     single<IRemoteAppointmentDataSource> { RemoteAppointmentDataSource() }
     single<IAppointmentRepository> { AppointmentRepository(get()) }
+
+    // Payment Receipt
+    single<IRemotePaymentReceiptDataSource> { RemotePaymentReceiptDataSource() }
+    single<IPaymentReceiptRepository> { PaymentReceiptRepository(get()) }
 
     // Addresses
     single<IRemoteAddressDataSource> { RemoteAddressDataSource() }
