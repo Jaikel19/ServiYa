@@ -46,7 +46,10 @@ class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
         appointmentId: String,
         receiptId: String,
         status: String,
-        note: String?
+        note: String?,
+        reviewedAt: String?,
+        reviewedBy: String?,
+        rejectionReason: String?
     ) {
         try {
             db.collection("appointments")
@@ -55,7 +58,10 @@ class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
                 .document(receiptId)
                 .update(
                     "status" to status,
-                    "note" to note
+                    "note" to note,
+                    "reviewedAt" to reviewedAt,
+                    "reviewedBy" to reviewedBy,
+                    "rejectionReason" to rejectionReason
                 )
         } catch (_: Exception) {
         }

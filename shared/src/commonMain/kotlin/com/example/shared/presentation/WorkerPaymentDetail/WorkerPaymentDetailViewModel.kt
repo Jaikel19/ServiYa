@@ -11,7 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class WorkerPaymentDetailViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val paymentReceiptRepository: IPaymentReceiptRepository
@@ -59,11 +64,16 @@ class WorkerPaymentDetailViewModel(
 
         viewModelScope.launch {
             try {
+                val now = currentDateTimeString()
+
                 paymentReceiptRepository.updateReceiptStatus(
                     appointmentId = appointment.id,
                     receiptId = receipt.id,
                     status = "APPROVED",
-                    note = null
+                    note = null,
+                    reviewedAt = now,
+                    reviewedBy = appointment.workerId,
+                    rejectionReason = null
                 )
 
                 appointmentRepository.confirmPayment(appointment.id)
@@ -81,11 +91,16 @@ class WorkerPaymentDetailViewModel(
 
         viewModelScope.launch {
             try {
+                val now = currentDateTimeString()
+
                 paymentReceiptRepository.updateReceiptStatus(
                     appointmentId = appointment.id,
                     receiptId = receipt.id,
                     status = "REJECTED",
-                    note = "Problema con comprobante"
+                    note = "Problema con comprobante",
+                    reviewedAt = now,
+                    reviewedBy = appointment.workerId,
+                    rejectionReason = "Problema con comprobante"
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -93,5 +108,18 @@ class WorkerPaymentDetailViewModel(
                 )
             }
         }
+    }
+
+    private fun currentDateTimeString(): String {
+        val now = Clock.System.now()
+        val local = now.toLocalDateTime(TimeZone.of("America/Costa_Rica"))
+
+        val year = local.year.toString().padStart(4, '0')
+        val month = local.monthNumber.toString().padStart(2, '0')
+        val day = local.dayOfMonth.toString().padStart(2, '0')
+        val hour = local.hour.toString().padStart(2, '0')
+        val minute = local.minute.toString().padStart(2, '0')
+
+        return "$year-$month-$day" + "T" + "$hour:$minute"
     }
 }

@@ -119,7 +119,10 @@ class WorkerRequestsViewModel(
                 appointmentId = appointment.id,
                 receiptId = receiptId,
                 status = "APPROVED",
-                note = null
+                note = null,
+                reviewedAt = null,
+                reviewedBy = null,
+                rejectionReason = null
             )
 
             appointmentRepository.confirmPayment(appointment.id)
@@ -136,7 +139,10 @@ class WorkerRequestsViewModel(
                 appointmentId = appointment.id,
                 receiptId = receiptId,
                 status = "REJECTED",
-                note = note
+                note = note,
+                reviewedAt = null,
+                reviewedBy = null,
+                rejectionReason = note
             )
         }
     }
