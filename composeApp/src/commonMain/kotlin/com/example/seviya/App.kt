@@ -127,6 +127,9 @@ import com.example.seviya.navigation.ClientPaymentUpload
 import com.example.seviya.navigation.ClientRequests
 import com.example.seviya.ui.ClientRequestsScreen
 import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
+import com.example.seviya.navigation.WorkerStartAppointmentOtp
+import com.example.seviya.UI.WorkerStartAppointmentOtpScreen
+import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Briefcase
@@ -736,7 +739,7 @@ fun App() {
                         val uiState by viewModel.uiState.collectAsState()
 
                         LaunchedEffect(route.bookingId) {
-                            viewModel.loadBookingDetail(route.bookingId)
+                            viewModel.loadAppointmentDetail(route.bookingId)
                         }
 
                         ClientAppointmentDetailScreen(
@@ -899,7 +902,7 @@ fun App() {
                                     monthlyCalendarViewModel.confirmPayment(appointment.id)
                                 },
                                 onStartAppointment = {
-                                    monthlyCalendarViewModel.startAppointment(appointment.id)
+                                    navController.navigate(WorkerStartAppointmentOtp(appointmentId = appointment.id))
                                 },
                                 onFinishAppointment = {
                                     monthlyCalendarViewModel.completeAppointment(appointment.id)
@@ -929,6 +932,30 @@ fun App() {
                         } ?: FeaturePlaceholder(
                             title = "Detalle de cita",
                             subtitle = "No hay una cita seleccionada en este momento."
+                        )
+                    }
+
+                    composable<WorkerStartAppointmentOtp> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerStartAppointmentOtp>()
+                        val viewModel: WorkerStartAppointmentOtpViewModel = koinViewModel()
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(route.appointmentId) {
+                            viewModel.loadData(route.appointmentId)
+                        }
+
+                        LaunchedEffect(uiState.startSuccess) {
+                            if (uiState.startSuccess) {
+                                navController.popBackStack()
+                                navController.popBackStack()
+                            }
+                        }
+
+                        WorkerStartAppointmentOtpScreen(
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onOtpChange = viewModel::onOtpChanged,
+                            onStartAppointment = { viewModel.startAppointmentWithOtp() }
                         )
                     }
 
