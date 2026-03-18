@@ -13,7 +13,11 @@ import kotlinx.serialization.Serializable
 @Serializable object CategoriesCatalog
 @Serializable object ClientMap
 @Serializable object ClientSearch
+
 @Serializable object ClientAlerts
+
+@Serializable object ClientRequests
+
 @Serializable object ClientDashboard
 @Serializable object ClientAgenda
 @Serializable object ClientProfile
@@ -50,6 +54,11 @@ data class WorkerPaymentDetail(val bookingId: String)
 @Serializable object WorkerAppointmentDetail
 
 @Serializable object ClientFavorites
+
+@Serializable
+data class ClientPaymentUpload(
+    val appointmentId: String
+)
 
 @Serializable
 data class WorkersList(
