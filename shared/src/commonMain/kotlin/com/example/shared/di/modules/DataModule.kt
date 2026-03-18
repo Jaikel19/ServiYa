@@ -18,6 +18,8 @@ import com.example.shared.data.remote.cancellationPolicy.IRemoteCancellationPoli
 import com.example.shared.data.remote.cancellationPolicy.RemoteCancellationPolicyDataSource
 import com.example.shared.data.remote.categories.IRemoteCategoriesDataSource
 import com.example.shared.data.remote.categories.RemoteCategoriesDataSource
+import com.example.shared.data.remote.favoriteWorkers.IRemoteFavoriteWorkersDataSource
+import com.example.shared.data.remote.favoriteWorkers.RemoteFavoriteWorkersDataSource
 import com.example.shared.data.remote.professionalProfile.IRemoteProfessionalProfileDataSource
 import com.example.shared.data.remote.professionalProfile.RemoteProfessionalProfileDataSource
 import com.example.shared.data.remote.workersList.IRemoteWorkersListDataSource
@@ -34,6 +36,8 @@ import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptReposito
 import com.example.shared.data.repository.PaymentReceipt.PaymentReceiptRepository
 import com.example.shared.data.repository.categories.CategoryRepository
 import com.example.shared.data.repository.categories.ICategoryRepository
+import com.example.shared.data.repository.favoriteWorkers.FavoriteWorkersRepository
+import com.example.shared.data.repository.favoriteWorkers.IFavoriteWorkersRepository
 import com.example.shared.data.repository.professionalProfile.IProfessionalProfileRepository
 import com.example.shared.data.repository.professionalProfile.ProfessionalProfileRepository
 import com.example.shared.data.repository.workersList.IWorkersListRepository
@@ -84,4 +88,9 @@ val dataModule = module {
 
     // Cancellation policy
     single<IRemoteCancellationPolicyDataSource> { RemoteCancellationPolicyDataSource() }
+
+    // Favorite workers
+    single<IRemoteFavoriteWorkersDataSource> { RemoteFavoriteWorkersDataSource() }
+    single<IFavoriteWorkersRepository> { FavoriteWorkersRepository(get(), get()) }
+
 }

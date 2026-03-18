@@ -49,6 +49,8 @@ data class WorkerPaymentDetail(val bookingId: String)
 @Serializable object WorkerSchedule
 @Serializable object WorkerAppointmentDetail
 
+@Serializable object ClientFavorites
+
 @Serializable
 data class WorkersList(
     val categoryId: String?,

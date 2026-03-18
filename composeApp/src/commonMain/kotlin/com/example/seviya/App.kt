@@ -43,7 +43,7 @@ import androidx.navigation.toRoute
 import com.example.seviya.UI.CategoriesCatalogRoute
 import com.example.seviya.UI.ClientAppointmentDetailScreen
 import com.example.seviya.UI.ClientDashboardRoute
-import com.example.seviya.UI.CurrentTimeSnapshot
+import com.example.seviya.UI.FavoriteWorkersRoute
 import com.example.seviya.UI.LandingScreen
 import com.example.seviya.UI.MonthlyCalendarScreen
 import com.example.seviya.UI.ProfessionalProfileRoute
@@ -54,6 +54,8 @@ import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
 import com.example.seviya.UI.WorkerAppointmentDetailScreen
 import com.example.seviya.UI.WorkerDashboardRoute
+import com.example.seviya.UI.WorkerPaymentDetailScreen
+import com.example.seviya.UI.WorkerRequestDetailScreen
 import com.example.seviya.UI.WorkersListRoute
 import com.example.seviya.components.ClientBottomBar
 import com.example.seviya.components.ClientTab
@@ -69,6 +71,7 @@ import com.example.seviya.navigation.ClientAlerts
 import com.example.seviya.navigation.ClientAppointmentDetail
 import com.example.seviya.navigation.ClientConfiguration
 import com.example.seviya.navigation.ClientDashboard
+import com.example.seviya.navigation.ClientFavorites
 import com.example.seviya.navigation.ClientMap
 import com.example.seviya.navigation.ClientMessages
 import com.example.seviya.navigation.ClientProfile
@@ -87,9 +90,11 @@ import com.example.seviya.navigation.WorkerAppointmentDetail
 import com.example.seviya.navigation.WorkerConfiguration
 import com.example.seviya.navigation.WorkerDashboard
 import com.example.seviya.navigation.WorkerMessages
+import com.example.seviya.navigation.WorkerPaymentDetail
 import com.example.seviya.navigation.WorkerPortfolio
 import com.example.seviya.navigation.WorkerProfile
 import com.example.seviya.navigation.WorkerReports
+import com.example.seviya.navigation.WorkerRequestDetail
 import com.example.seviya.navigation.WorkerRequests
 import com.example.seviya.navigation.WorkerSchedule
 import com.example.seviya.navigation.WorkerServices
@@ -97,13 +102,25 @@ import com.example.seviya.navigation.WorkerSettings
 import com.example.seviya.navigation.WorkersList
 import com.example.seviya.theme.AppTheme
 import com.example.seviya.ui.ServicesScreen
+import com.example.seviya.ui.WorkerRequestsScreen
+import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.Appointment
+import com.example.shared.domain.entity.AppointmentLocation
+import com.example.shared.domain.entity.AppointmentService
+import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Service
+import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
+import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
+import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
+import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
+import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import compose.icons.TablerIcons
@@ -118,29 +135,7 @@ import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
-import com.example.seviya.UI.ClientDashboardRoute
-import com.example.seviya.UI.WorkerPaymentDetailScreen
-import com.example.seviya.UI.WorkerRequestDetailScreen
-import com.example.seviya.navigation.WorkerPaymentDetail
-import com.example.seviya.navigation.WorkerRequestDetail
-import com.example.seviya.ui.WorkerRequestsScreen
-import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
-import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
-import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
-
-//esto se agrego para que sirva drante la migracion de booking
-import com.example.shared.domain.entity.Address
-import com.example.shared.domain.entity.Appointment
-import com.example.shared.domain.entity.AppointmentLocation
-import com.example.shared.domain.entity.AppointmentService
-import com.example.shared.domain.entity.Booking
-import com.example.shared.domain.entity.Service
-import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 
 enum class SessionRole {
     GUEST,
@@ -196,6 +191,7 @@ fun App() {
                                 currentDestination.isRoute<ClientMessages>() ||
                                 currentDestination.isRoute<ClientConfiguration>() ||
                                 currentDestination.isRoute<ClientSettings>() ||
+                                currentDestination.isRoute<ClientFavorites>() ||
                                 currentDestination.isRoute<RequestAppointment>()
                         )
 
@@ -513,6 +509,7 @@ fun App() {
                         val viewModel: WorkersListViewModel = koinViewModel()
 
                         WorkersListRoute(
+                            clientId = currentClientId,
                             viewModel = viewModel,
                             selectedCategoryId = route.categoryId,
                             selectedCategoryName = route.categoryName,
@@ -550,6 +547,7 @@ fun App() {
                         val viewModel: ProfessionalProfileViewModel = koinViewModel()
 
                         ProfessionalProfileRoute(
+                            clientId = currentClientId,
                             workerId = route.workerId,
                             viewModel = viewModel,
                             onBack = { navController.popBackStack() },
@@ -574,10 +572,6 @@ fun App() {
                                 workerMenuExpanded = false
                             },
                             onProcessAppointment = { profile, selectedServices, workerAppointments ->
-                                val appTimeZone = TimeZone.of("America/Costa_Rica")
-                                val nowInstant = kotlin.time.Clock.System.now()
-                                val nowLocal = nowInstant.toLocalDateTime(appTimeZone)
-
                                 requestAppointmentDraft = RequestAppointmentDraft(
                                     clientId = currentClientId,
                                     clientName = currentClientName,
@@ -588,23 +582,7 @@ fun App() {
                                     selectedServices = selectedServices,
                                     schedule = profile.schedule,
                                     travelTimeMinutes = profile.travelTime,
-                                    workerAppointments = workerAppointments,
-                                    currentTime = CurrentTimeSnapshot(
-                                        epochMillis = nowInstant.toEpochMilliseconds(),
-                                        currentDayKey = when (nowLocal.date.dayOfWeek) {
-                                            DayOfWeek.MONDAY -> "monday"
-                                            DayOfWeek.TUESDAY -> "tuesday"
-                                            DayOfWeek.WEDNESDAY -> "wednesday"
-                                            DayOfWeek.THURSDAY -> "thursday"
-                                            DayOfWeek.FRIDAY -> "friday"
-                                            DayOfWeek.SATURDAY -> "saturday"
-                                            DayOfWeek.SUNDAY -> "sunday"
-                                        },
-                                        currentMinutes = (nowLocal.hour * 60) + nowLocal.minute,
-                                        todayYear = nowLocal.year,
-                                        todayMonth = nowLocal.monthNumber,
-                                        todayDay = nowLocal.dayOfMonth
-                                    )
+                                    workerAppointments = workerAppointments
                                 )
 
                                 navController.navigateSingleTop(RequestAppointment)
@@ -672,6 +650,41 @@ fun App() {
                                 navController.navigateSingleTop(CategoriesCatalog)
                             },
                             onOpenMenu = {
+                                clientMenuExpanded = true
+                                workerMenuExpanded = false
+                            }
+                        )
+                    }
+
+                    composable<ClientFavorites> {
+                        val viewModel: FavoriteWorkersViewModel = koinViewModel()
+
+                        FavoriteWorkersRoute(
+                            clientId = currentClientId,
+                            viewModel = viewModel,
+                            onWorkerClick = { workerId ->
+                                navController.navigate(
+                                    ProfessionalProfile(workerId = workerId)
+                                )
+                            },
+                            onThemeClick = { },
+                            onBottomServices = {
+                                currentClientTab = ClientTab.SERVICES
+                                navController.navigateSingleTop(CategoriesCatalog)
+                            },
+                            onBottomMap = {
+                                currentClientTab = ClientTab.MAP
+                                navController.navigateSingleTop(ClientMap)
+                            },
+                            onBottomSearch = {
+                                currentClientTab = ClientTab.SEARCH
+                                navController.navigateSingleTop(ClientSearch)
+                            },
+                            onBottomNotifications = {
+                                currentClientTab = ClientTab.ALERTS
+                                navController.navigateSingleTop(ClientAlerts)
+                            },
+                            onBottomMenu = {
                                 clientMenuExpanded = true
                                 workerMenuExpanded = false
                             }
@@ -903,6 +916,7 @@ fun App() {
                             }
                         )
                     }
+
                     composable<WorkerRequestDetail> { backStackEntry ->
                         val route = backStackEntry.toRoute<WorkerRequestDetail>()
                         val viewModel: WorkerRequestDetailViewModel = koinViewModel()
@@ -1112,6 +1126,16 @@ private fun clientMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(ClientAgenda)
+            }
+        ),
+        MenuOption(
+            title = "Favoritos",
+            subtitle = "Trabajadores guardados por el cliente",
+            icon = TablerIcons.Briefcase,
+            iconColor = Color(0xFFE77E9B),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientFavorites)
             }
         ),
         MenuOption(
@@ -1427,7 +1451,7 @@ private fun NavHostController.navigateToLandingClearingStack() {
     }
 }
 
-//esto siguiente se tiene que borrar apenas todas las clases dejen de recibir booking
+// esto siguiente se tiene que borrar apenas todas las clases dejen de recibir booking
 private fun Booking.toAppointment(): Appointment {
     return Appointment(
         id = id,

@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.seviya.theme.*
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.CancellationPolicy
 import com.example.shared.domain.entity.PortfolioItem
 import com.example.shared.domain.entity.ProfessionalProfileData
@@ -71,11 +72,6 @@ import compose.icons.tablericons.*
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlin.math.round
-import kotlin.time.Clock
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import com.example.shared.domain.entity.Appointment
 
 private enum class ProfileTab {
     INFO, SERVICES, REVIEWS, PORTFOLIO
@@ -85,15 +81,14 @@ private enum class ReviewFilterType {
     ALL, FIVE, FOUR, THREE
 }
 
-private val COSTA_RICA_TIME_ZONE = TimeZone.of("America/Costa_Rica")
-
 @Composable
 fun ProfessionalProfileRoute(
+    clientId: String,
     workerId: String,
     viewModel: ProfessionalProfileViewModel,
     avatarPainter: Painter? = null,
     onBack: () -> Unit = {},
-    onProcessAppointment: (ProfessionalProfileData, List<Service>, List<com.example.shared.domain.entity.Appointment>) -> Unit = { _, _, _ -> },
+    onProcessAppointment: (ProfessionalProfileData, List<Service>, List<Appointment>) -> Unit = { _, _, _ -> },
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
     onBottomSearch: () -> Unit = {},
@@ -102,14 +97,18 @@ fun ProfessionalProfileRoute(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(workerId) {
+    LaunchedEffect(workerId, clientId) {
         viewModel.loadProfile(workerId)
+        viewModel.loadFavoriteStatus(clientId, workerId)
     }
 
     ProfessionalProfileScreen(
         avatarPainter = avatarPainter,
         state = state,
         onBack = onBack,
+        onFavoriteClick = {
+            viewModel.toggleFavorite(clientId, workerId)
+        },
         onProcessAppointment = onProcessAppointment,
         onBottomServices = onBottomServices,
         onBottomMap = onBottomMap,
@@ -125,6 +124,7 @@ fun ProfessionalProfileScreen(
     avatarPainter: Painter? = null,
     state: ProfessionalProfileUiState,
     onBack: () -> Unit = {},
+    onFavoriteClick: () -> Unit = {},
     onProcessAppointment: (ProfessionalProfileData, List<Service>, List<Appointment>) -> Unit = { _, _, _ -> },
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
@@ -163,6 +163,8 @@ fun ProfessionalProfileScreen(
                 HeaderSection(
                     avatarPainter = avatarPainter,
                     onBack = onBack,
+                    onFavoriteClick = onFavoriteClick,
+                    isFavorite = state.isFavorite,
                     profile = profile
                 )
 
@@ -315,6 +317,8 @@ fun ProfessionalProfileScreen(
 private fun HeaderSection(
     avatarPainter: Painter?,
     onBack: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    isFavorite: Boolean,
     profile: ProfessionalProfileData?
 ) {
     val name = profile?.name?.takeIf { it.isNotBlank() } ?: "Profesional"
@@ -330,19 +334,31 @@ private fun HeaderSection(
             .padding(horizontal = 20.dp)
             .padding(top = 2.dp, bottom = 6.dp)
     ) {
-        SquareGlassButton(
-            onClick = onBack,
-            content = {
-                Icon(
-                    imageVector = TablerIcons.ChevronRight,
-                    contentDescription = "Volver",
-                    tint = White,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .rotate(180f)
-                )
-            }
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 2.dp)
+        ) {
+            SquareGlassButton(
+                onClick = onBack,
+                content = {
+                    Icon(
+                        imageVector = TablerIcons.ChevronRight,
+                        contentDescription = "Volver",
+                        tint = White,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .rotate(180f)
+                    )
+                }
+            )
+
+            FavoriteGlassButton(
+                isFavorite = isFavorite,
+                onClick = onFavoriteClick,
+                modifier = Modifier.align(Alignment.TopEnd)
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -422,6 +438,45 @@ private fun SquareGlassButton(
         contentAlignment = Alignment.Center
     ) {
         content()
+    }
+}
+
+@Composable
+private fun FavoriteGlassButton(
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .size(56.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(
+                if (isFavorite) White.copy(alpha = 0.18f)
+                else White.copy(alpha = 0.12f)
+            )
+            .border(
+                width = 1.5.dp,
+                color = if (isFavorite) {
+                    BrandRed.copy(alpha = 0.55f)
+                } else {
+                    White.copy(alpha = 0.16f)
+                },
+                shape = RoundedCornerShape(18.dp)
+            )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = TablerIcons.Heart,
+            contentDescription = if (isFavorite) {
+                "Quitar de favoritos"
+            } else {
+                "Agregar a favoritos"
+            },
+            tint = if (isFavorite) BrandRed else White,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
 
@@ -1781,8 +1836,9 @@ private fun ProfileScheduleCard(
         schedule.sortedBy { it.dayNumber }
     }
 
-    val currentDayKey = remember { currentDayKey() }
-    val isOpenNow = remember(schedule) { isWorkerOpenNow(schedule) }
+    val hasEnabledSchedule = remember(schedule) {
+        schedule.any { it.enabled && it.timeBlocks.isNotEmpty() }
+    }
 
     Card(
         shape = RoundedCornerShape(24.dp),
@@ -1809,7 +1865,7 @@ private fun ProfileScheduleCard(
                     modifier = Modifier
                         .clip(RoundedCornerShape(999.dp))
                         .background(
-                            if (isOpenNow) BrandBlue.copy(alpha = 0.10f)
+                            if (hasEnabledSchedule) BrandBlue.copy(alpha = 0.10f)
                             else SoftSurface
                         )
                         .padding(horizontal = 12.dp, vertical = 7.dp)
@@ -1820,14 +1876,14 @@ private fun ProfileScheduleCard(
                                 .size(8.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    if (isOpenNow) BrandBlue
+                                    if (hasEnabledSchedule) BrandBlue
                                     else BlueGrayTextLight
                                 )
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
-                            text = if (isOpenNow) "ABIERTO AHORA" else "CERRADO",
-                            color = if (isOpenNow) BrandBlue else Color(0xFF7C8798),
+                            text = if (hasEnabledSchedule) "HORARIO DISPONIBLE" else "SIN HORARIO",
+                            color = if (hasEnabledSchedule) BrandBlue else Color(0xFF7C8798),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
@@ -1847,7 +1903,7 @@ private fun ProfileScheduleCard(
                 sortedSchedule.forEachIndexed { index, item ->
                     ScheduleDayRow(
                         item = item,
-                        highlighted = item.dayKey.equals(currentDayKey, ignoreCase = true)
+                        highlighted = false
                     )
 
                     if (index < sortedSchedule.lastIndex) {
@@ -1917,53 +1973,6 @@ private fun formatDayTimeBlocks(item: WorkerSchedule): String {
         .filter { it.start.isNotBlank() && it.end.isNotBlank() }
         .joinToString(" / ") { "${it.start} - ${it.end}" }
         .ifBlank { "CERRADO" }
-}
-
-@OptIn(kotlin.time.ExperimentalTime::class)
-private fun currentDayKey(): String {
-    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
-    return when (now.date.dayOfWeek) {
-        DayOfWeek.MONDAY -> "monday"
-        DayOfWeek.TUESDAY -> "tuesday"
-        DayOfWeek.WEDNESDAY -> "wednesday"
-        DayOfWeek.THURSDAY -> "thursday"
-        DayOfWeek.FRIDAY -> "friday"
-        DayOfWeek.SATURDAY -> "saturday"
-        DayOfWeek.SUNDAY -> "sunday"
-    }
-}
-
-@OptIn(kotlin.time.ExperimentalTime::class)
-private fun isWorkerOpenNow(schedule: List<WorkerSchedule>): Boolean {
-    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    val currentMinutes = now.time.hour * 60 + now.time.minute
-    val dayKey = currentDayKey()
-
-    val todaySchedule = schedule.firstOrNull {
-        it.dayKey.equals(dayKey, ignoreCase = true)
-    } ?: return false
-
-    if (!todaySchedule.enabled || todaySchedule.timeBlocks.isEmpty()) return false
-
-    return todaySchedule.timeBlocks.any { block ->
-        val startMinutes = parseHourToMinutes(block.start)
-        val endMinutes = parseHourToMinutes(block.end)
-
-        startMinutes != null &&
-                endMinutes != null &&
-                currentMinutes in startMinutes..endMinutes
-    }
-}
-
-private fun parseHourToMinutes(value: String): Int? {
-    val parts = value.split(":")
-    if (parts.size != 2) return null
-
-    val hour = parts[0].toIntOrNull() ?: return null
-    val minute = parts[1].toIntOrNull() ?: return null
-
-    return hour * 60 + minute
 }
 
 private fun dayLabelFromKey(dayKey: String): String {

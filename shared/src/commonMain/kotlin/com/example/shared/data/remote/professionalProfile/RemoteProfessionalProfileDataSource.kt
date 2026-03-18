@@ -1,6 +1,7 @@
 package com.example.shared.data.remote.professionalProfile
 
 import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.CancellationPolicy
 import com.example.shared.domain.entity.Category
 import com.example.shared.domain.entity.PortfolioItem
@@ -10,9 +11,8 @@ import com.example.shared.domain.entity.WorkerSchedule
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import com.example.shared.domain.entity.Appointment
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource {
 
@@ -154,5 +154,35 @@ class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource
         } catch (e: Exception) {
             flowOf(emptyList())
         }
+    }
+
+    override suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>> {
+        return db.collection("users")
+            .document(clientId)
+            .collection("favorites")
+            .snapshots
+            .map { querySnapshot ->
+                querySnapshot.documents.map { it.id }.toSet()
+            }
+    }
+
+    override suspend fun addFavorite(clientId: String, workerId: String) {
+        db.collection("users")
+            .document(clientId)
+            .collection("favorites")
+            .document(workerId)
+            .set(
+                mapOf(
+                    "workerId" to workerId
+                )
+            )
+    }
+
+    override suspend fun removeFavorite(clientId: String, workerId: String) {
+        db.collection("users")
+            .document(clientId)
+            .collection("favorites")
+            .document(workerId)
+            .delete()
     }
 }
