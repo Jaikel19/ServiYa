@@ -49,18 +49,25 @@ class MonthlyCalendarViewModel(
 
             appointmentRepository.getAppointmentsByWorker(workerId)
                 .onEach { appointments ->
-                    println("DEBUG appointments recibidos en ViewModel: $appointments")
+
+                    val visibleAppointments = appointments.filter { appointment ->
+                        appointment.status.equals("confirmed", ignoreCase = true) ||
+                                appointment.status.equals("in_progress", ignoreCase = true) ||
+                                appointment.status.equals("completed", ignoreCase = true)
+                    }
+
+                    println("DEBUG appointments visibles en agenda: $visibleAppointments")
 
                     val currentSelected = _uiState.value.selectedAppointment
                     val refreshedSelected = if (currentSelected != null) {
-                        appointments.firstOrNull { it.id == currentSelected.id }
+                        visibleAppointments.firstOrNull { it.id == currentSelected.id }
                     } else {
                         null
                     }
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        appointments = appointments,
+                        appointments = visibleAppointments,
                         selectedAppointment = refreshedSelected,
                         errorMessage = null
                     )
