@@ -12,5 +12,5 @@ data class PaymentReceipt(
     val reviewedAt: String? = null,     // YYYY-MM-DDTHH:mm
     val reviewedBy: String? = null,
     val rejectionReason: String? = null,
-    val status: String = ""             // PENDING | APPROVED | REJECTED
+    val status: String = ""             // pending ||payment_pending | APPROVED | REJECTED
 )

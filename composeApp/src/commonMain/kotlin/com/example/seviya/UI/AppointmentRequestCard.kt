@@ -17,25 +17,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Appointment
 
 val PrimaryBlue = Color(0xFF1A3A6B)
 
 @Composable
-fun BookingRequestCard(
-    booking: Booking,
+fun AppointmentRequestCard(
+    appointment: Appointment,
     onAccept: () -> Unit,
     onReject: () -> Unit,
     onCardClick: () -> Unit = {}
 ) {
-    val servicesText = booking.services.joinToString { it.name }
+    val servicesText = appointment.services.joinToString { it.name }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                println("DEBUG card clickeada: ${booking.id}")
-                onCardClick() },
+                println("DEBUG card clickeada: ${appointment.id}")
+                onCardClick()
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -64,7 +65,7 @@ fun BookingRequestCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = booking.clientName,
+                        text = appointment.clientName,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.SemiBold
                         )
@@ -80,7 +81,6 @@ fun BookingRequestCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Reject button
                 Box(
                     modifier = Modifier
                         .size(38.dp)
@@ -102,7 +102,6 @@ fun BookingRequestCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Accept button
                 Box(
                     modifier = Modifier
                         .size(38.dp)
@@ -136,7 +135,7 @@ fun BookingRequestCard(
                     Text(text = "📅", fontSize = 12.sp)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = booking.date,
+                        text = appointment.serviceStartAt,
                         style = MaterialTheme.typography.bodySmall.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -144,7 +143,7 @@ fun BookingRequestCard(
                 }
 
                 Text(
-                    text = "₡${booking.totalCost}",
+                    text = "₡${appointment.totalCost}",
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         color = PrimaryBlue
@@ -158,7 +157,7 @@ fun BookingRequestCard(
                 Text(text = "📍", fontSize = 12.sp)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = booking.location.district,
+                    text = appointment.location.district,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
