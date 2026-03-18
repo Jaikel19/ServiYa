@@ -123,6 +123,10 @@ import com.example.shared.presentation.services.ServicesViewModel
 import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
+import com.example.seviya.navigation.ClientPaymentUpload
+import com.example.seviya.navigation.ClientRequests
+import com.example.seviya.ui.ClientRequestsScreen
+import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Briefcase
@@ -192,7 +196,9 @@ fun App() {
                                 currentDestination.isRoute<ClientConfiguration>() ||
                                 currentDestination.isRoute<ClientSettings>() ||
                                 currentDestination.isRoute<ClientFavorites>() ||
-                                currentDestination.isRoute<RequestAppointment>()
+                                currentDestination.isRoute<RequestAppointment>()||
+                                currentDestination.isRoute<ClientRequests>() ||
+                                currentDestination.isRoute<ClientPaymentUpload>()
                         )
 
     val showWorkerBottomBar =
@@ -605,12 +611,13 @@ fun App() {
                                 viewModel = viewModel,
                                 onBack = { navController.popBackStack() },
                                 onOpenRequests = {
-                                    navController.navigateSingleTop(ClientDashboard)
+                                    navController.navigateSingleTop(ClientRequests)
                                 },
                                 onOpenHome = {
                                     currentClientTab = ClientTab.SERVICES
                                     navController.navigateSingleTop(CategoriesCatalog)
                                 }
+
                             )
                         }
                     }
@@ -643,7 +650,7 @@ fun App() {
                                 navController.navigateSingleTop(ClientConfiguration)
                             },
                             onOpenRequests = {
-                                navController.navigateSingleTop(ClientConfiguration)
+                                navController.navigateSingleTop(ClientRequests)
                             },
                             onOpenCategories = {
                                 currentClientTab = ClientTab.SERVICES
@@ -688,6 +695,38 @@ fun App() {
                                 clientMenuExpanded = true
                                 workerMenuExpanded = false
                             }
+                        )
+                    }
+
+                    composable<ClientRequests> {
+                        val viewModel: ClientRequestsViewModel = koinViewModel()
+                        val uiState by viewModel.uiState.collectAsState()
+
+                        LaunchedEffect(currentClientId) {
+                            viewModel.loadRequests(currentClientId)
+                        }
+
+                        ClientRequestsScreen(
+                            uiState = uiState,
+                            onOpenRequestDetail = { appointmentId ->
+                                navController.navigate(
+                                    ClientAppointmentDetail(bookingId = appointmentId)
+                                )
+                            },
+                            onOpenPaymentUpload = { appointmentId ->
+                                navController.navigate(
+                                    ClientPaymentUpload(appointmentId = appointmentId)
+                                )
+                            }
+                        )
+                    }
+
+                    composable<ClientPaymentUpload> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ClientPaymentUpload>()
+
+                        FeaturePlaceholder(
+                            title = "Subir comprobante",
+                            subtitle = "Aquí irá la vista para subir el comprobante de pago de la cita ${route.appointmentId}."
                         )
                     }
 
@@ -1131,6 +1170,16 @@ private fun clientMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(ClientAgenda)
+            }
+        ),
+        MenuOption(
+            title = "Solicitudes",
+            subtitle = "Seguimiento de solicitudes y comprobantes",
+            icon = TablerIcons.Dashboard,
+            iconColor = Color(0xFF4F8CFF),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientRequests)
             }
         ),
         MenuOption(
