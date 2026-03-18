@@ -16,12 +16,13 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
             .where { "clientId" equalTo clientId }
             .snapshots
             .map { snapshot ->
-                snapshot.documents.map { doc ->
+                snapshot.documents.mapNotNull { doc ->
                     try {
+                        if (doc.id == "_schema") return@mapNotNull null
                         doc.data<Appointment>().copy(id = doc.id)
                     } catch (e: Exception) {
                         println("ERROR parsing appointment by client ${doc.id}: ${e.message}")
-                        Appointment(id = doc.id)
+                        null
                     }
                 }
             }
@@ -32,12 +33,13 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
             .where { "workerId" equalTo workerId }
             .snapshots
             .map { snapshot ->
-                snapshot.documents.map { doc ->
+                snapshot.documents.mapNotNull { doc ->
                     try {
+                        if (doc.id == "_schema") return@mapNotNull null
                         doc.data<Appointment>().copy(id = doc.id)
                     } catch (e: Exception) {
                         println("ERROR parsing appointment by worker ${doc.id}: ${e.message}")
-                        Appointment(id = doc.id)
+                        null
                     }
                 }
             }
@@ -51,7 +53,7 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
                 try {
                     if (doc.exists) doc.data<Appointment>().copy(id = doc.id) else null
                 } catch (e: Exception) {
-                    println("ERROR parsing appointment: ${e.message}")
+                    println("ERROR parsing appointment ${doc.id}: ${e.message}")
                     null
                 }
             }
@@ -86,5 +88,67 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
         } catch (e: Exception) {
             println("ERROR deleteAppointment: ${e.message}")
         }
+    }
+
+    override suspend fun approveAppointment(appointmentId: String) {
+        db.collection(appointmentsCollection)
+            .document(appointmentId)
+            .update(
+                "status" to "approved"
+            )
+    }
+
+    override suspend fun confirmPayment(appointmentId: String) {
+        db.collection(appointmentsCollection)
+            .document(appointmentId)
+            .update(
+                "status" to "confirmed"
+            )
+    }
+
+    override suspend fun startAppointment(appointmentId: String) {
+        db.collection(appointmentsCollection)
+            .document(appointmentId)
+            .update(
+                "status" to "in_progress"
+            )
+    }
+
+    override suspend fun completeAppointment(appointmentId: String) {
+        db.collection(appointmentsCollection)
+            .document(appointmentId)
+            .update(
+                "status" to "completed"
+            )
+    }
+
+    override suspend fun rejectAppointmentByWorker(appointmentId: String) {
+        db.collection(appointmentsCollection)
+            .document(appointmentId)
+            .update(
+                "status" to "rejected",
+                "cancellationReason" to "Cancelada por trabajador",
+                "cancellationBy" to "worker"
+            )
+    }
+
+    override suspend fun cancelAppointmentByWorker(appointmentId: String) {
+        db.collection(appointmentsCollection)
+            .document(appointmentId)
+            .update(
+                "status" to "cancelled",
+                "cancellationReason" to "Cancelada por trabajador",
+                "cancellationBy" to "worker"
+            )
+    }
+
+    override suspend fun cancelAppointmentByClient(appointmentId: String) {
+        db.collection(appointmentsCollection)
+            .document(appointmentId)
+            .update(
+                "status" to "cancelled",
+                "cancellationReason" to "Cancelada por cliente",
+                "cancellationBy" to "client"
+            )
     }
 }

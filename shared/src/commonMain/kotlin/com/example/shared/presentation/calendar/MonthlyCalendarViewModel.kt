@@ -2,8 +2,8 @@ package com.example.shared.presentation.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shared.data.repository.IBookingRepository
-import com.example.shared.domain.entity.Booking
+import com.example.shared.data.repository.Appointment.IAppointmentRepository
+import com.example.shared.domain.entity.Appointment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +18,7 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class MonthlyCalendarViewModel(
-    private val bookingRepository: IBookingRepository
+    private val appointmentRepository: IAppointmentRepository
 ) : ViewModel() {
 
     private val today = Clock.System.now()
@@ -30,8 +30,8 @@ class MonthlyCalendarViewModel(
             currentMonth = today.monthNumber,
             currentYear = today.year,
             currentWeekDay = today.dayOfMonth,
-            bookings = emptyList(),
-            selectedBooking = null,
+            appointments = emptyList(),
+            selectedAppointment = null,
             isLoading = false,
             errorMessage = null
         )
@@ -39,37 +39,37 @@ class MonthlyCalendarViewModel(
 
     val uiState: StateFlow<MonthlyCalendarUiState> = _uiState.asStateFlow()
 
-    fun loadBookings(workerId: String) {
+    fun loadAppointments(workerId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
-                bookings = emptyList(),
+                appointments = emptyList(),
                 errorMessage = null
             )
 
-            bookingRepository.getBookingsByWorker(workerId)
-                .onEach { bookings ->
-                    println("DEBUG bookings recibidos en ViewModel: $bookings")
+            appointmentRepository.getAppointmentsByWorker(workerId)
+                .onEach { appointments ->
+                    println("DEBUG appointments recibidos en ViewModel: $appointments")
 
-                    val currentSelected = _uiState.value.selectedBooking
+                    val currentSelected = _uiState.value.selectedAppointment
                     val refreshedSelected = if (currentSelected != null) {
-                        bookings.firstOrNull { it.id == currentSelected.id }
+                        appointments.firstOrNull { it.id == currentSelected.id }
                     } else {
                         null
                     }
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        bookings = bookings,
-                        selectedBooking = refreshedSelected,
+                        appointments = appointments,
+                        selectedAppointment = refreshedSelected,
                         errorMessage = null
                     )
                 }
                 .catch { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        bookings = emptyList(),
-                        errorMessage = e.message ?: "Error fetching bookings"
+                        appointments = emptyList(),
+                        errorMessage = e.message ?: "Error fetching appointments"
                     )
                 }
                 .collect()
@@ -134,15 +134,15 @@ class MonthlyCalendarViewModel(
         )
     }
 
-    fun selectBooking(booking: Booking) {
+    fun selectAppointment(appointment: Appointment) {
         _uiState.value = _uiState.value.copy(
-            selectedBooking = booking
+            selectedAppointment = appointment
         )
     }
 
-    fun clearSelectedBooking() {
+    fun clearSelectedAppointment() {
         _uiState.value = _uiState.value.copy(
-            selectedBooking = null
+            selectedAppointment = null
         )
     }
 
@@ -152,10 +152,22 @@ class MonthlyCalendarViewModel(
         )
     }
 
-    fun confirmPayment(bookingId: String) {
+    fun approveAppointment(appointmentId: String) {
         viewModelScope.launch {
             try {
-                bookingRepository.confirmPayment(bookingId)
+                appointmentRepository.approveAppointment(appointmentId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error al aprobar cita"
+                )
+            }
+        }
+    }
+
+    fun confirmPayment(appointmentId: String) {
+        viewModelScope.launch {
+            try {
+                appointmentRepository.confirmPayment(appointmentId)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     errorMessage = e.message ?: "Error al confirmar pago"
@@ -164,10 +176,10 @@ class MonthlyCalendarViewModel(
         }
     }
 
-    fun startAppointment(bookingId: String) {
+    fun startAppointment(appointmentId: String) {
         viewModelScope.launch {
             try {
-                bookingRepository.startAppointment(bookingId)
+                appointmentRepository.startAppointment(appointmentId)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     errorMessage = e.message ?: "Error al iniciar cita"
@@ -176,10 +188,10 @@ class MonthlyCalendarViewModel(
         }
     }
 
-    fun completeAppointment(bookingId: String) {
+    fun completeAppointment(appointmentId: String) {
         viewModelScope.launch {
             try {
-                bookingRepository.completeAppointment(bookingId)
+                appointmentRepository.completeAppointment(appointmentId)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     errorMessage = e.message ?: "Error al completar cita"
@@ -188,10 +200,34 @@ class MonthlyCalendarViewModel(
         }
     }
 
-    fun cancelAppointmentByWorker(bookingId: String) {
+    fun rejectAppointmentByWorker(appointmentId: String) {
         viewModelScope.launch {
             try {
-                bookingRepository.cancelAppointmentByWorker(bookingId)
+                appointmentRepository.rejectAppointmentByWorker(appointmentId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error al rechazar cita"
+                )
+            }
+        }
+    }
+
+    fun cancelAppointmentByWorker(appointmentId: String) {
+        viewModelScope.launch {
+            try {
+                appointmentRepository.cancelAppointmentByWorker(appointmentId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "Error al cancelar cita"
+                )
+            }
+        }
+    }
+
+    fun cancelAppointmentByClient(appointmentId: String) {
+        viewModelScope.launch {
+            try {
+                appointmentRepository.cancelAppointmentByClient(appointmentId)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     errorMessage = e.message ?: "Error al cancelar cita"

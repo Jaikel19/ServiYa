@@ -17,13 +17,19 @@ class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
             .collection("paymentReceipt")
             .snapshots
             .map { snapshot ->
-                snapshot.documents.firstOrNull()?.let { doc ->
-                    try {
-                        doc.data<PaymentReceipt>().copy(id = doc.id)
-                    } catch (e: Exception) {
-                        println("ERROR parsing receipt: ${e.message}")
-                        null
-                    }
+
+                if (snapshot.documents.isEmpty()) {
+                    println("DEBUG no paymentReceipt for appointment: $appointmentId")
+                    return@map null
+                }
+
+                val doc = snapshot.documents.firstOrNull() ?: return@map null
+
+                try {
+                    doc.data<PaymentReceipt>().copy(id = doc.id)
+                } catch (e: Exception) {
+                    println("ERROR parsing receipt ${doc.id}: ${e.message}")
+                    null
                 }
             }
     }

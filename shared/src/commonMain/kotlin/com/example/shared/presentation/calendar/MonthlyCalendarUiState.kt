@@ -1,13 +1,13 @@
 package com.example.shared.presentation.calendar
 
-import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Appointment
 
 data class MonthlyCalendarUiState(
     val currentMonth: Int,
     val currentYear: Int,
     val currentWeekDay: Int,
-    val bookings: List<Booking> = emptyList(),
-    val selectedBooking: Booking? = null,
+    val appointments: List<Appointment> = emptyList(),
+    val selectedAppointment: Appointment? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

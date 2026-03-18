@@ -2,7 +2,6 @@ package com.example.seviya.UI
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,8 +39,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.seviya.theme.*
-import com.example.shared.domain.entity.Booking
+import com.example.seviya.theme.SoftBlueSurface
+import com.example.seviya.theme.SoftSurface
+import com.example.seviya.theme.TextSecondaryAlt
+import com.example.seviya.theme.White
+import com.example.shared.domain.entity.Appointment
+import com.example.shared.domain.entity.PaymentReceipt
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.CalendarEvent
@@ -53,7 +56,8 @@ import io.kamel.image.asyncPainterResource
 
 @Composable
 fun WorkerAppointmentDetailScreen(
-    booking: Booking,
+    appointment: Appointment,
+    paymentReceipt: PaymentReceipt? = null,
     onBack: () -> Unit = {},
     onOpenGoogleMaps: () -> Unit = {},
     onOpenWaze: () -> Unit = {},
@@ -100,7 +104,7 @@ fun WorkerAppointmentDetailScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = booking.services.firstOrNull()?.name ?: "Servicio",
+                                text = appointment.services.firstOrNull()?.name ?: "Servicio",
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     color = Color(0xFF18233A),
                                     fontWeight = FontWeight.ExtraBold
@@ -108,14 +112,14 @@ fun WorkerAppointmentDetailScreen(
                             )
                         }
 
-                        StatusChip(status = booking.status)
+                        StatusChip(status = appointment.status)
                     }
 
                     Spacer(modifier = Modifier.height(18.dp))
 
                     DetailInfoRow(
                         label = "CLIENTE",
-                        value = booking.clientName,
+                        value = appointment.clientName,
                         icon = TablerIcons.Tool
                     )
 
@@ -123,7 +127,7 @@ fun WorkerAppointmentDetailScreen(
 
                     DetailInfoRow(
                         label = "FECHA Y HORA",
-                        value = "${extractDateOnlyDetail(booking.date)} • ${extractTimeFromDateTimeDetail(booking.date)}",
+                        value = "${extractDateOnlyDetail(appointment.serviceStartAt)} • ${extractTimeFromDateTimeDetail(appointment.serviceStartAt)}",
                         icon = TablerIcons.CalendarEvent
                     )
                 }
@@ -164,14 +168,14 @@ fun WorkerAppointmentDetailScreen(
 
                             Column {
                                 Text(
-                                    text = "${booking.location.alias}, ${booking.location.province}",
+                                    text = "${appointment.location.alias}, ${appointment.location.province}",
                                     style = MaterialTheme.typography.titleLarge.copy(
                                         fontWeight = FontWeight.Bold,
                                         color = Color(0xFF18233A)
                                     )
                                 )
                                 Text(
-                                    text = "${booking.location.district} • ${booking.location.reference}",
+                                    text = "${appointment.location.district} • ${appointment.location.reference}",
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         color = Color(0xFF8A97AB)
                                     )
@@ -189,8 +193,8 @@ fun WorkerAppointmentDetailScreen(
                         RouteButton(
                             text = "Google Maps",
                             onClick = {
-                                val lat = booking.location.latitude
-                                val lng = booking.location.longitude
+                                val lat = appointment.location.latitude
+                                val lng = appointment.location.longitude
                                 uriHandler.openUri("https://www.google.com/maps/search/?api=1&query=$lat,$lng")
                             },
                             modifier = Modifier.weight(1f)
@@ -199,8 +203,8 @@ fun WorkerAppointmentDetailScreen(
                         RouteButton(
                             text = "Abrir en Waze",
                             onClick = {
-                                val lat = booking.location.latitude
-                                val lng = booking.location.longitude
+                                val lat = appointment.location.latitude
+                                val lng = appointment.location.longitude
                                 uriHandler.openUri("https://waze.com/ul?ll=$lat,$lng&navigate=yes")
                             },
                             modifier = Modifier.weight(1f)
@@ -208,7 +212,7 @@ fun WorkerAppointmentDetailScreen(
                     }
                 }
 
-                if (canShowPaymentReceipt(booking)) {
+                if (canShowPaymentReceipt(paymentReceipt)) {
                     StepCard(
                         step = "3",
                         title = "VERIFICAR PAGO SINPE"
@@ -227,17 +231,17 @@ fun WorkerAppointmentDetailScreen(
 
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
-                                color = if (isPaymentVerified(booking))
+                                color = if (isPaymentVerified(appointment, paymentReceipt))
                                     Color(0xFFE4F7EC)
                                 else
                                     Color(0xFFFCE9E9)
                             ) {
                                 Text(
-                                    text = if (isPaymentVerified(booking))
+                                    text = if (isPaymentVerified(appointment, paymentReceipt))
                                         "VERIFICADO"
                                     else
                                         "PENDIENTE",
-                                    color = if (isPaymentVerified(booking))
+                                    color = if (isPaymentVerified(appointment, paymentReceipt))
                                         Color(0xFF18A55B)
                                     else
                                         Color(0xFFE54848),
@@ -264,7 +268,7 @@ fun WorkerAppointmentDetailScreen(
                                 verticalArrangement = Arrangement.spacedBy(14.dp)
                             ) {
                                 KamelImage(
-                                    resource = asyncPainterResource(data = booking.paymentReceiptUrl),
+                                    resource = asyncPainterResource(data = paymentReceipt?.imageUrl.orEmpty()),
                                     contentDescription = "Comprobante SINPE",
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -273,7 +277,7 @@ fun WorkerAppointmentDetailScreen(
                                     contentScale = ContentScale.Crop
                                 )
 
-                                if (canVerifyPayment(booking)) {
+                                if (canVerifyPayment(appointment, paymentReceipt)) {
                                     Button(
                                         onClick = onVerifyPayment,
                                         modifier = Modifier.fillMaxWidth(),
@@ -290,28 +294,28 @@ fun WorkerAppointmentDetailScreen(
                     }
                 }
 
-                if (canStartAppointment(booking)) {
+                if (canStartAppointment(appointment)) {
                     PrimaryActionButton(
                         text = "Iniciar cita",
                         onClick = onStartAppointment
                     )
                 }
 
-                if (canFinishAppointment(booking)) {
+                if (canFinishAppointment(appointment)) {
                     PrimaryActionButton(
                         text = "Completar cita",
                         onClick = onFinishAppointment
                     )
                 }
 
-                if (canRateClient(booking)) {
+                if (canRateClient(appointment)) {
                     PrimaryActionButton(
                         text = "Calificar cliente",
                         onClick = onRateClient
                     )
                 }
 
-                if (canCancelAppointment(booking)) {
+                if (canCancelAppointment(appointment)) {
                     OutlinedButton(
                         onClick = onCancelAppointment,
                         modifier = Modifier.fillMaxWidth(),
@@ -469,6 +473,12 @@ private fun StatusChip(status: String) {
             textColor = Color(0xFFFF8C00)
         }
 
+        "approved" -> {
+            text = "APROBADA"
+            background = Color(0xFFE8F0FF)
+            textColor = Color(0xFF0A4DB3)
+        }
+
         "confirmed" -> {
             text = "CONFIRMADA"
             background = Color(0xFFE6F7EC)
@@ -489,6 +499,12 @@ private fun StatusChip(status: String) {
 
         "cancelled" -> {
             text = "CANCELADA"
+            background = Color(0xFFFCE9E9)
+            textColor = Color(0xFFE54848)
+        }
+
+        "rejected" -> {
+            text = "RECHAZADA"
             background = Color(0xFFFCE9E9)
             textColor = Color(0xFFE54848)
         }
@@ -604,36 +620,44 @@ private fun PrimaryActionButton(
     }
 }
 
-private fun canShowPaymentReceipt(booking: Booking): Boolean {
-    return booking.paymentReceiptUrl.isNotBlank()
+private fun canShowPaymentReceipt(paymentReceipt: PaymentReceipt?): Boolean {
+    return paymentReceipt?.imageUrl?.isNotBlank() == true
 }
 
-private fun canVerifyPayment(booking: Booking): Boolean {
-    return booking.status.equals("payment_pending", ignoreCase = true) &&
-            booking.paymentReceiptUrl.isNotBlank()
+private fun canVerifyPayment(
+    appointment: Appointment,
+    paymentReceipt: PaymentReceipt?
+): Boolean {
+    return appointment.status.equals("payment_pending", ignoreCase = true) &&
+            paymentReceipt?.imageUrl?.isNotBlank() == true &&
+            !paymentReceipt.status.equals("APPROVED", ignoreCase = true)
 }
 
-private fun canStartAppointment(booking: Booking): Boolean {
-    return booking.status.equals("confirmed", ignoreCase = true)
+private fun canStartAppointment(appointment: Appointment): Boolean {
+    return appointment.status.equals("confirmed", ignoreCase = true)
 }
 
-private fun canFinishAppointment(booking: Booking): Boolean {
-    return booking.status.equals("in_progress", ignoreCase = true)
+private fun canFinishAppointment(appointment: Appointment): Boolean {
+    return appointment.status.equals("in_progress", ignoreCase = true)
 }
 
-private fun canRateClient(booking: Booking): Boolean {
-    return booking.status.equals("completed", ignoreCase = true) &&
-            !booking.ratingToClientDone
+private fun canRateClient(appointment: Appointment): Boolean {
+    return appointment.status.equals("completed", ignoreCase = true) &&
+            !appointment.workerToClientReviewDone
 }
 
-private fun canCancelAppointment(booking: Booking): Boolean {
-    return booking.status.equals("confirmed", ignoreCase = true)
+private fun canCancelAppointment(appointment: Appointment): Boolean {
+    return appointment.status.equals("confirmed", ignoreCase = true)
 }
 
-private fun isPaymentVerified(booking: Booking): Boolean {
-    return booking.status.equals("confirmed", ignoreCase = true) ||
-            booking.status.equals("in_progress", ignoreCase = true) ||
-            booking.status.equals("completed", ignoreCase = true)
+private fun isPaymentVerified(
+    appointment: Appointment,
+    paymentReceipt: PaymentReceipt?
+): Boolean {
+    return paymentReceipt?.status.equals("APPROVED", ignoreCase = true) ||
+            appointment.status.equals("confirmed", ignoreCase = true) ||
+            appointment.status.equals("in_progress", ignoreCase = true) ||
+            appointment.status.equals("completed", ignoreCase = true)
 }
 
 private fun extractDateOnlyDetail(dateTime: String): String {

@@ -12,17 +12,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -30,9 +26,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,8 +42,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.seviya.theme.*
-import com.example.shared.domain.entity.Booking
+import com.example.seviya.theme.BrandBlue
+import com.example.seviya.theme.BrandRed
+import com.example.seviya.theme.InactiveSoft
+import com.example.seviya.theme.White
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Apps
@@ -58,9 +54,6 @@ import compose.icons.tablericons.Bell
 import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.ChevronLeft
 import compose.icons.tablericons.ChevronRight
-import compose.icons.tablericons.Globe
-import compose.icons.tablericons.Menu2
-import compose.icons.tablericons.Search
 
 @Composable
 fun MonthlyCalendarScreen(
@@ -71,13 +64,13 @@ fun MonthlyCalendarScreen(
     onGoSearch: () -> Unit = {},
     onGoAlerts: () -> Unit = {},
     onGoMenu: () -> Unit = {},
-    onOpenBookingDetail: (Booking) -> Unit = {}
+    onOpenAppointmentDetail: (Appointment) -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
     val isMonthMode = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadBookings("worker_demo_001")
+        viewModel.loadAppointments("worker_demo_001")
     }
 
     val daysOfWeek = listOf("LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM")
@@ -86,7 +79,7 @@ fun MonthlyCalendarScreen(
     val totalDays = getDaysInMonth(state.currentMonth, state.currentYear)
     val firstDayOffset = getFirstDayOffset(state.currentMonth, state.currentYear)
 
-    val selectedDay = state.selectedBooking?.let { extractDayFromDate(it.date) }
+    val selectedDay = state.selectedAppointment?.let { extractDayFromDate(it.serviceStartAt) }
     val referenceDay = selectedDay ?: state.currentWeekDay
 
     val cells = mutableListOf<Int?>()
@@ -235,11 +228,11 @@ fun MonthlyCalendarScreen(
                                         .weight(1f)
                                 ) {
                                     week.forEach { day ->
-                                        val dayBookings = if (day != null) {
-                                            state.bookings.filter {
-                                                extractDayFromDate(it.date) == day &&
-                                                        extractMonthFromDate(it.date) == state.currentMonth &&
-                                                        extractYearFromDate(it.date) == state.currentYear
+                                        val dayAppointments = if (day != null) {
+                                            state.appointments.filter {
+                                                extractDayFromDate(it.serviceStartAt) == day &&
+                                                        extractMonthFromDate(it.serviceStartAt) == state.currentMonth &&
+                                                        extractYearFromDate(it.serviceStartAt) == state.currentYear
                                             }
                                         } else {
                                             emptyList()
@@ -247,11 +240,11 @@ fun MonthlyCalendarScreen(
 
                                         AgendaDayCell(
                                             day = day,
-                                            bookings = dayBookings,
+                                            appointments = dayAppointments,
                                             isSelected = selectedDay == day,
-                                            onBookingClick = { booking ->
-                                                viewModel.selectBooking(booking)
-                                                onOpenBookingDetail(booking)
+                                            onAppointmentClick = { appointment ->
+                                                viewModel.selectAppointment(appointment)
+                                                onOpenAppointmentDetail(appointment)
                                             }
                                         )
                                     }
@@ -448,9 +441,9 @@ private fun ToggleChip(
 @Composable
 private fun RowScope.AgendaDayCell(
     day: Int?,
-    bookings: List<Booking>,
+    appointments: List<Appointment>,
     isSelected: Boolean,
-    onBookingClick: (Booking) -> Unit
+    onAppointmentClick: (Appointment) -> Unit
 ) {
     val borderColor = if (isSelected) Color(0xFF1E5CC6) else Color(0xFFDCE2EA)
     val borderWidth = if (isSelected) 2.dp else 0.5.dp
@@ -487,17 +480,17 @@ private fun RowScope.AgendaDayCell(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                bookings.take(4).forEach { booking ->
-                    AgendaBookingChip(
-                        text = extractTimeFromDateTime(booking.date),
-                        onClick = { onBookingClick(booking) }
+                appointments.take(4).forEach { appointment ->
+                    AgendaAppointmentChip(
+                        text = extractTimeFromDateTime(appointment.serviceStartAt),
+                        onClick = { onAppointmentClick(appointment) }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
 
-                if (bookings.size > 4) {
+                if (appointments.size > 4) {
                     Text(
-                        text = "+${bookings.size - 4} más",
+                        text = "+${appointments.size - 4} más",
                         color = Color(0xFF0C4AAA),
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(top = 2.dp)
@@ -509,7 +502,7 @@ private fun RowScope.AgendaDayCell(
 }
 
 @Composable
-private fun AgendaBookingChip(
+private fun AgendaAppointmentChip(
     text: String,
     onClick: () -> Unit
 ) {
@@ -590,9 +583,6 @@ private fun isLeapYear(year: Int): Boolean {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 }
 
-/**
- * Semana empezando en lunes.
- */
 private fun getFirstDayOffset(month: Int, year: Int): Int {
     val q = 1
     var m = month

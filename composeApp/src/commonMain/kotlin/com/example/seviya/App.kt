@@ -132,7 +132,15 @@ import com.example.seviya.ui.WorkerRequestsScreen
 import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
 import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
-import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
+
+//esto se agrego para que sirva drante la migracion de booking
+import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.Appointment
+import com.example.shared.domain.entity.AppointmentLocation
+import com.example.shared.domain.entity.AppointmentService
+import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Service
+import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 
 enum class SessionRole {
     GUEST,
@@ -788,7 +796,7 @@ fun App() {
                                 navController.navigateSingleTop(WorkerSettings)
                             },
                             onOpenAppointmentDetail = { booking ->
-                                monthlyCalendarViewModel.selectBooking(booking)
+                                monthlyCalendarViewModel.selectAppointment(booking.toAppointment())
                                 navController.navigateSingleTop(WorkerAppointmentDetail)
                             },
                             onStartAppointment = { booking ->
@@ -798,7 +806,7 @@ fun App() {
                                 monthlyCalendarViewModel.completeAppointment(booking.id)
                             },
                             onOpenReview = { booking ->
-                                monthlyCalendarViewModel.selectBooking(booking)
+                                monthlyCalendarViewModel.selectAppointment(booking.toAppointment())
                                 navController.navigateSingleTop(WorkerAppointmentDetail)
                             }
                         )
@@ -808,35 +816,45 @@ fun App() {
                         MonthlyCalendarScreen(
                             viewModel = monthlyCalendarViewModel,
                             onBack = { navController.popBackStack() },
-                            onOpenBookingDetail = { booking ->
-                                monthlyCalendarViewModel.selectBooking(booking)
+                            onOpenAppointmentDetail = { appointment ->
+                                monthlyCalendarViewModel.selectAppointment(appointment)
                                 navController.navigateSingleTop(WorkerAppointmentDetail)
                             }
                         )
                     }
 
                     composable<WorkerAppointmentDetail> {
-                        calendarState.selectedBooking?.let { booking ->
+                        val detailViewModel: WorkerAppointmentDetailViewModel = koinViewModel()
+                        val detailUiState by detailViewModel.uiState.collectAsState()
+
+                        calendarState.selectedAppointment?.let { appointment ->
+
+                            LaunchedEffect(appointment.id) {
+                                detailViewModel.loadPaymentReceipt(appointment.id)
+                            }
+
                             WorkerAppointmentDetailScreen(
-                                booking = booking,
+                                appointment = appointment,
+                                paymentReceipt = detailUiState.paymentReceipt,
                                 onBack = {
-                                    monthlyCalendarViewModel.clearSelectedBooking()
+                                    detailViewModel.clearState()
+                                    monthlyCalendarViewModel.clearSelectedAppointment()
                                     navController.popBackStack()
                                 },
                                 onOpenGoogleMaps = {},
                                 onOpenWaze = {},
                                 onVerifyPayment = {
-                                    monthlyCalendarViewModel.confirmPayment(booking.id)
+                                    monthlyCalendarViewModel.confirmPayment(appointment.id)
                                 },
                                 onStartAppointment = {
-                                    monthlyCalendarViewModel.startAppointment(booking.id)
+                                    monthlyCalendarViewModel.startAppointment(appointment.id)
                                 },
                                 onFinishAppointment = {
-                                    monthlyCalendarViewModel.completeAppointment(booking.id)
+                                    monthlyCalendarViewModel.completeAppointment(appointment.id)
                                 },
                                 onRateClient = {},
                                 onCancelAppointment = {
-                                    monthlyCalendarViewModel.cancelAppointmentByWorker(booking.id)
+                                    monthlyCalendarViewModel.cancelAppointmentByWorker(appointment.id)
                                 },
                                 onGoServices = {
                                     currentWorkerTab = WorkerTab.DASHBOARD
@@ -1404,4 +1422,96 @@ private fun NavHostController.navigateToLandingClearingStack() {
         launchSingleTop = true
         restoreState = false
     }
+}
+
+//esto siguiente se tiene que borrar apenas todas las clases dejen de recibir booking
+private fun Booking.toAppointment(): Appointment {
+    return Appointment(
+        id = id,
+        clientId = clientId,
+        clientName = clientName,
+        workerId = workerId,
+        workerName = workerName,
+        status = status,
+        serviceStartAt = date,
+        services = services.map { it.toAppointmentService() },
+        totalCost = totalCost.toInt(),
+        location = location.toAppointmentLocation(),
+        cancellationBy = cancellationBy.ifBlank { null },
+        cancellationReason = cancellationReason.ifBlank { null },
+        clientToWorkerReviewDone = ratingToWorkerDone,
+        workerToClientReviewDone = ratingToClientDone
+    )
+}
+
+private fun Appointment.toBooking(): Booking {
+    return Booking(
+        id = id,
+        clientId = clientId,
+        clientName = clientName,
+        workerId = workerId,
+        workerName = workerName,
+        date = serviceStartAt,
+        status = status,
+        totalCost = totalCost.toDouble(),
+        services = services.map { it.toService() },
+        location = location.toAddress(),
+        cancellationReason = cancellationReason ?: "",
+        cancellationBy = cancellationBy ?: "",
+        ratingToClientDone = workerToClientReviewDone,
+        ratingToWorkerDone = clientToWorkerReviewDone
+    )
+}
+
+private fun Service.toAppointmentService(): AppointmentService {
+    return AppointmentService(
+        id = id,
+        name = name,
+        description = description,
+        cost = cost.toInt(),
+        durationMinutes = extractMinutesFromDuration(duration),
+        subtotal = cost.toInt()
+    )
+}
+
+private fun AppointmentService.toService(): Service {
+    return Service(
+        id = id,
+        name = name,
+        description = description,
+        cost = cost.toDouble(),
+        duration = "${durationMinutes} min"
+    )
+}
+
+private fun Address.toAppointmentLocation(): AppointmentLocation {
+    return AppointmentLocation(
+        id = id,
+        alias = alias,
+        province = province,
+        district = district,
+        canton = canton,
+        latitude = latitude,
+        longitude = longitude,
+        reference = reference
+    )
+}
+
+private fun AppointmentLocation.toAddress(): Address {
+    return Address(
+        id = id,
+        alias = alias,
+        province = province,
+        district = district,
+        canton = canton,
+        latitude = latitude,
+        longitude = longitude,
+        reference = reference
+    )
+}
+
+private fun extractMinutesFromDuration(duration: String): Int {
+    return duration
+        .filter { it.isDigit() }
+        .toIntOrNull() ?: 0
 }
