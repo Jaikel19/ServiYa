@@ -14,8 +14,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.UI.BookingRequestCard
-import com.example.shared.domain.entity.Booking
+import com.example.seviya.UI.AppointmentRequestCard
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsUiState
 
 enum class RequestFilter { PENDING, PAYMENT_PENDING }
@@ -23,25 +23,18 @@ enum class RequestFilter { PENDING, PAYMENT_PENDING }
 @Composable
 fun WorkerRequestsScreen(
     uiState: WorkerRequestsUiState,
-    onAccept: (Booking) -> Unit,
-    onReject: (Booking) -> Unit,
-    onConfirm: (Booking) -> Unit,
-    onCancel: (Booking) -> Unit,
-    onOpenRequestDetail: (bookingId: String) -> Unit = {},
-    onOpenPaymentDetail: (bookingId: String) -> Unit = {}
+    onAccept: (Appointment) -> Unit,
+    onReject: (Appointment) -> Unit,
+    onConfirm: (Appointment) -> Unit,
+    onCancel: (Appointment) -> Unit,
+    onLoadPaymentPending: () -> Unit = {},
+    onOpenRequestDetail: (appointmentId: String) -> Unit = {},
+    onOpenPaymentDetail: (appointmentId: String) -> Unit = {}
 ) {
     var selectedFilter by remember { mutableStateOf(RequestFilter.PENDING) }
 
-    val filteredRequests = uiState.requests.filter {
-        when (selectedFilter) {
-            RequestFilter.PENDING -> it.status == "pending"
-            RequestFilter.PAYMENT_PENDING -> it.status == "payment_pending"
-        }
-    }
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
         // Header
         item {
             Box(
@@ -156,7 +149,10 @@ fun WorkerRequestsScreen(
 
                     FilterChip(
                         selected = selectedFilter == RequestFilter.PAYMENT_PENDING,
-                        onClick = { selectedFilter = RequestFilter.PAYMENT_PENDING },
+                        onClick = {
+                            selectedFilter = RequestFilter.PAYMENT_PENDING
+                            onLoadPaymentPending()
+                        },
                         label = {
                             Text(
                                 text = "Pendientes de pago",
@@ -206,58 +202,61 @@ fun WorkerRequestsScreen(
                 }
             }
 
-            uiState.requests.isEmpty() -> {
-                item {
-                    Text(
-                        "No hay solicitudes disponibles.",
-                        modifier = Modifier.padding(20.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            filteredRequests.isEmpty() -> {
-                item {
-                    Text(
-                        text = when (selectedFilter) {
-                            RequestFilter.PENDING -> "No hay solicitudes pendientes."
-                            RequestFilter.PAYMENT_PENDING -> "No hay solicitudes pendientes de pago."
-                        },
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            else -> {
-                items(filteredRequests) { booking ->
-                    Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
-                        BookingRequestCard(
-                            booking = booking,
-                            onAccept = {
-                                when (selectedFilter) {
-                                    RequestFilter.PENDING -> onAccept(booking)
-                                    RequestFilter.PAYMENT_PENDING -> onConfirm(booking)
-                                }
-                            },
-                            onReject = {
-                                when (selectedFilter) {
-                                    RequestFilter.PENDING -> onReject(booking)
-                                    RequestFilter.PAYMENT_PENDING -> onCancel(booking)
-                                }
-                            },
-                            onCardClick = {
-                                when (selectedFilter) {
-                                    RequestFilter.PENDING -> onOpenRequestDetail(booking.id)
-                                    RequestFilter.PAYMENT_PENDING -> onOpenPaymentDetail(booking.id)
-                                }
-                            }
+            selectedFilter == RequestFilter.PENDING -> {
+                if (uiState.requests.isEmpty()) {
+                    item {
+                        Text(
+                            "No hay solicitudes pendientes.",
+                            modifier = Modifier.padding(20.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                } else {
+                    items(uiState.requests) { appointment ->
+                        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                            AppointmentRequestCard(
+                                appointment = appointment,
+                                onAccept = { onAccept(appointment) },
+                                onReject = { onReject(appointment) },
+                                onCardClick = { onOpenRequestDetail(appointment.id) }
+                            )
+                        }
+                    }
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
                 }
+            }
 
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
+            selectedFilter == RequestFilter.PAYMENT_PENDING -> {
+                if (uiState.isLoadingPayments) {
+                    item {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp)
+                                .wrapContentWidth(Alignment.CenterHorizontally),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                } else if (uiState.paymentPendingAppointments.isEmpty()) {
+                    item {
+                        Text(
+                            "No hay solicitudes pendientes de pago.",
+                            modifier = Modifier.padding(20.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else {
+                    items(uiState.paymentPendingAppointments) { (appointment, _) ->
+                        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                            AppointmentRequestCard(
+                                appointment = appointment,
+                                onAccept = { onConfirm(appointment) },
+                                onReject = { onCancel(appointment) },
+                                onCardClick = { onOpenPaymentDetail(appointment.id) }
+                            )
+                        }
+                    }
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
                 }
             }
         }

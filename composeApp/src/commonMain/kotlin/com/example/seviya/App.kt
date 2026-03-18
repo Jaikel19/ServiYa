@@ -890,15 +890,16 @@ fun App() {
 
                         WorkerRequestsScreen(
                             uiState = uiState,
-                            onAccept = { booking -> viewModel.acceptRequest(booking) },
-                            onReject = { booking -> viewModel.rejectRequest(booking) },
-                            onConfirm = { booking -> viewModel.confirmPayment(booking) },
-                            onCancel = { booking -> viewModel.cancelPayment(booking) },
-                            onOpenRequestDetail = { bookingId ->
-                                navController.navigate(WorkerRequestDetail(bookingId = bookingId))
+                            onAccept = { appointment -> viewModel.acceptRequest(appointment) },
+                            onReject = { appointment -> viewModel.rejectRequest(appointment) },
+                            onConfirm = { appointment -> viewModel.confirmPayment(appointment) },
+                            onCancel = { appointment -> viewModel.cancelPayment(appointment) },
+                            onLoadPaymentPending = { viewModel.loadPaymentPending(currentWorkerId) },
+                            onOpenRequestDetail = { appointmentId ->
+                                navController.navigate(WorkerRequestDetail(bookingId = appointmentId))
                             },
-                            onOpenPaymentDetail = { bookingId ->
-                                navController.navigate(WorkerPaymentDetail(bookingId = bookingId))
+                            onOpenPaymentDetail = { appointmentId ->
+                                navController.navigate(WorkerPaymentDetail(bookingId = appointmentId))
                             }
                         )
                     }
