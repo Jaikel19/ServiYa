@@ -954,6 +954,12 @@ fun App() {
                             viewModel.loadPaymentDetail(route.bookingId)
                         }
 
+                        LaunchedEffect(uiState.paymentVerified) {
+                            if (uiState.paymentVerified) {
+                                navController.popBackStack()
+                            }
+                        }
+
                         uiState.appointment?.let { appointment ->
                             WorkerPaymentDetailScreen(
                                 appointment = appointment,
@@ -961,7 +967,6 @@ fun App() {
                                 onBack = { navController.popBackStack() },
                                 onVerifyPayment = {
                                     viewModel.verifyPayment()
-                                    navController.popBackStack()
                                 },
                                 onReportProblem = {
                                     viewModel.reportProblem()

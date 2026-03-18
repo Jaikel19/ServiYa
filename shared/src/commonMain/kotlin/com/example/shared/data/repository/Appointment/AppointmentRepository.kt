@@ -4,9 +4,14 @@ import com.example.shared.data.remote.appointment.IRemoteAppointmentDataSource
 import com.example.shared.domain.entity.Appointment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import com.example.shared.data.repository.OtpAppointment.IOtpAppointmentRepository
+import com.example.shared.domain.entity.OtpAppointment
+import com.example.shared.utils.DateTimeUtils
+import com.example.shared.utils.OtpUtils
 
 class AppointmentRepository(
-    private val remote: IRemoteAppointmentDataSource
+    private val remote: IRemoteAppointmentDataSource,
+    private val otpAppointmentRepository: IOtpAppointmentRepository
 ) : IAppointmentRepository {
 
     override suspend fun getAppointmentsByClient(clientId: String): Flow<List<Appointment>> =
@@ -57,7 +62,37 @@ class AppointmentRepository(
     }
 
     override suspend fun confirmPayment(appointmentId: String) {
-        remote.confirmPayment(appointmentId)
+        println("OTP DEBUG 0: entró a confirmPayment con id = $appointmentId")
+
+        try {
+            remote.confirmPayment(appointmentId)
+            println("OTP DEBUG 1: cita confirmada = $appointmentId")
+
+            val otpCode = OtpUtils.generateOtpCode()
+            val now = DateTimeUtils.nowIsoMinute()
+
+            println("OTP DEBUG 2: otpCode generado = $otpCode")
+            println("OTP DEBUG 3: fecha actual = $now")
+
+            val otp = OtpAppointment(
+                id = "current",
+                purpose = "start",
+                code = otpCode,
+                codeHash = OtpUtils.sha256(otpCode),
+                createdAt = now,
+                expiresAt = now,
+                usedAt = null,
+                status = "GENERATED"
+            )
+
+            println("OTP DEBUG 4: otp creado = $otp")
+
+            val result = otpAppointmentRepository.createOtp(appointmentId, otp)
+            println("OTP DEBUG 5: createOtp result = $result")
+        } catch (e: Exception) {
+            println("OTP DEBUG ERROR: ${e.message}")
+            e.printStackTrace()
+        }
     }
 
     override suspend fun startAppointment(appointmentId: String) {

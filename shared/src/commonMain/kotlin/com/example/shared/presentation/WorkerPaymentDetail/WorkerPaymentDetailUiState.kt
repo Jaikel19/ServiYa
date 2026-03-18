@@ -7,5 +7,6 @@ data class WorkerPaymentDetailUiState(
     val appointment: Appointment? = null,
     val paymentReceipt: PaymentReceipt? = null,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val paymentVerified: Boolean = false
 )

@@ -77,6 +77,12 @@ class WorkerPaymentDetailViewModel(
                 )
 
                 appointmentRepository.confirmPayment(appointment.id)
+
+                _uiState.value = _uiState.value.copy(
+                    paymentVerified = true,
+                    errorMessage = null
+                )
+
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     errorMessage = e.message ?: "Error verificando pago"

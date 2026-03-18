@@ -10,52 +10,56 @@ class RemoteOtpAppointmentDataSource : IRemoteOtpAppointmentDataSource {
 
     private val db = Firebase.firestore
 
-    // GET (realtime) — solo hay un OTP por cita
     override suspend fun getOtpByAppointment(appointmentId: String): Flow<OtpAppointment?> {
         return db.collection("appointments")
             .document(appointmentId)
             .collection("otp")
+            .document("current")
             .snapshots
-            .map { snapshot ->
-                snapshot.documents.firstOrNull()?.let { doc ->
-                    try {
+            .map { doc ->
+                try {
+                    if (doc.exists) {
                         doc.data<OtpAppointment>().copy(id = doc.id)
-                    } catch (e: Exception) {
-                        println("ERROR parsing otp: ${e.message}")
+                    } else {
                         null
                     }
+                } catch (e: Exception) {
+                    println("ERROR parsing otp: ${e.message}")
+                    null
                 }
             }
     }
 
-    // CREATE
     override suspend fun createOtp(appointmentId: String, otp: OtpAppointment): String {
         return try {
-            val ref = db.collection("appointments")
+            db.collection("appointments")
                 .document(appointmentId)
                 .collection("otp")
-                .add(otp)
-            ref.id
+                .document("current")
+                .set(otp.copy(id = "current"))
+
+            "current"
         } catch (e: Exception) {
             println("ERROR createOtp: ${e.message}")
             ""
         }
     }
 
-    // MARK AS USED
-    override suspend fun markOtpAsUsed(appointmentId: String, otpId: String, usedAt: Long) {
+    override suspend fun markOtpAsUsed(appointmentId: String, otpId: String, usedAt: String) {
         try {
             db.collection("appointments")
                 .document(appointmentId)
                 .collection("otp")
                 .document(otpId)
-                .update("usedAt" to usedAt)
+                .update(
+                    "usedAt" to usedAt,
+                    "status" to "VERIFIED"
+                )
         } catch (e: Exception) {
             println("ERROR markOtpAsUsed: ${e.message}")
         }
     }
 
-    // DELETE
     override suspend fun deleteOtp(appointmentId: String, otpId: String) {
         try {
             db.collection("appointments")

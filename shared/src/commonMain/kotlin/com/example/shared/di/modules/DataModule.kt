@@ -10,6 +10,8 @@ import com.example.shared.data.remote.Service.IRemoteServicesDataSource
 import com.example.shared.data.remote.Service.RemoteServicesDataSource
 import com.example.shared.data.remote.Address.IRemoteAddressDataSource
 import com.example.shared.data.remote.Address.RemoteAddressDataSource
+import com.example.shared.data.remote.OtpAppointment.IRemoteOtpAppointmentDataSource
+import com.example.shared.data.remote.OtpAppointment.RemoteOtpAppointmentDataSource
 import com.example.shared.data.remote.PaymentReceipt.IRemotePaymentReceiptDataSource
 import com.example.shared.data.remote.PaymentReceipt.RemotePaymentReceiptDataSource
 import com.example.shared.data.remote.appointment.IRemoteAppointmentDataSource
@@ -32,6 +34,8 @@ import com.example.shared.data.repository.Address.AddressRepository
 import com.example.shared.data.repository.Address.IAddressRepository
 import com.example.shared.data.repository.Appointment.AppointmentRepository
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
+import com.example.shared.data.repository.OtpAppointment.IOtpAppointmentRepository
+import com.example.shared.data.repository.OtpAppointment.OtpAppointmentRepository
 import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
 import com.example.shared.data.repository.PaymentReceipt.PaymentReceiptRepository
 import com.example.shared.data.repository.categories.CategoryRepository
@@ -76,7 +80,12 @@ val dataModule = module {
 
     // Appointments
     single<IRemoteAppointmentDataSource> { RemoteAppointmentDataSource() }
-    single<IAppointmentRepository> { AppointmentRepository(get()) }
+
+    // OTP Appointment
+    single<IRemoteOtpAppointmentDataSource> { RemoteOtpAppointmentDataSource() }
+    single<IOtpAppointmentRepository> { OtpAppointmentRepository(get()) }
+
+    single<IAppointmentRepository> { AppointmentRepository(get(), get()) }
 
     // Payment Receipt
     single<IRemotePaymentReceiptDataSource> { RemotePaymentReceiptDataSource() }
@@ -92,5 +101,4 @@ val dataModule = module {
     // Favorite workers
     single<IRemoteFavoriteWorkersDataSource> { RemoteFavoriteWorkersDataSource() }
     single<IFavoriteWorkersRepository> { FavoriteWorkersRepository(get(), get()) }
-
 }
