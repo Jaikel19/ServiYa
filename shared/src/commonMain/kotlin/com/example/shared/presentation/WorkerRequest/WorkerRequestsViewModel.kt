@@ -24,20 +24,29 @@ class WorkerRequestsViewModel(
 
     fun loadRequests(workerId: String) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            _state.value = _state.value.copy(
+                isLoading = true,
+                requests = emptyList(),
+                errorMessage = null
+            )
 
             appointmentRepository.getAppointmentsByWorker(workerId)
                 .catch { e ->
                     _state.value = _state.value.copy(
                         isLoading = false,
+                        requests = emptyList(),
                         errorMessage = e.message ?: "Error fetching requests"
                     )
                 }
                 .collectLatest { appointments ->
-                    val pending = appointments.filter { it.status == "pending" }
+                    val pending = appointments.filter {
+                        it.status.equals("pending", ignoreCase = true)
+                    }
+
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        requests = pending
+                        requests = pending,
+                        errorMessage = null
                     )
                 }
         }
@@ -45,40 +54,50 @@ class WorkerRequestsViewModel(
 
     fun loadPaymentPending(workerId: String) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoadingPayments = true)
+            _state.value = _state.value.copy(
+                isLoadingPayments = true,
+                paymentPendingAppointments = emptyList(),
+                errorMessage = null
+            )
 
-            try {
-                val appointments = appointmentRepository
-                    .getAppointmentsByWorker(workerId)
-                    .first()
-                    .filter { it.status == "approved" }
-
-                val pairs = mutableListOf<Pair<Appointment, PaymentReceipt>>()
-
-                for (appointment in appointments) {
-                    try {
-                        val receipt = paymentReceiptRepository
-                            .getReceiptByAppointment(appointment.id)
-                            .first()
-
-                        if (receipt?.status == "payment_pending") {
-                            pairs.add(Pair(appointment, receipt))
-                        }
-                    } catch (e: Exception) {
-                        println("ERROR loading receipt for ${appointment.id}: ${e.message}")
-                    }
+            appointmentRepository.getAppointmentsByWorker(workerId)
+                .catch { e ->
+                    _state.value = _state.value.copy(
+                        isLoadingPayments = false,
+                        paymentPendingAppointments = emptyList(),
+                        errorMessage = e.message ?: "Error fetching payment pending"
+                    )
                 }
+                .collectLatest { appointments ->
+                    val paymentPendingList = appointments.filter {
+                        it.status.equals("payment_pending", ignoreCase = true)
+                    }
 
-                _state.value = _state.value.copy(
-                    isLoadingPayments = false,
-                    paymentPendingAppointments = pairs
-                )
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isLoadingPayments = false,
-                    errorMessage = e.message ?: "Error fetching payment pending"
-                )
-            }
+                    val pairs = mutableListOf<Pair<Appointment, PaymentReceipt>>()
+
+                    for (appointment in paymentPendingList) {
+                        try {
+                            val receipt = paymentReceiptRepository
+                                .getReceiptByAppointment(appointment.id)
+                                .first()
+
+                            if (
+                                receipt != null &&
+                                receipt.status.equals("PENDING", ignoreCase = true) &&
+                                receipt.imageUrl.isNotBlank()
+                            ) {
+                                pairs.add(Pair(appointment, receipt))
+                            }
+                        } catch (_: Exception) {
+                        }
+                    }
+
+                    _state.value = _state.value.copy(
+                        isLoadingPayments = false,
+                        paymentPendingAppointments = pairs,
+                        errorMessage = null
+                    )
+                }
         }
     }
 
@@ -94,15 +113,59 @@ class WorkerRequestsViewModel(
         }
     }
 
+    fun confirmPayment(appointment: Appointment, receiptId: String) {
+        viewModelScope.launch {
+            paymentReceiptRepository.updateReceiptStatus(
+                appointmentId = appointment.id,
+                receiptId = receiptId,
+                status = "APPROVED",
+                note = null
+            )
+
+            appointmentRepository.confirmPayment(appointment.id)
+        }
+    }
+
+    fun reportPaymentProblem(
+        appointment: Appointment,
+        receiptId: String,
+        note: String = "Problema con comprobante"
+    ) {
+        viewModelScope.launch {
+            paymentReceiptRepository.updateReceiptStatus(
+                appointmentId = appointment.id,
+                receiptId = receiptId,
+                status = "REJECTED",
+                note = note
+            )
+        }
+    }
+
     fun confirmPayment(appointment: Appointment) {
         viewModelScope.launch {
-            appointmentRepository.confirmPayment(appointment.id)
+            val receipt = paymentReceiptRepository
+                .getReceiptByAppointment(appointment.id)
+                .first()
+
+            val receiptId = receipt?.id ?: return@launch
+
+            confirmPayment(appointment, receiptId)
         }
     }
 
     fun cancelPayment(appointment: Appointment) {
         viewModelScope.launch {
-            appointmentRepository.cancelAppointmentByWorker(appointment.id)
+            val receipt = paymentReceiptRepository
+                .getReceiptByAppointment(appointment.id)
+                .first()
+
+            val receiptId = receipt?.id ?: return@launch
+
+            reportPaymentProblem(appointment, receiptId)
         }
+    }
+
+    fun refreshPaymentPending(workerId: String) {
+        loadPaymentPending(workerId)
     }
 }

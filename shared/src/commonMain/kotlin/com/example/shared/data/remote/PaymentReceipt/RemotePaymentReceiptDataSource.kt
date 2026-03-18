@@ -4,37 +4,32 @@ import com.example.shared.domain.entity.PaymentReceipt
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 
 class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
 
     private val db = Firebase.firestore
 
-    // GET (realtime) — solo hay un recibo por cita
-    override suspend fun getReceiptByAppointment(appointmentId: String): Flow<PaymentReceipt?> {
-        return db.collection("appointments")
-            .document(appointmentId)
-            .collection("paymentReceipt")
-            .snapshots
-            .map { snapshot ->
+    override suspend fun getReceiptByAppointment(appointmentId: String): Flow<PaymentReceipt?> = flow {
+        val receipt: PaymentReceipt? = try {
+            val snapshot = db.collection("appointments")
+                .document(appointmentId)
+                .collection("paymentReceipt")
+                .get()
 
-                if (snapshot.documents.isEmpty()) {
-                    println("DEBUG no paymentReceipt for appointment: $appointmentId")
-                    return@map null
-                }
-
-                val doc = snapshot.documents.firstOrNull() ?: return@map null
-
-                try {
-                    doc.data<PaymentReceipt>().copy(id = doc.id)
-                } catch (e: Exception) {
-                    println("ERROR parsing receipt ${doc.id}: ${e.message}")
-                    null
-                }
+            if (snapshot.documents.isEmpty()) {
+                null
+            } else {
+                val doc = snapshot.documents.first()
+                doc.data<PaymentReceipt>().copy(id = doc.id)
             }
+        } catch (e: Exception) {
+            null
+        }
+
+        emit(receipt)
     }
 
-    // CREATE
     override suspend fun createReceipt(appointmentId: String, receipt: PaymentReceipt): String {
         return try {
             val ref = db.collection("appointments")
@@ -43,12 +38,10 @@ class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
                 .add(receipt)
             ref.id
         } catch (e: Exception) {
-            println("ERROR createReceipt: ${e.message}")
             ""
         }
     }
 
-    // UPDATE STATUS
     override suspend fun updateReceiptStatus(
         appointmentId: String,
         receiptId: String,
@@ -64,12 +57,10 @@ class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
                     "status" to status,
                     "note" to note
                 )
-        } catch (e: Exception) {
-            println("ERROR updateReceiptStatus: ${e.message}")
+        } catch (_: Exception) {
         }
     }
 
-    // DELETE
     override suspend fun deleteReceipt(appointmentId: String, receiptId: String) {
         try {
             db.collection("appointments")
@@ -77,8 +68,7 @@ class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
                 .collection("paymentReceipt")
                 .document(receiptId)
                 .delete()
-        } catch (e: Exception) {
-            println("ERROR deleteReceipt: ${e.message}")
+        } catch (_: Exception) {
         }
     }
 }

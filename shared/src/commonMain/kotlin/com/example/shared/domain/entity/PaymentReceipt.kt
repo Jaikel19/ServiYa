@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PaymentReceipt(
     val id: String = "",
-    val attemptNumber: Int = 0,
+    val attemptNumber: Long = 0L,
     val imageUrl: String = "",
     val note: String? = null,
     val sentAt: String = "",            // YYYY-MM-DDTHH:mm
