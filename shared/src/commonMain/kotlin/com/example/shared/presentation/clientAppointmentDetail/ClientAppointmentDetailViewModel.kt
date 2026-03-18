@@ -26,6 +26,9 @@ class ClientAppointmentDetailViewModel(
                     .getAppointmentById(appointmentId)
                     .first()
 
+                println("CLIENT OTP DEBUG 1: appointmentId = $appointmentId")
+                println("CLIENT OTP DEBUG 2: appointment = $appointment")
+
                 if (appointment == null) {
                     _uiState.value = ClientAppointmentDetailUiState(
                         isLoading = false,
@@ -37,6 +40,8 @@ class ClientAppointmentDetailViewModel(
                 val otp = otpAppointmentRepository
                     .getOtpByAppointment(appointmentId)
                     .first()
+
+                println("CLIENT OTP DEBUG 3: otp = $otp")
 
                 val cancellationPolicy =
                     bookingRepository.getCancellationPolicyByWorkerId(appointment.workerId)
@@ -52,7 +57,14 @@ class ClientAppointmentDetailViewModel(
                     cancellationPolicy = cancellationPolicy,
                     errorMessage = null
                 )
+
+                println("CLIENT OTP DEBUG 4: canShowOtp = ${_uiState.value.canShowOtp}")
+                println("CLIENT OTP DEBUG 5: otpCode = ${_uiState.value.otp?.code}")
+
             } catch (e: Exception) {
+                println("CLIENT OTP DEBUG ERROR: ${e.message}")
+                e.printStackTrace()
+
                 _uiState.value = ClientAppointmentDetailUiState(
                     isLoading = false,
                     errorMessage = e.message ?: "Error al cargar el detalle de la cita"

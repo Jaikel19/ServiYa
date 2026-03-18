@@ -583,19 +583,20 @@ private fun ClientActionButton(
 @Composable
 private fun ClientOtpRow(code: String) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(14.dp)
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         code.forEach { digit ->
             Surface(
-                modifier = Modifier.size(54.dp),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.size(44.dp),
+                shape = RoundedCornerShape(14.dp),
                 color = White,
                 border = BorderStroke(1.dp, Color(0xFFE4EDF8))
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = digit.toString(),
-                        style = MaterialTheme.typography.headlineMedium.copy(
+                        style = MaterialTheme.typography.titleLarge.copy(
                             color = BrandBlue,
                             fontWeight = FontWeight.ExtraBold
                         )

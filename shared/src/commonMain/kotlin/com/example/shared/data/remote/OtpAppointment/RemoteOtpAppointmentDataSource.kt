@@ -18,13 +18,40 @@ class RemoteOtpAppointmentDataSource : IRemoteOtpAppointmentDataSource {
             .snapshots
             .map { doc ->
                 try {
-                    if (doc.exists) {
-                        doc.data<OtpAppointment>().copy(id = doc.id)
-                    } else {
-                        null
+                    if (!doc.exists) {
+                        println("OTP REMOTE DEBUG 1: doc no existe para $appointmentId")
+                        return@map null
                     }
+
+                    val code = doc.get<String>("code") ?: ""
+                    val purpose = doc.get<String>("purpose") ?: "start"
+                    val codeHash = doc.get<String>("codeHash") ?: ""
+                    val createdAt = doc.get<String>("createdAt") ?: ""
+                    val expiresAt = doc.get<String>("expiresAt") ?: ""
+                    val usedAt = doc.get<String?>("usedAt")
+                    val status = doc.get<String>("status") ?: "GENERATED"
+
+                    println("OTP REMOTE DEBUG 2: raw code = '$code'")
+                    println("OTP REMOTE DEBUG 3: raw purpose = '$purpose'")
+                    println("OTP REMOTE DEBUG 4: raw codeHash = '$codeHash'")
+                    println("OTP REMOTE DEBUG 5: raw createdAt = '$createdAt'")
+                    println("OTP REMOTE DEBUG 6: raw expiresAt = '$expiresAt'")
+                    println("OTP REMOTE DEBUG 7: raw usedAt = '$usedAt'")
+                    println("OTP REMOTE DEBUG 8: raw status = '$status'")
+
+                    OtpAppointment(
+                        id = doc.id,
+                        purpose = purpose,
+                        code = code,
+                        codeHash = codeHash,
+                        createdAt = createdAt,
+                        expiresAt = expiresAt,
+                        usedAt = usedAt,
+                        status = status
+                    )
                 } catch (e: Exception) {
-                    println("ERROR parsing otp: ${e.message}")
+                    println("OTP REMOTE DEBUG ERROR: ${e.message}")
+                    e.printStackTrace()
                     null
                 }
             }
