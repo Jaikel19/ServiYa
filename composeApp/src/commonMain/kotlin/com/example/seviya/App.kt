@@ -930,18 +930,20 @@ fun App() {
                             subtitle = "No se encontró la solicitud."
                         )
                     }
+
                     composable<WorkerPaymentDetail> { backStackEntry ->
                         val route = backStackEntry.toRoute<WorkerPaymentDetail>()
                         val viewModel: WorkerPaymentDetailViewModel = koinViewModel()
                         val uiState by viewModel.uiState.collectAsState()
 
                         LaunchedEffect(route.bookingId) {
-                            viewModel.loadBooking(route.bookingId)
+                            viewModel.loadPaymentDetail(route.bookingId)
                         }
 
-                        uiState.booking?.let { booking ->
+                        uiState.appointment?.let { appointment ->
                             WorkerPaymentDetailScreen(
-                                booking = booking,
+                                appointment = appointment,
+                                paymentReceipt = uiState.paymentReceipt,
                                 onBack = { navController.popBackStack() },
                                 onVerifyPayment = {
                                     viewModel.verifyPayment()

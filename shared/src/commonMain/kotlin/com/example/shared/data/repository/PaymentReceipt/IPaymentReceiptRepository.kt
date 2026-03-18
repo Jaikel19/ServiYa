@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface IPaymentReceiptRepository {
     suspend fun getReceiptByAppointment(appointmentId: String): Flow<PaymentReceipt?>
     suspend fun createReceipt(appointmentId: String, receipt: PaymentReceipt): String
-    suspend fun updateReceiptStatus(appointmentId: String, receiptId: String, status: String, note: String?)
+
+    suspend fun updateReceiptStatus(appointmentId: String, receiptId: String, status: String, note: String?, reviewedAt: String?, reviewedBy: String?, rejectionReason: String?)
+
     suspend fun deleteReceipt(appointmentId: String, receiptId: String)
 }
