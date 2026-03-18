@@ -28,9 +28,20 @@ class PaymentReceiptRepository(
         appointmentId: String,
         receiptId: String,
         status: String,
-        note: String?
+        note: String?,
+        reviewedAt: String?,
+        reviewedBy: String?,
+        rejectionReason: String?
     ) = try {
-        remote.updateReceiptStatus(appointmentId, receiptId, status, note)
+        remote.updateReceiptStatus(
+            appointmentId = appointmentId,
+            receiptId = receiptId,
+            status = status,
+            note = note,
+            reviewedAt = reviewedAt,
+            reviewedBy = reviewedBy,
+            rejectionReason = rejectionReason
+        )
     } catch (e: Exception) {
         println("ERROR updateReceiptStatus: ${e.message}")
     }

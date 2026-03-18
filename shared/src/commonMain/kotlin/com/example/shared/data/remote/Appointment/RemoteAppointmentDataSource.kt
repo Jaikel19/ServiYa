@@ -5,7 +5,12 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
 
     private val db = Firebase.firestore
@@ -94,7 +99,8 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
         db.collection(appointmentsCollection)
             .document(appointmentId)
             .update(
-                "status" to "approved"
+                "status" to "approved",
+                "updatedAt" to currentDateTimeString()
             )
     }
 
@@ -102,7 +108,8 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
         db.collection(appointmentsCollection)
             .document(appointmentId)
             .update(
-                "status" to "confirmed"
+                "status" to "confirmed",
+                "updatedAt" to currentDateTimeString()
             )
     }
 
@@ -110,7 +117,8 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
         db.collection(appointmentsCollection)
             .document(appointmentId)
             .update(
-                "status" to "in_progress"
+                "status" to "in_progress",
+                "updatedAt" to currentDateTimeString()
             )
     }
 
@@ -118,7 +126,8 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
         db.collection(appointmentsCollection)
             .document(appointmentId)
             .update(
-                "status" to "completed"
+                "status" to "completed",
+                "updatedAt" to currentDateTimeString()
             )
     }
 
@@ -128,7 +137,8 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
             .update(
                 "status" to "rejected",
                 "cancellationReason" to "Cancelada por trabajador",
-                "cancellationBy" to "worker"
+                "cancellationBy" to "worker",
+                "updatedAt" to currentDateTimeString()
             )
     }
 
@@ -138,7 +148,8 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
             .update(
                 "status" to "cancelled",
                 "cancellationReason" to "Cancelada por trabajador",
-                "cancellationBy" to "worker"
+                "cancellationBy" to "worker",
+                "updatedAt" to currentDateTimeString()
             )
     }
 
@@ -148,7 +159,21 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
             .update(
                 "status" to "cancelled",
                 "cancellationReason" to "Cancelada por cliente",
-                "cancellationBy" to "client"
+                "cancellationBy" to "client",
+                "updatedAt" to currentDateTimeString()
             )
+    }
+
+    private fun currentDateTimeString(): String {
+        val now = Clock.System.now()
+        val local = now.toLocalDateTime(TimeZone.of("America/Costa_Rica"))
+
+        val year = local.year.toString().padStart(4, '0')
+        val month = local.monthNumber.toString().padStart(2, '0')
+        val day = local.dayOfMonth.toString().padStart(2, '0')
+        val hour = local.hour.toString().padStart(2, '0')
+        val minute = local.minute.toString().padStart(2, '0')
+
+        return "$year-$month-$day" + "T" + "$hour:$minute"
     }
 }

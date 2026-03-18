@@ -28,36 +28,46 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.seviya.theme.BrandBlue
 import com.example.seviya.theme.BrandRed
 import com.example.seviya.theme.White
-import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Appointment
+import com.example.shared.domain.entity.PaymentReceipt
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 
-
 @Composable
 fun WorkerPaymentDetailScreen(
-    booking: Booking,
+    appointment: Appointment,
+    paymentReceipt: PaymentReceipt?,
     onBack: () -> Unit,
     onVerifyPayment: () -> Unit,
     onReportProblem: () -> Unit
 ) {
+    val showImagePreview = paymentReceipt?.imageUrl?.isNotBlank() == true
+    var showFullImage by remember { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,7 +78,7 @@ fun WorkerPaymentDetailScreen(
                     modifier = Modifier
                         .padding(start = 20.dp, top = 24.dp)
                         .clip(RoundedCornerShape(999.dp))
-                        .clickable { onBack() },  // agrega esto
+                        .clickable { onBack() },
                     shape = RoundedCornerShape(999.dp),
                     color = White.copy(alpha = 0.13f),
                     border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
@@ -119,7 +129,6 @@ fun WorkerPaymentDetailScreen(
                 }
             }
 
-            // Info card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -137,7 +146,7 @@ fun WorkerPaymentDetailScreen(
                         Column {
                             Surface(
                                 shape = RoundedCornerShape(999.dp),
-                                color = Color(0xFFFFF3CD)
+                                color = paymentStatusBackground(paymentReceipt)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
@@ -147,13 +156,13 @@ fun WorkerPaymentDetailScreen(
                                         modifier = Modifier
                                             .size(6.dp)
                                             .clip(RoundedCornerShape(999.dp))
-                                            .background(Color(0xFFF59E0B))
+                                            .background(paymentStatusDot(paymentReceipt))
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "Pendiente",
+                                        text = paymentStatusText(paymentReceipt),
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = Color(0xFF92400E),
+                                            color = paymentStatusTextColor(paymentReceipt),
                                             fontWeight = FontWeight.SemiBold
                                         )
                                     )
@@ -163,7 +172,7 @@ fun WorkerPaymentDetailScreen(
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
-                                text = "₡${booking.totalCost}",
+                                text = "₡${appointment.totalCost}",
                                 style = MaterialTheme.typography.headlineLarge.copy(
                                     fontWeight = FontWeight.Bold
                                 )
@@ -185,15 +194,11 @@ fun WorkerPaymentDetailScreen(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Cliente
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "👤",
-                            fontSize = 14.sp
-                        )
+                        Text(text = "👤", fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Cliente:",
@@ -204,7 +209,7 @@ fun WorkerPaymentDetailScreen(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = booking.clientName,
+                            text = appointment.clientName,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -213,7 +218,6 @@ fun WorkerPaymentDetailScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Fecha
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
@@ -229,7 +233,7 @@ fun WorkerPaymentDetailScreen(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = booking.date,
+                            text = appointment.serviceStartAt,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -238,37 +242,33 @@ fun WorkerPaymentDetailScreen(
                 }
             }
 
-            // Recibo
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Vista previa del recibo",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold
-                        )
+                Text(
+                    text = "Vista previa del recibo",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold
                     )
-                }
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                if (booking.paymentReceiptUrl.isNotBlank()) {
+                if (showImagePreview) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(3f / 4f),
+                            .aspectRatio(3f / 4f)
+                            .clickable {
+                                showFullImage = true
+                            },
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         KamelImage(
-                            resource = asyncPainterResource(booking.paymentReceiptUrl),
+                            resource = asyncPainterResource(paymentReceipt?.imageUrl.orEmpty()),
                             contentDescription = "Comprobante de pago",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -304,27 +304,29 @@ fun WorkerPaymentDetailScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "Toca la imagen para ver los detalles del comprobante",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
+                if (showImagePreview) {
+                    Text(
+                        text = "Toca la imagen para verla ampliada",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Espacio para los botones fijos
             Spacer(modifier = Modifier.height(160.dp))
         }
 
-        // Botones fijos abajo
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .background(
-                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                    Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
                             MaterialTheme.colorScheme.background.copy(alpha = 0.95f),
@@ -341,10 +343,11 @@ fun WorkerPaymentDetailScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue)
+                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                enabled = canVerifyPayment(paymentReceipt)
             ) {
                 Text(
-                    text = "✓  Verificar pago",
+                    text = "Verificar pago",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     )
@@ -360,15 +363,81 @@ fun WorkerPaymentDetailScreen(
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = BrandRed
                 ),
-                border = BorderStroke(2.dp, BrandRed)
+                border = BorderStroke(2.dp, BrandRed),
+                enabled = canReportProblem(paymentReceipt)
             ) {
                 Text(
-                    text = "⚠  Problema con pago",
+                    text = "Problema con pago",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     )
                 )
             }
         }
+
+        if (showFullImage && paymentReceipt?.imageUrl?.isNotBlank() == true) {
+            Dialog(
+                onDismissRequest = { showFullImage = false }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.92f))
+                        .padding(12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    KamelImage(
+                        resource = asyncPainterResource(paymentReceipt.imageUrl),
+                        contentDescription = "Comprobante ampliado",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+                }
+            }
+        }
     }
+}
+
+private fun paymentStatusText(paymentReceipt: PaymentReceipt?): String {
+    return when (paymentReceipt?.status?.uppercase()) {
+        "APPROVED" -> "Aprobado"
+        "REJECTED" -> "Con problema"
+        else -> "Pendiente"
+    }
+}
+
+private fun paymentStatusBackground(paymentReceipt: PaymentReceipt?): Color {
+    return when (paymentReceipt?.status?.uppercase()) {
+        "APPROVED" -> Color(0xFFE8F7EC)
+        "REJECTED" -> Color(0xFFFCE9E9)
+        else -> Color(0xFFFFF3CD)
+    }
+}
+
+private fun paymentStatusDot(paymentReceipt: PaymentReceipt?): Color {
+    return when (paymentReceipt?.status?.uppercase()) {
+        "APPROVED" -> Color(0xFF16A34A)
+        "REJECTED" -> Color(0xFFDC2626)
+        else -> Color(0xFFF59E0B)
+    }
+}
+
+private fun paymentStatusTextColor(paymentReceipt: PaymentReceipt?): Color {
+    return when (paymentReceipt?.status?.uppercase()) {
+        "APPROVED" -> Color(0xFF166534)
+        "REJECTED" -> Color(0xFF991B1B)
+        else -> Color(0xFF92400E)
+    }
+}
+
+private fun canVerifyPayment(paymentReceipt: PaymentReceipt?): Boolean {
+    return paymentReceipt?.id?.isNotBlank() == true &&
+            paymentReceipt.status.equals("PENDING", ignoreCase = true)
+}
+
+private fun canReportProblem(paymentReceipt: PaymentReceipt?): Boolean {
+    return paymentReceipt?.id?.isNotBlank() == true &&
+            paymentReceipt.status.equals("PENDING", ignoreCase = true)
 }
