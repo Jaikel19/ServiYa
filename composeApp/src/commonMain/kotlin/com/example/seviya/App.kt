@@ -992,9 +992,9 @@ fun App() {
                             viewModel.loadBooking(route.bookingId)
                         }
 
-                        uiState.booking?.let { booking ->
+                        uiState.appointment?.let { appointment ->
                             WorkerRequestDetailScreen(
-                                booking = booking,
+                                booking = appointment,
                                 onBack = { navController.popBackStack() },
                                 onAccept = {
                                     viewModel.acceptRequest()
