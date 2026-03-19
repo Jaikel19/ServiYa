@@ -5,8 +5,9 @@ ktor = "3.4.0"
 kotlinx-coroutines = "1.10.2"
 dateTime = "0.7.1"
 kotlinx-serialization = "1.7.3"
-
+kamel = "1.0.9"
 sqldelight = "2.2.1"
+google-services = "4.4.4"
 
 agp = "8.11.2"
 android-compileSdk = "36"
@@ -35,6 +36,8 @@ firebase-bom = "34.10.0"
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "composeMultiplatform" }
 composeIcons-tabler = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "devsrComposeIcons" }
 compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "composeMultiplatform" }
+
+kamel-image-default = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 
 # Koin
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
@@ -112,3 +115,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.services)
 }
 
 kotlin {
@@ -16,7 +16,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -26,7 +26,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(project.dependencies.platform(libs.firebase.bom))
@@ -74,7 +74,7 @@ kotlin {
             implementation(libs.compose.animation)
             implementation(libs.kotlinx.datetime)
 
-            implementation("media.kamel:kamel-image-default:1.0.9")
+            implementation(libs.kamel.image.default)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
