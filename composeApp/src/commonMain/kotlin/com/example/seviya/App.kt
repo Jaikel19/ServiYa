@@ -90,11 +90,11 @@ import com.example.seviya.navigation.WorkerAppointmentDetail
 import com.example.seviya.navigation.WorkerConfiguration
 import com.example.seviya.navigation.WorkerDashboard
 import com.example.seviya.navigation.WorkerMessages
-import com.example.seviya.navigation.WorkerPaymentDetail
+
 import com.example.seviya.navigation.WorkerPortfolio
 import com.example.seviya.navigation.WorkerProfile
 import com.example.seviya.navigation.WorkerReports
-import com.example.seviya.navigation.WorkerRequestDetail
+
 import com.example.seviya.navigation.WorkerRequests
 import com.example.seviya.navigation.WorkerSchedule
 import com.example.seviya.navigation.WorkerServices
@@ -103,15 +103,8 @@ import com.example.seviya.navigation.WorkersList
 import com.example.seviya.theme.AppTheme
 import com.example.seviya.ui.ServicesScreen
 import com.example.seviya.ui.WorkerRequestsScreen
-import com.example.shared.domain.entity.Address
-import com.example.shared.domain.entity.Appointment
-import com.example.shared.domain.entity.AppointmentLocation
-import com.example.shared.domain.entity.AppointmentService
-import com.example.shared.domain.entity.Booking
-import com.example.shared.domain.entity.Service
-import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
-import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
-import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
+
+
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
@@ -120,7 +113,7 @@ import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
-import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
+
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.seviya.navigation.ClientPaymentUpload
@@ -142,7 +135,31 @@ import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
+import com.example.seviya.UI.ClientDashboardRoute
+import com.example.seviya.UI.ClientMapScreen
+import com.example.seviya.UI.WorkerPaymentDetailScreen
+import com.example.seviya.UI.WorkerRequestDetailScreen
+import com.example.seviya.navigation.WorkerPaymentDetail
+import com.example.seviya.navigation.WorkerRequestDetail
+import com.example.seviya.ui.WorkerRequestsScreen
+import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
+import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
+import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
+
+//esto se agrego para que sirva drante la migracion de booking
+import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.Appointment
+import com.example.shared.domain.entity.AppointmentLocation
+import com.example.shared.domain.entity.AppointmentService
+import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Service
+import com.example.shared.presentation.clientMap.ClientMapViewModel
+import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 
 enum class SessionRole {
     GUEST,
@@ -653,7 +670,7 @@ fun App() {
                                 navController.navigateSingleTop(ClientConfiguration)
                             },
                             onOpenRequests = {
-                                navController.navigateSingleTop(ClientRequests)
+                                navController.navigateSingleTop(ClientConfiguration)
                             },
                             onOpenCategories = {
                                 currentClientTab = ClientTab.SERVICES
@@ -774,9 +791,13 @@ fun App() {
                     }
 
                     composable<ClientMap> {
-                        FeaturePlaceholder(
-                            title = "Mapa del cliente",
-                            subtitle = "Aquí irá el mapa interactivo con trabajadores por categoría y zona."
+                        val viewModel: ClientMapViewModel = koinViewModel()
+                        ClientMapScreen(
+                            clientId = currentClientId,
+                            viewModel = viewModel,
+                            onWorkerClick = { workerId ->
+                                navController.navigate(ProfessionalProfile(workerId = workerId))
+                            }
                         )
                     }
 
@@ -1033,6 +1054,7 @@ fun App() {
                                 onBack = { navController.popBackStack() },
                                 onVerifyPayment = {
                                     viewModel.verifyPayment()
+                                    navController.popBackStack()
                                 },
                                 onReportProblem = {
                                     viewModel.reportProblem()
@@ -1532,7 +1554,7 @@ private fun NavHostController.navigateToLandingClearingStack() {
     }
 }
 
-// esto siguiente se tiene que borrar apenas todas las clases dejen de recibir booking
+//esto siguiente se tiene que borrar apenas todas las clases dejen de recibir booking
 private fun Booking.toAppointment(): Appointment {
     return Appointment(
         id = id,
