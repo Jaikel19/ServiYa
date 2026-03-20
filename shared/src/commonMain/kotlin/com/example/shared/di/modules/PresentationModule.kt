@@ -1,5 +1,5 @@
 package com.example.shared.di.modules
-
+import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
 import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
 import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
@@ -9,6 +9,7 @@ import com.example.shared.presentation.clientAppointmentDetail.ClientAppointment
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
+import com.example.shared.presentation.clientMap.ClientMapViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
@@ -32,10 +33,13 @@ val presentationModule = module {
     factory { ClientDashboardViewModel(get()) }
     factory { RequestAppointmentViewModel(get(), get()) }
     factory { WorkerRequestsViewModel(get(), get()) }
-    factory { WorkerRequestDetailViewModel(get()) }
     factory { WorkerPaymentDetailViewModel(get(), get()) }
     factory { WorkerAppointmentDetailViewModel(get()) }
     factory { FavoriteWorkersViewModel(get()) }
     factory { ClientRequestsViewModel(get()) }
     factory { WorkerStartAppointmentOtpViewModel(get(), get()) }
+    factory { ClientMapViewModel(get()) }
+    factory { WorkerRequestDetailViewModel(get(), get()) }
+    factory { ClientPaymentUploadViewModel(get(), get(), get()) }
+
 }

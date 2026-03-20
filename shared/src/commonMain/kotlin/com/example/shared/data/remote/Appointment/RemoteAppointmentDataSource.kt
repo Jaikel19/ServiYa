@@ -176,4 +176,15 @@ class RemoteAppointmentDataSource : IRemoteAppointmentDataSource {
 
         return "$year-$month-$day" + "T" + "$hour:$minute"
     }
+
+
+    override suspend fun markPaymentPending(appointmentId: String) {
+        try {
+            db.collection(appointmentsCollection)
+                .document(appointmentId)
+                .update("status" to "payment_pending")
+        } catch (e: Exception) {
+            println("ERROR markPaymentPending: ${e.message}")
+        }
+    }
 }

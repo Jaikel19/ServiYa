@@ -19,4 +19,5 @@ interface IAppointmentRepository {
     suspend fun rejectAppointmentByWorker(appointmentId: String)
     suspend fun cancelAppointmentByWorker(appointmentId: String)
     suspend fun cancelAppointmentByClient(appointmentId: String)
+    suspend fun markPaymentPending(appointmentId: String)
 }

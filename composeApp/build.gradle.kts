@@ -28,6 +28,8 @@ kotlin {
     }
 
     sourceSets {
+
+
         androidMain.dependencies {
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.compose.uiToolingPreview)
@@ -40,6 +42,10 @@ kotlin {
 
             // Coroutines (Android)
             implementation(libs.kotlinx.coroutines.android)
+
+            //maps
+            implementation(libs.maps.compose)
+
         }
         commonMain.dependencies {
             // Firebase GitLive (KMP)
@@ -75,6 +81,9 @@ kotlin {
             implementation(libs.kotlinx.datetime)
 
             implementation(libs.kamel.image.default)
+
+
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

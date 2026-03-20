@@ -103,7 +103,26 @@ class WorkerRequestsViewModel(
 
     fun acceptRequest(appointment: Appointment) {
         viewModelScope.launch {
+            // Aprobar la cita
             appointmentRepository.approveAppointment(appointment.id)
+
+            // Crear PaymentReceipt con campos vacíos y status "pending"
+            val receipt = PaymentReceipt(
+                id = "",
+                attemptNumber = 0L,
+                imageUrl = "",
+                note = null,
+                sentAt = "",
+                reviewedAt = null,
+                reviewedBy = null,
+                rejectionReason = null,
+                status = "pending"
+            )
+
+            paymentReceiptRepository.createReceipt(
+                appointmentId = appointment.id,
+                receipt = receipt
+            )
         }
     }
 

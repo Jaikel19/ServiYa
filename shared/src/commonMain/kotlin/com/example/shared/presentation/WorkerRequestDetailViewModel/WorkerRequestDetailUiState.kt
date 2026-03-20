@@ -1,10 +1,10 @@
 package com.example.shared.presentation.WorkerRequestDetailViewModel
 
-import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Appointment
 
 
 data class WorkerRequestDetailUiState(
-    val booking: Booking? = null,
+    val appointment: Appointment? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

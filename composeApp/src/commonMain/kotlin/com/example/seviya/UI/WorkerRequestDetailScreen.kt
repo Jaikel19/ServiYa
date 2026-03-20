@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.sp
 import com.example.seviya.theme.BrandBlue
 import com.example.seviya.theme.BrandRed
 import com.example.seviya.theme.White
-import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Appointment
 
 @Composable
 fun WorkerRequestDetailScreen(
-    booking: Booking,
+    booking: Appointment,
     onBack: () -> Unit,
     onAccept: () -> Unit,
     onReject: () -> Unit,
@@ -41,7 +41,6 @@ fun WorkerRequestDetailScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,7 +51,7 @@ fun WorkerRequestDetailScreen(
                 modifier = Modifier
                     .padding(start = 20.dp, top = 24.dp)
                     .clip(RoundedCornerShape(999.dp))
-                    .clickable { onBack() },  // agrega esto
+                    .clickable { onBack() },
                 shape = RoundedCornerShape(999.dp),
                 color = White.copy(alpha = 0.13f),
                 border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
@@ -103,7 +102,6 @@ fun WorkerRequestDetailScreen(
             }
         }
 
-        // Título
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -126,7 +124,6 @@ fun WorkerRequestDetailScreen(
             )
         }
 
-        // Card de detalles
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,7 +136,6 @@ fun WorkerRequestDetailScreen(
                 modifier = Modifier.padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Cliente
                 DetailRow(
                     emoji = "👤",
                     label = "CLIENTE",
@@ -148,16 +144,14 @@ fun WorkerRequestDetailScreen(
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-                // Fecha
                 DetailRow(
                     emoji = "📅",
                     label = "FECHA Y HORA",
-                    value = booking.date
+                    value = booking.serviceStartAt
                 )
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-                // Ubicación
                 DetailRow(
                     emoji = "📍",
                     label = "UBICACIÓN",
@@ -166,7 +160,6 @@ fun WorkerRequestDetailScreen(
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-                // Costo
                 DetailRow(
                     emoji = "💰",
                     label = "COSTO TOTAL",
@@ -177,7 +170,6 @@ fun WorkerRequestDetailScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botones
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -190,9 +182,7 @@ fun WorkerRequestDetailScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = BrandBlue
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue)
             ) {
                 Text(
                     text = "Aceptar Solicitud",

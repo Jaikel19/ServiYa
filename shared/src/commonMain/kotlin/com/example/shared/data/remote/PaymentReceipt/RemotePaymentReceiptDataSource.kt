@@ -41,7 +41,21 @@ class RemotePaymentReceiptDataSource : IRemotePaymentReceiptDataSource {
             ""
         }
     }
-
+    override suspend fun updateReceiptImageUrl(
+        appointmentId: String,
+        receiptId: String,
+        imageUrl: String
+    ) {
+        try {
+            db.collection("appointments")
+                .document(appointmentId)
+                .collection("paymentReceipt")
+                .document(receiptId)
+                .update("imageUrl" to imageUrl)
+        } catch (e: Exception) {
+            println("ERROR updateReceiptImageUrl: ${e.message}")
+        }
+    }
     override suspend fun updateReceiptStatus(
         appointmentId: String,
         receiptId: String,

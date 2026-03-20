@@ -31,7 +31,14 @@ devsrComposeIcons = "1.1.1"
 firebase-gitlive-sdk = "2.4.0"
 firebase-bom = "34.10.0"
 
+
+maps-compose = "4.4.1"
+
 [libraries]
+
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "maps-compose" }
 
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "composeMultiplatform" }
 composeIcons-tabler = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "devsrComposeIcons" }
