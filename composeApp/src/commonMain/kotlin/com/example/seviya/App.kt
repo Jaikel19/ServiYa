@@ -672,7 +672,7 @@ fun App() {
                                 navController.navigateSingleTop(ClientConfiguration)
                             },
                             onOpenRequests = {
-                                navController.navigateSingleTop(ClientConfiguration)
+                                navController.navigateSingleTop(ClientRequests)
                             },
                             onOpenCategories = {
                                 currentClientTab = ClientTab.SERVICES
