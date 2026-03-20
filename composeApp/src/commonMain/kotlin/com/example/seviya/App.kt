@@ -142,6 +142,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.UI.ClientDashboardRoute
 import com.example.seviya.UI.ClientMapScreen
+import com.example.seviya.UI.ClientPaymentUploadScreen
 import com.example.seviya.UI.WorkerPaymentDetailScreen
 import com.example.seviya.UI.WorkerRequestDetailScreen
 import com.example.seviya.navigation.WorkerPaymentDetail
@@ -158,6 +159,7 @@ import com.example.shared.domain.entity.AppointmentLocation
 import com.example.shared.domain.entity.AppointmentService
 import com.example.shared.domain.entity.Booking
 import com.example.shared.domain.entity.Service
+import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
 import com.example.shared.presentation.clientMap.ClientMapViewModel
 import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 
@@ -743,10 +745,16 @@ fun App() {
 
                     composable<ClientPaymentUpload> { backStackEntry ->
                         val route = backStackEntry.toRoute<ClientPaymentUpload>()
+                        val viewModel: ClientPaymentUploadViewModel = koinViewModel()
 
-                        FeaturePlaceholder(
-                            title = "Subir comprobante",
-                            subtitle = "Aquí irá la vista para subir el comprobante de pago de la cita ${route.appointmentId}."
+                        LaunchedEffect(route.appointmentId) {
+                            viewModel.loadData(route.appointmentId)
+                        }
+
+                        ClientPaymentUploadScreen(
+                            appointmentId = route.appointmentId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
                         )
                     }
 

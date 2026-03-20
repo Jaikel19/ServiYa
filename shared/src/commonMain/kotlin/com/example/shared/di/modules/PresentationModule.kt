@@ -1,5 +1,5 @@
 package com.example.shared.di.modules
-
+import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
 import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
 import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
@@ -40,4 +40,6 @@ val presentationModule = module {
     factory { WorkerStartAppointmentOtpViewModel(get(), get()) }
     factory { ClientMapViewModel(get()) }
     factory { WorkerRequestDetailViewModel(get(), get()) }
+    factory { ClientPaymentUploadViewModel(get(), get(), get()) }
+
 }

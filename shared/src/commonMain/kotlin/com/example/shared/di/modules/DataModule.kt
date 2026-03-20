@@ -1,5 +1,6 @@
 package com.example.shared.di.modules
 
+import com.example.shared.data.cloudinary.CloudinaryService
 import com.example.shared.data.local.AppDatabase
 import com.example.shared.data.local.DriverFactory
 import com.example.shared.data.local.ILocalServicesDataSource
@@ -50,8 +51,12 @@ import com.example.shared.data.repository.professionalProfile.IProfessionalProfi
 import com.example.shared.data.repository.professionalProfile.ProfessionalProfileRepository
 import com.example.shared.data.repository.workersList.IWorkersListRepository
 import com.example.shared.data.repository.workersList.WorkersListRepository
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.dsl.module
-
+import org.koin.core.qualifier.named
 val dataModule = module {
 
     // Remote Services
@@ -108,4 +113,13 @@ val dataModule = module {
 
     single<IRemoteUserDataSource> { RemoteUserDataSource() }
     single<IUserRepository> { UserRepository(get()) }
+
+    single(named("cloudinary")) {
+        HttpClient {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+    }
+    single { CloudinaryService(get(named("cloudinary"))) }
 }

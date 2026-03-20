@@ -114,4 +114,8 @@ class AppointmentRepository(
     override suspend fun cancelAppointmentByClient(appointmentId: String) {
         remote.cancelAppointmentByClient(appointmentId)
     }
+    override suspend fun markPaymentPending(appointmentId: String) {
+        remote.markPaymentPending(appointmentId)
+    }
+
 }

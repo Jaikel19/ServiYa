@@ -97,7 +97,7 @@ kotlin {
             dependencies {
                 implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.ktor.client.okhttp)
-
+                implementation(libs.ktor.client.okhttp)
                 // SQLDelight
                 implementation(libs.sqldelight.driver.android)
             }

@@ -45,7 +45,15 @@ class PaymentReceiptRepository(
     } catch (e: Exception) {
         println("ERROR updateReceiptStatus: ${e.message}")
     }
-
+    override suspend fun updateReceiptImageUrl(
+        appointmentId: String,
+        receiptId: String,
+        imageUrl: String
+    ) = try {
+        remote.updateReceiptImageUrl(appointmentId, receiptId, imageUrl)
+    } catch (e: Exception) {
+        println("ERROR updateReceiptImageUrl: ${e.message}")
+    }
     override suspend fun deleteReceipt(appointmentId: String, receiptId: String) =
         try {
             remote.deleteReceipt(appointmentId, receiptId)

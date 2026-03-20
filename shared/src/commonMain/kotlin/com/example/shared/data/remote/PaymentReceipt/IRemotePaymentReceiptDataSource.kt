@@ -10,4 +10,5 @@ interface IRemotePaymentReceiptDataSource {
     suspend fun updateReceiptStatus(appointmentId: String, receiptId: String, status: String, note: String?, reviewedAt: String?, reviewedBy: String?, rejectionReason: String?)
 
     suspend fun deleteReceipt(appointmentId: String, receiptId: String)
+    suspend fun updateReceiptImageUrl(appointmentId: String, receiptId: String, imageUrl: String)
 }
