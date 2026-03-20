@@ -48,7 +48,38 @@ class ClientPaymentUploadViewModel(
             }
         }
     }
+    fun onImageUploaded(imageUrl: String) {
+        val appointment = _state.value.appointment ?: return
+        val receipt = _state.value.paymentReceipt ?: return
 
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isUploading = true)
+            try {
+                paymentReceiptRepository.updateReceiptImageUrl(
+                    appointmentId = appointment.id,
+                    receiptId = receipt.id,
+                    imageUrl = imageUrl
+                )
+                appointmentRepository.markPaymentPending(appointment.id)
+                _state.value = _state.value.copy(
+                    isUploading = false,
+                    uploadSuccess = true
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isUploading = false,
+                    errorMessage = e.message ?: "Error guardando comprobante"
+                )
+            }
+        }
+    }
+
+    fun onUploadError(message: String) {
+        _state.value = _state.value.copy(
+            isUploading = false,
+            errorMessage = message
+        )
+    }
     fun onImageSelected(imageBytes: ByteArray) {
         _state.value = _state.value.copy(selectedImageBytes = imageBytes)
     }

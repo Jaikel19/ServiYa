@@ -26,9 +26,11 @@ import com.example.seviya.theme.BrandBlue
 import com.example.seviya.theme.BrandRed
 import com.example.seviya.theme.White
 import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
-
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 actual fun ClientPaymentUploadScreen(
@@ -38,6 +40,7 @@ actual fun ClientPaymentUploadScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(appointmentId) {
         viewModel.loadData(appointmentId)
@@ -241,7 +244,6 @@ actual fun ClientPaymentUploadScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 if (uiState.selectedImageBytes != null) {
-                    // Mostrar imagen seleccionada
                     val uri = remember(uiState.selectedImageBytes) {
                         val tempFile = java.io.File.createTempFile("receipt", ".jpg", context.cacheDir)
                         tempFile.writeBytes(uiState.selectedImageBytes!!)
@@ -278,7 +280,6 @@ actual fun ClientPaymentUploadScreen(
                         }
                     }
                 } else {
-                    // Zona para seleccionar imagen
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -328,7 +329,6 @@ actual fun ClientPaymentUploadScreen(
                 )
             }
 
-            // Error
             uiState.errorMessage?.let { error ->
                 Text(
                     text = error,
@@ -358,7 +358,48 @@ actual fun ClientPaymentUploadScreen(
                 .padding(horizontal = 16.dp, vertical = 20.dp)
         ) {
             Button(
-                onClick = { viewModel.uploadReceipt() },
+                onClick = {
+                    val imageBytes = uiState.selectedImageBytes ?: return@Button
+                    coroutineScope.launch {
+                        try {
+                            val imageUrl = withContext(Dispatchers.IO) {
+                                val url = java.net.URL("https://api.cloudinary.com/v1_1/dfk5xx88f/image/upload")
+                                val boundary = "Boundary${System.currentTimeMillis()}"
+
+                                val connection = url.openConnection() as java.net.HttpURLConnection
+                                connection.requestMethod = "POST"
+                                connection.doOutput = true
+                                connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+
+                                val output = connection.outputStream
+                                output.write("--$boundary\r\n".toByteArray())
+                                output.write("Content-Disposition: form-data; name=\"upload_preset\"\r\n\r\n".toByteArray())
+                                output.write("seviya_unsigned\r\n".toByteArray())
+                                output.write("--$boundary\r\n".toByteArray())
+                                output.write("Content-Disposition: form-data; name=\"file\"; filename=\"receipt.jpg\"\r\n".toByteArray())
+                                output.write("Content-Type: image/jpeg\r\n\r\n".toByteArray())
+                                output.write(imageBytes)
+                                output.write("\r\n--$boundary--\r\n".toByteArray())
+                                output.flush()
+
+                                val response = connection.inputStream.bufferedReader().readText()
+                                println("DEBUG Cloudinary response: $response")
+
+                                val json = org.json.JSONObject(response)
+                                json.optString("secure_url", "")
+                            }
+
+                            if (imageUrl.isNotBlank()) {
+                                viewModel.onImageUploaded(imageUrl)
+                            } else {
+                                viewModel.onUploadError("Error al subir la imagen")
+                            }
+                        } catch (e: Exception) {
+                            println("ERROR upload: ${e.message}")
+                            viewModel.onUploadError(e.message ?: "Error desconocido")
+                        }
+                    }
+                },
                 enabled = uiState.selectedImageBytes != null && !uiState.isUploading,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -383,7 +424,6 @@ actual fun ClientPaymentUploadScreen(
             }
         }
 
-        // Loading overlay
         if (uiState.isLoading) {
             Box(
                 modifier = Modifier
