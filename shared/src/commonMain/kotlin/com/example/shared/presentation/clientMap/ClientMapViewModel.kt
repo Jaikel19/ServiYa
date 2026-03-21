@@ -15,7 +15,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
-
+import kotlinx.coroutines.withTimeoutOrNull
 class ClientMapViewModel(
     private val userRepository: IUserRepository
 ) : ViewModel() {
@@ -74,7 +74,12 @@ class ClientMapViewModel(
         _state.value = _state.value.copy(isLoading = true)
 
         try {
-            val workers = userRepository.getAllWorkers().first()
+            val workers = withTimeoutOrNull(10000) {
+                userRepository.getAllWorkers()
+                    .catch { emit(emptyList()) }
+                    .first { it.isNotEmpty() }
+            } ?: emptyList()
+
             println("DEBUG workers encontrados: ${workers.size}")
 
             val markers = mutableListOf<WorkerMapMarker>()
@@ -93,8 +98,9 @@ class ClientMapViewModel(
                         address.latitude, address.longitude,
                         zone.latitude, zone.longitude
                     )
-                    println("DEBUG distancia de ${worker.name}: $distance km")
-                    if (distance <= 10.0) {
+                    println("DEBUG distancia de ${worker.name}: $distance km - zone: ${zone.latitude}, ${zone.longitude}")
+                    println("DEBUG client address: ${address.latitude}, ${address.longitude}")
+                    if (distance <= 250.0) {
                         markers.add(WorkerMapMarker(user = worker, workZone = zone))
                         break
                     }
@@ -104,7 +110,8 @@ class ClientMapViewModel(
             println("DEBUG markers totales: ${markers.size}")
             _state.value = _state.value.copy(
                 isLoading = false,
-                markers = markers
+                markers = markers,
+                filteredMarkers = markers
             )
         } catch (e: Exception) {
             println("ERROR loadMarkersForAddress: ${e.message}")
@@ -129,4 +136,30 @@ class ClientMapViewModel(
         return R * c
     }
     private fun Double.toRadians() = this * PI / 180.0
+
+    fun onSearchQueryChanged(query: String) {
+        _state.value = _state.value.copy(searchQuery = query)
+        applyFilters()
+    }
+
+    fun onCategorySelected(categoryId: String?) {
+        _state.value = _state.value.copy(selectedCategoryId = categoryId)
+        applyFilters()
+    }
+
+    private fun applyFilters() {
+        val query = _state.value.searchQuery.trim().lowercase()
+        val categoryId = _state.value.selectedCategoryId
+        val allMarkers = _state.value.markers
+
+        val filtered = allMarkers.filter { marker ->
+            val matchesName = query.isEmpty() ||
+                    marker.user.name.lowercase().contains(query)
+            val matchesCategory = categoryId == null ||
+                    marker.user.categories.any { it.id == categoryId }
+            matchesName && matchesCategory
+        }
+
+        _state.value = _state.value.copy(filteredMarkers = filtered)
+    }
 }
