@@ -159,7 +159,6 @@ class ClientMapViewModel(
                     marker.user.categories.any { it.id == categoryId }
             matchesName && matchesCategory
         }
-
         _state.value = _state.value.copy(filteredMarkers = filtered)
     }
 }
