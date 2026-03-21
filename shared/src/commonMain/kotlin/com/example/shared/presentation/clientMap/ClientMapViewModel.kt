@@ -108,10 +108,16 @@ class ClientMapViewModel(
             }
 
             println("DEBUG markers totales: ${markers.size}")
+
+            val availableCategories = markers
+                .flatMap { it.user.categories }
+                .distinctBy { it.id }
+
             _state.value = _state.value.copy(
                 isLoading = false,
                 markers = markers,
-                filteredMarkers = markers
+                filteredMarkers = markers,
+                availableCategories = availableCategories
             )
         } catch (e: Exception) {
             println("ERROR loadMarkersForAddress: ${e.message}")
@@ -146,19 +152,32 @@ class ClientMapViewModel(
         _state.value = _state.value.copy(selectedCategoryId = categoryId)
         applyFilters()
     }
-
+    fun onCategoryQueryChanged(query: String) {
+        _state.value = _state.value.copy(categoryQuery = query)
+        println("DEBUG categoryQuery: $query")
+        println("DEBUG markers categorias: ${_state.value.markers.map { it.user.name + " -> " + it.user.categories.map { c -> c.name } }}")
+        applyFilters()
+    }
     private fun applyFilters() {
         val query = _state.value.searchQuery.trim().lowercase()
-        val categoryId = _state.value.selectedCategoryId
+        val categoryQuery = _state.value.categoryQuery.trim().lowercase()
+        val minStars = _state.value.minStars
         val allMarkers = _state.value.markers
 
         val filtered = allMarkers.filter { marker ->
             val matchesName = query.isEmpty() ||
                     marker.user.name.lowercase().contains(query)
-            val matchesCategory = categoryId == null ||
-                    marker.user.categories.any { it.id == categoryId }
-            matchesName && matchesCategory
+            val matchesCategory = categoryQuery.isEmpty() ||
+                    marker.user.categories.any { it.name.lowercase().contains(categoryQuery) }
+            val matchesStars = minStars == null ||
+                    (marker.user.stars ?: 0.0) >= minStars
+            matchesName && matchesCategory && matchesStars
         }
+
         _state.value = _state.value.copy(filteredMarkers = filtered)
+    }
+    fun onMinStarsSelected(stars: Double?) {
+        _state.value = _state.value.copy(minStars = stars)
+        applyFilters()
     }
 }

@@ -86,18 +86,10 @@ class RemoteUserDataSource : IRemoteUserDataSource {
 
     private fun parseUser(doc: DocumentSnapshot): User {
         val categories = try {
-            val rawCategories = doc.get<List<Any>>("categories") ?: emptyList()
-            rawCategories.mapNotNull { item ->
-                when (item) {
-                    is String -> Category(id = item, name = item)
-                    is Map<*, *> -> Category(
-                        id = item["id"]?.toString() ?: "",
-                        name = item["name"]?.toString() ?: ""
-                    )
-                    else -> null
-                }
-            }
+            val rawCategories = doc.get<List<String>>("categories") ?: emptyList()
+            rawCategories.map { Category(id = it, name = it) }
         } catch (e: Exception) {
+            println("ERROR categories para ${doc.id}: ${e.message}")
             emptyList()
         }
 

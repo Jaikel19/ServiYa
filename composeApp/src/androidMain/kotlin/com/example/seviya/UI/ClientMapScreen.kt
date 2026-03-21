@@ -22,6 +22,9 @@ import com.example.seviya.theme.BrandRed
 import com.example.seviya.theme.White
 import com.example.shared.presentation.clientMap.ClientMapViewModel
 import com.example.shared.presentation.clientMap.WorkerMapMarker
+import compose.icons.TablerIcons
+import compose.icons.tablericons.ChevronDown
+import compose.icons.tablericons.ChevronUp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -73,7 +76,6 @@ actual fun ClientMapScreen(
                 )
             }
 
-            // Cambiado a filteredMarkers
             uiState.filteredMarkers.forEach { marker ->
                 Marker(
                     state = MarkerState(
@@ -98,6 +100,7 @@ actual fun ClientMapScreen(
                 .padding(horizontal = 20.dp, vertical = 16.dp)
                 .align(Alignment.TopCenter)
         ) {
+            // Logo + MAPA pill
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -141,7 +144,7 @@ actual fun ClientMapScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Barra de búsqueda
+            // Barra de búsqueda por nombre
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -173,55 +176,95 @@ actual fun ClientMapScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Chips de categorías
-            val categories = uiState.markers
-                .flatMap { it.user.categories }
-                .distinctBy { it.id }
-
-            if (categories.isNotEmpty()) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+            // Fila: búsqueda por categoría + control de estrellas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Búsqueda por categoría
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(16.dp),
+                    color = White
                 ) {
-                    item {
-                        FilterChip(
-                            selected = uiState.selectedCategoryId == null,
-                            onClick = { viewModel.onCategorySelected(null) },
-                            label = {
-                                Text(
-                                    text = "Todos",
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        fontWeight = FontWeight.SemiBold
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "🏷️", fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        BasicTextField(
+                            value = uiState.categoryQuery,
+                            onValueChange = { viewModel.onCategoryQueryChanged(it) },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            decorationBox = { innerTextField ->
+                                if (uiState.categoryQuery.isEmpty()) {
+                                    Text(
+                                        text = "Categoría...",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            color = Color.Gray
+                                        )
                                     )
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = White,
-                                selectedLabelColor = BrandBlue,
-                                containerColor = White.copy(alpha = 0.2f),
-                                labelColor = White
-                            )
+                                }
+                                innerTextField()
+                            }
                         )
                     }
-                    items(categories) { category ->
-                        FilterChip(
-                            selected = uiState.selectedCategoryId == category.id,
-                            onClick = { viewModel.onCategorySelected(category.id) },
-                            label = {
-                                Text(
-                                    text = category.name,
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = White,
-                                selectedLabelColor = BrandBlue,
-                                containerColor = White.copy(alpha = 0.2f),
-                                labelColor = White
+                }
+
+                // Control de estrellas
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = White.copy(alpha = 0.15f),
+                    border = BorderStroke(1.dp, White.copy(alpha = 0.25f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = TablerIcons.ChevronDown,
+                            contentDescription = "Bajar estrellas",
+                            tint = White,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    val current = uiState.minStars?.toInt() ?: 1
+                                    if (current <= 1) {
+                                        viewModel.onMinStarsSelected(null)
+                                    } else {
+                                        viewModel.onMinStarsSelected((current - 1).toDouble())
+                                    }
+                                }
+                        )
+
+                        Text(
+                            text = "⭐ ${uiState.minStars?.toInt() ?: "-"}",
+                            color = White,
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Bold
                             )
+                        )
+
+                        Icon(
+                            imageVector = TablerIcons.ChevronUp,
+                            contentDescription = "Subir estrellas",
+                            tint = White,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    val current = uiState.minStars?.toInt() ?: 0
+                                    if (current >= 5) {
+                                        viewModel.onMinStarsSelected(5.0)
+                                    } else {
+                                        viewModel.onMinStarsSelected((current + 1).toDouble())
+                                    }
+                                }
                         )
                     }
                 }
