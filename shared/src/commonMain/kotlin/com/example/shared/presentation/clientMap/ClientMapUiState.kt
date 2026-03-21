@@ -13,7 +13,10 @@ data class ClientMapUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val markers: List<WorkerMapMarker> = emptyList(),
+    val filteredMarkers: List<WorkerMapMarker> = emptyList(),
     val selectedMarker: WorkerMapMarker? = null,
     val clientAddress: Address? = null,
-    val addresses: List<Address> = emptyList()
+    val addresses: List<Address> = emptyList(),
+    val searchQuery: String = "",
+    val selectedCategoryId: String? = null
 )

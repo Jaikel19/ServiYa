@@ -4,8 +4,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -71,7 +73,8 @@ actual fun ClientMapScreen(
                 )
             }
 
-            uiState.markers.forEach { marker ->
+            // Cambiado a filteredMarkers
+            uiState.filteredMarkers.forEach { marker ->
                 Marker(
                     state = MarkerState(
                         LatLng(marker.workZone.latitude, marker.workZone.longitude)
@@ -87,12 +90,12 @@ actual fun ClientMapScreen(
         }
 
         // Header
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BrandBlue)
-                .padding(horizontal = 20.dp, vertical = 16.dp)
                 .statusBarsPadding()
+                .padding(horizontal = 20.dp, vertical = 16.dp)
                 .align(Alignment.TopCenter)
         ) {
             Row(
@@ -116,7 +119,6 @@ actual fun ClientMapScreen(
                         )
                     )
                 }
-
                 Surface(
                     shape = RoundedCornerShape(999.dp),
                     color = White.copy(alpha = 0.13f),
@@ -131,6 +133,94 @@ actual fun ClientMapScreen(
                             color = White,
                             style = MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.ExtraBold
+                            )
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Barra de búsqueda
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = White
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "🔍", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    BasicTextField(
+                        value = uiState.searchQuery,
+                        onValueChange = { viewModel.onSearchQueryChanged(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        decorationBox = { innerTextField ->
+                            if (uiState.searchQuery.isEmpty()) {
+                                Text(
+                                    text = "Buscar trabajador por nombre...",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = Color.Gray
+                                    )
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Chips de categorías
+            val categories = uiState.markers
+                .flatMap { it.user.categories }
+                .distinctBy { it.id }
+
+            if (categories.isNotEmpty()) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    item {
+                        FilterChip(
+                            selected = uiState.selectedCategoryId == null,
+                            onClick = { viewModel.onCategorySelected(null) },
+                            label = {
+                                Text(
+                                    text = "Todos",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = White,
+                                selectedLabelColor = BrandBlue,
+                                containerColor = White.copy(alpha = 0.2f),
+                                labelColor = White
+                            )
+                        )
+                    }
+                    items(categories) { category ->
+                        FilterChip(
+                            selected = uiState.selectedCategoryId == category.id,
+                            onClick = { viewModel.onCategorySelected(category.id) },
+                            label = {
+                                Text(
+                                    text = category.name,
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = White,
+                                selectedLabelColor = BrandBlue,
+                                containerColor = White.copy(alpha = 0.2f),
+                                labelColor = White
                             )
                         )
                     }
