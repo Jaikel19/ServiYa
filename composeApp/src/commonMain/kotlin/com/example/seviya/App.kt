@@ -143,6 +143,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.example.seviya.UI.ClientDashboardRoute
 import com.example.seviya.UI.ClientMapScreen
 import com.example.seviya.UI.ClientPaymentUploadScreen
+import com.example.seviya.UI.WorkerDailyAppointmentsScreen
 import com.example.seviya.UI.WorkerPaymentDetailScreen
 import com.example.seviya.UI.WorkerRequestDetailScreen
 import com.example.seviya.navigation.WorkerPaymentDetail
@@ -162,6 +163,7 @@ import com.example.shared.domain.entity.Service
 import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
 import com.example.shared.presentation.clientMap.ClientMapViewModel
 import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
+import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppointmentsViewModel
 
 enum class SessionRole {
     GUEST,
@@ -1090,9 +1092,17 @@ fun App() {
                     }
 
                     composable<WorkerMessages> {
-                        FeaturePlaceholder(
-                            title = "Mensajes del trabajador",
-                            subtitle = "Aquí irán los chats del trabajador con los clientes."
+                        val viewModel: WorkerDailyAppointmentsViewModel = koinViewModel()
+
+                        LaunchedEffect(currentWorkerId) {
+                            viewModel.loadAppointments(currentWorkerId)
+                        }
+
+                        WorkerDailyAppointmentsScreen(
+                            workerId = currentWorkerId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() },
+                            onOpenMaps = { _, _, _ -> }
                         )
                     }
 

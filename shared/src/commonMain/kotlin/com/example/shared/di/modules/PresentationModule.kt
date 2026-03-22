@@ -14,6 +14,7 @@ import com.example.shared.presentation.professionalProfile.ProfessionalProfileVi
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
 import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
+import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppointmentsViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
@@ -41,5 +42,5 @@ val presentationModule = module {
     factory { ClientMapViewModel(get()) }
     factory { WorkerRequestDetailViewModel(get(), get()) }
     factory { ClientPaymentUploadViewModel(get(), get(), get()) }
-
+    factory { WorkerDailyAppointmentsViewModel(get()) }
 }
