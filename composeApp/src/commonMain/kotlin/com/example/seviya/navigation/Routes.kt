@@ -29,7 +29,8 @@ import kotlinx.serialization.Serializable
 data class ClientAppointmentDetail(
     val bookingId: String
 )
-
+@Serializable
+data class WorkerDailyAppointments(val workerId: String)
 @Serializable
 object RequestAppointment
 
