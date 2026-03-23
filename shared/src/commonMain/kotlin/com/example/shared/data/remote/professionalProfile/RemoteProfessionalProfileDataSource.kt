@@ -185,4 +185,10 @@ class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource
             .document(workerId)
             .delete()
     }
+
+    override suspend fun updateWorkerCategories(workerId: String, categoryIds: List<String>) {
+        db.collection("users")
+            .document(workerId)
+            .update("categories" to categoryIds)
+    }
 }

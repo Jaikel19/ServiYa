@@ -6,6 +6,7 @@ import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.ProfessionalProfileData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 class ProfessionalProfileRepository(
     private val remoteProfile: IRemoteProfessionalProfileDataSource,
@@ -64,5 +65,15 @@ class ProfessionalProfileRepository(
 
     override suspend fun removeFavorite(clientId: String, workerId: String) {
         remoteProfile.removeFavorite(clientId, workerId)
+    }
+
+    override suspend fun getWorkerCategoryIds(workerId: String): Flow<List<String>> {
+        return remoteProfile.getWorkerProfile(workerId).map { profile ->
+            profile?.categories ?: emptyList()
+        }
+    }
+
+    override suspend fun updateWorkerCategories(workerId: String, categoryIds: List<String>) {
+        remoteProfile.updateWorkerCategories(workerId, categoryIds)
     }
 }
