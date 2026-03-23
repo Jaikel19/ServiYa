@@ -86,6 +86,8 @@ import com.example.seviya.navigation.ClientProfile
 import com.example.seviya.navigation.ClientRequests
 import com.example.seviya.navigation.ClientSearch
 import com.example.seviya.navigation.ClientSettings
+import com.example.seviya.navigation.ClientWeeklyAppointments
+import com.example.seviya.navigation.ClientDailyAppointments
 import com.example.seviya.navigation.Landing
 import com.example.seviya.navigation.ProfessionalProfile
 import com.example.seviya.navigation.RequestAppointment
@@ -99,6 +101,8 @@ import com.example.seviya.navigation.WorkerAppointmentDetail
 import com.example.seviya.navigation.WorkerConfiguration
 import com.example.seviya.navigation.WorkerDashboard
 import com.example.seviya.navigation.WorkerMessages
+import com.example.seviya.navigation.WorkerWeeklyAppointments
+
 import com.example.seviya.navigation.WorkerPaymentDetail
 import com.example.seviya.navigation.WorkerPortfolio
 import com.example.seviya.navigation.WorkerProfile
@@ -125,6 +129,10 @@ import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailVi
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
 import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
+import com.example.seviya.UI.DailyAgendaScreen
+import com.example.seviya.navigation.WorkerDailyAppointments
+import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
+import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
@@ -139,6 +147,9 @@ import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppoin
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
+import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
+import com.example.seviya.UI.ClientLocationCatalogScreen
+import com.example.seviya.navigation.ClientLocationCatalog
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Briefcase
@@ -147,6 +158,7 @@ import compose.icons.tablericons.ChartBar
 import compose.icons.tablericons.Clock
 import compose.icons.tablericons.Dashboard
 import compose.icons.tablericons.Logout
+import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Settings
@@ -218,7 +230,8 @@ fun App() {
                                 currentDestination.isRoute<ClientFavorites>() ||
                                 currentDestination.isRoute<RequestAppointment>()||
                                 currentDestination.isRoute<ClientRequests>() ||
-                                currentDestination.isRoute<ClientPaymentUpload>()
+                                currentDestination.isRoute<ClientPaymentUpload>() ||
+                                currentDestination.isRoute<ClientLocationCatalog>()
                         )
 
     val showWorkerBottomBar =
@@ -236,7 +249,8 @@ fun App() {
                                 currentDestination.isRoute<WorkerPortfolio>() ||
                                 currentDestination.isRoute<WorkerServices>() ||
                                 currentDestination.isRoute<WorkerSchedule>() ||
-                                currentDestination.isRoute<WorkerAppointmentDetail>()
+                                currentDestination.isRoute<WorkerAppointmentDetail>() ||
+                                currentDestination.isRoute<WorkerDailyAppointments>()
                         )
 
     val guestCurrentTab =
@@ -771,6 +785,15 @@ fun App() {
                         )
                     }
 
+                    composable<ClientLocationCatalog> {
+                        val viewModel: ClientLocationCatalogViewModel = koinViewModel()
+                        ClientLocationCatalogScreen(
+                            clientId = currentClientId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
                     composable<ClientAppointmentDetail> { backStackEntry ->
                         val route = backStackEntry.toRoute<ClientAppointmentDetail>()
                         val viewModel: ClientAppointmentDetailViewModel = koinViewModel()
@@ -836,19 +859,52 @@ fun App() {
                         )
                     }
 
+                    composable<ClientDailyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ClientDailyAppointments>()
+                        val viewModel: DailyAgendaViewModel = koinViewModel()
+
+                        DailyAgendaScreen(
+                            viewModel = viewModel,
+                            userId = route.clientId,
+                            role = CalendarUserRole.CLIENT,
+                            onBack = { navController.popBackStack() },
+                            onOpenDetail = { appointment ->
+                                navController.navigate(
+                                    ClientAppointmentDetail(bookingId = appointment.id)
+                                )
+                            }
+                        )
+                    }
+
+                    composable<ClientWeeklyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ClientWeeklyAppointments>()
+
+                        FeaturePlaceholder(
+                            title = "Agenda semanal",
+                            subtitle = "Aquí irá la agenda semanal del cliente para ${route.clientId}."
+                        )
+                    }
+
                     composable<ClientAgenda> {
                         MonthlyCalendarScreen(
                             viewModel = monthlyCalendarViewModel,
                             userId = currentClientId,
-                            userRole = com.example.shared.presentation.calendar.CalendarUserRole.CLIENT,
-                            onBack = {
-                                clientMenuExpanded = false
-                                navController.popBackStack()
+                            userRole = CalendarUserRole.CLIENT,
+                            onBack = { navController.popBackStack() },
+
+                            onOpenMonthView = {
+                                navController.navigateSingleTop(ClientAgenda)
                             },
+                            onOpenWeekView = {
+                                navController.navigate(ClientWeeklyAppointments(clientId = currentClientId))
+                            },
+                            onOpenDayView = {
+                                navController.navigate(ClientDailyAppointments(clientId = currentClientId))
+                            },
+
                             onOpenAppointmentDetail = { appointment ->
-                                navController.navigate(
-                                    ClientAppointmentDetail(bookingId = appointment.id)
-                                )
+                                monthlyCalendarViewModel.selectAppointment(appointment)
+                                navController.navigateSingleTop(ClientAppointmentDetail(appointment.id))
                             }
                         )
                     }
@@ -919,12 +975,46 @@ fun App() {
                         )
                     }
 
+                    composable<WorkerDailyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerDailyAppointments>()
+                        val viewModel: DailyAgendaViewModel = koinViewModel()
+
+                        DailyAgendaScreen(
+                            viewModel = viewModel,
+                            userId = route.workerId,
+                            role = CalendarUserRole.WORKER,
+                            onBack = { navController.popBackStack() },
+                            onOpenDetail = { appointment ->
+                                monthlyCalendarViewModel.selectAppointment(appointment)
+                                navController.navigateSingleTop(WorkerAppointmentDetail)
+                            }
+                        )
+                    }
+
+                    composable<WorkerWeeklyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerWeeklyAppointments>()
+
+                        FeaturePlaceholder(
+                            title = "Agenda semanal",
+                            subtitle = "Aquí irá la agenda semanal del trabajador para ${route.workerId}."
+                        )
+                    }
+
                     composable<WorkerAgenda> {
                         MonthlyCalendarScreen(
                             viewModel = monthlyCalendarViewModel,
                             userId = currentWorkerId,
-                            userRole = com.example.shared.presentation.calendar.CalendarUserRole.WORKER,
+                            userRole = CalendarUserRole.WORKER,
                             onBack = { navController.popBackStack() },
+                            onOpenMonthView = {
+                                navController.navigateSingleTop(WorkerAgenda)
+                            },
+                            onOpenWeekView = {
+                                navController.navigate(WorkerWeeklyAppointments(workerId = currentWorkerId))
+                            },
+                            onOpenDayView = {
+                                navController.navigate(WorkerDailyAppointments(workerId = currentWorkerId))
+                            },
                             onOpenAppointmentDetail = { appointment ->
                                 monthlyCalendarViewModel.selectAppointment(appointment)
                                 navController.navigateSingleTop(WorkerAppointmentDetail)
@@ -1280,6 +1370,16 @@ private fun clientMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(ClientFavorites)
+            }
+        ),
+        MenuOption(
+            title = "Mis Ubicaciones",
+            subtitle = "Gestiona tus direcciones frecuentes",
+            icon = TablerIcons.MapPin,
+            iconColor = Color(0xFF4A9EC7),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientLocationCatalog)
             }
         ),
         MenuOption(

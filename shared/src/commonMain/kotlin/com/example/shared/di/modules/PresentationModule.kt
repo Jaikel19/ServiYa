@@ -10,6 +10,7 @@ import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
 import com.example.shared.presentation.clientMap.ClientMapViewModel
+import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
@@ -18,6 +19,7 @@ import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppoin
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
+import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
 import org.koin.dsl.module
 
 val presentationModule = module {
@@ -26,6 +28,7 @@ val presentationModule = module {
 
     factory { ServicesViewModel(get()) }
     factory { MonthlyCalendarViewModel(get()) }
+    factory { DailyAgendaViewModel(get()) }
     factory { ProfessionalProfileViewModel(get()) }
     factory { CategoriesViewModel(get()) }
     factory { WorkersListViewModel(get(), get())}
@@ -43,4 +46,5 @@ val presentationModule = module {
     factory { WorkerRequestDetailViewModel(get(), get()) }
     factory { ClientPaymentUploadViewModel(get(), get(), get()) }
     factory { WorkerDailyAppointmentsViewModel(get()) }
+    factory { ClientLocationCatalogViewModel(get()) }
 }
