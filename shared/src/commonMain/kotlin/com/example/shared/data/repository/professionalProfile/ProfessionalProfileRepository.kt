@@ -76,4 +76,12 @@ class ProfessionalProfileRepository(
     override suspend fun updateWorkerCategories(workerId: String, categoryIds: List<String>) {
         remoteProfile.updateWorkerCategories(workerId, categoryIds)
     }
+
+    override suspend fun getWorkerTravelTime(workerId: String): Flow<Int> {
+        return remoteProfile.getWorkerTravelTime(workerId)
+    }
+
+    override suspend fun updateTravelTime(workerId: String, minutes: Int) {
+        remoteProfile.updateTravelTime(workerId, minutes)
+    }
 }
