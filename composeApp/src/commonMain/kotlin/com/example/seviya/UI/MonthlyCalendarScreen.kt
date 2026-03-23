@@ -67,10 +67,12 @@ fun MonthlyCalendarScreen(
     onGoSearch: () -> Unit = {},
     onGoAlerts: () -> Unit = {},
     onGoMenu: () -> Unit = {},
+    onOpenMonthView: () -> Unit = {},
+    onOpenWeekView: () -> Unit = {},
+    onOpenDayView: () -> Unit = {},
     onOpenAppointmentDetail: (Appointment) -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
-    val isMonthMode = remember { mutableStateOf(true) }
 
     LaunchedEffect(userId, userRole) {
         viewModel.loadAppointments(userId, userRole)
@@ -94,17 +96,7 @@ fun MonthlyCalendarScreen(
 
     val weeks = cells.chunked(7)
 
-    val visibleWeeks = if (isMonthMode.value) {
-        weeks
-    } else {
-        listOf(
-            getWeekForDay(
-                day = referenceDay,
-                month = state.currentMonth,
-                year = state.currentYear
-            )
-        )
-    }
+    val visibleWeeks = weeks
 
     Scaffold(
         containerColor = Color(0xFFF4F5F8),
@@ -159,10 +151,11 @@ fun MonthlyCalendarScreen(
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    MonthWeekToggle(
-                        isMonthMode = isMonthMode.value,
-                        onMonthClick = { isMonthMode.value = true },
-                        onWeekClick = { isMonthMode.value = false }
+                    CalendarViewToggle(
+                        selectedMode = "MES",
+                        onMonthClick = onOpenMonthView,
+                        onWeekClick = onOpenWeekView,
+                        onDayClick = onOpenDayView
                     )
                 }
 
@@ -222,7 +215,7 @@ fun MonthlyCalendarScreen(
                         }
 
                         Column(
-                            modifier = Modifier.height(if (isMonthMode.value) 460.dp else 92.dp)
+                            modifier = Modifier.height(460.dp)
                         ) {
                             visibleWeeks.forEach { week ->
                                 Row(
@@ -369,10 +362,11 @@ private fun MonthArrow(
 }
 
 @Composable
-private fun MonthWeekToggle(
-    isMonthMode: Boolean,
+private fun CalendarViewToggle(
+    selectedMode: String,
     onMonthClick: () -> Unit,
-    onWeekClick: () -> Unit
+    onWeekClick: () -> Unit,
+    onDayClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -383,19 +377,27 @@ private fun MonthWeekToggle(
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         ToggleChip(
-            selected = isMonthMode,
+            selected = selectedMode == "MES",
             text = "Mes",
             icon = TablerIcons.Apps,
             onClick = onMonthClick,
-            modifier = Modifier.width(84.dp)
+            modifier = Modifier.width(72.dp)
         )
 
         ToggleChip(
-            selected = !isMonthMode,
+            selected = selectedMode == "SEM",
             text = "Sem",
-            icon = TablerIcons.Bell,
+            icon = TablerIcons.CalendarEvent,
             onClick = onWeekClick,
-            modifier = Modifier.width(84.dp)
+            modifier = Modifier.width(72.dp)
+        )
+
+        ToggleChip(
+            selected = selectedMode == "DIA",
+            text = "Día",
+            icon = TablerIcons.CalendarEvent,
+            onClick = onDayClick,
+            modifier = Modifier.width(72.dp)
         )
     }
 }

@@ -10,6 +10,7 @@ import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
 import com.example.shared.presentation.clientMap.ClientMapViewModel
+import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
@@ -26,6 +27,7 @@ val presentationModule = module {
 
     factory { ServicesViewModel(get()) }
     factory { MonthlyCalendarViewModel(get()) }
+    factory { DailyAgendaViewModel(get()) }
     factory { ProfessionalProfileViewModel(get()) }
     factory { CategoriesViewModel(get()) }
     factory { WorkersListViewModel(get(), get())}
