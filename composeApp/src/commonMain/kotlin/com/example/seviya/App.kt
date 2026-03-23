@@ -59,6 +59,7 @@ import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
 import com.example.seviya.UI.WorkerAppointmentDetailScreen
 import com.example.seviya.UI.WorkerDailyAppointmentsScreen
+import com.example.seviya.UI.WorkerCategoriesRoute
 import com.example.seviya.UI.WorkerDashboardRoute
 import com.example.seviya.UI.WorkerPaymentDetailScreen
 import com.example.seviya.UI.WorkerRequestDetailScreen
@@ -109,6 +110,7 @@ import com.example.seviya.navigation.WorkerProfile
 import com.example.seviya.navigation.WorkerReports
 import com.example.seviya.navigation.WorkerRequestDetail
 import com.example.seviya.navigation.WorkerRequests
+import com.example.seviya.navigation.WorkerCategories
 import com.example.seviya.navigation.WorkerSchedule
 import com.example.seviya.navigation.WorkerServices
 import com.example.seviya.navigation.WorkerSettings
@@ -149,6 +151,7 @@ import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
+import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
 import com.example.seviya.UI.ClientLocationCatalogScreen
 import com.example.seviya.navigation.ClientLocationCatalog
 import compose.icons.TablerIcons
@@ -250,8 +253,13 @@ fun App() {
                                 currentDestination.isRoute<WorkerPortfolio>() ||
                                 currentDestination.isRoute<WorkerServices>() ||
                                 currentDestination.isRoute<WorkerSchedule>() ||
+
+                                currentDestination.isRoute<WorkerCategories>() ||
+                                
+
                                 currentDestination.isRoute<WorkerAppointmentDetail>() ||
                                 currentDestination.isRoute<WorkerDailyAppointments>()
+
                         )
 
     val guestCurrentTab =
@@ -1276,6 +1284,15 @@ fun App() {
                             subtitle = "Aquí irá la configuración de días laborales, zonas y disponibilidad."
                         )
                     }
+
+                    composable<WorkerCategories> {
+                        val viewModel: WorkerCategoriesViewModel = koinViewModel()
+                        WorkerCategoriesRoute(
+                            workerId = currentWorkerId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
 
@@ -1532,6 +1549,16 @@ private fun workerMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(WorkerServices)
+            }
+        ),
+        MenuOption(
+            title = "Mis Categorías",
+            subtitle = "Categorías de servicios que ofrezco",
+            icon = TablerIcons.Adjustments,
+            iconColor = Color(0xFF3B82F6),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(WorkerCategories)
             }
         ),
         MenuOption(

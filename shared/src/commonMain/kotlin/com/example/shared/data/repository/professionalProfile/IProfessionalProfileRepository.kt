@@ -11,4 +11,6 @@ interface IProfessionalProfileRepository {
     suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>>
     suspend fun addFavorite(clientId: String, workerId: String)
     suspend fun removeFavorite(clientId: String, workerId: String)
+    suspend fun getWorkerCategoryIds(workerId: String): Flow<List<String>>
+    suspend fun updateWorkerCategories(workerId: String, categoryIds: List<String>)
 }
