@@ -20,6 +20,9 @@ class WorkersListRepository(
 
                 val address = remote.getWorkerAddress(workerId)
                 val categoryNames = remote.getCategoryNames(profile.categories)
+                val schedule = remote.getWorkerSchedule(workerId)
+                val appointments = remote.getWorkerAppointments(workerId)
+                val workZones = remote.getWorkerWorkZones(workerId)
 
                 val services = try {
                     servicesRepository.getServicesByWorker(workerId).first()
@@ -39,8 +42,12 @@ class WorkersListRepository(
                     categoryIds = profile.categories,
                     categoryNames = categoryNames,
                     province = address?.province.orEmpty(),
+                    canton = address?.canton.orEmpty(),
                     district = address?.district.orEmpty(),
-                    startingPrice = startingPrice
+                    startingPrice = startingPrice,
+                    schedule = schedule,
+                    appointments = appointments,
+                    workZones = workZones
                 )
             }.sortedByDescending { it.stars }
         }

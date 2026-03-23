@@ -10,6 +10,10 @@ data class WorkerListItemData(
     val categoryIds: List<String> = emptyList(),
     val categoryNames: List<String> = emptyList(),
     val province: String = "",
+    val canton: String = "",
     val district: String = "",
-    val startingPrice: Double = 0.0
+    val startingPrice: Double = 0.0,
+    val schedule: List<WorkerSchedule> = emptyList(),
+    val appointments: List<Appointment> = emptyList(),
+    val workZones: List<WorkZone> = emptyList()
 )

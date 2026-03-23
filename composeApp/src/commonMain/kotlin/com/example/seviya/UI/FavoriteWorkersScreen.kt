@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.seviya.theme.AppBackgroundAlt
-import com.example.seviya.theme.BorderBlueLight
 import com.example.seviya.theme.BrandBlue
 import com.example.seviya.theme.BrandRed
 import com.example.seviya.theme.ImageBlueSoftAlt
@@ -66,9 +65,7 @@ import com.example.shared.domain.entity.WorkerListItemData
 import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersUiState
 import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
 import compose.icons.TablerIcons
-import compose.icons.tablericons.MapPin
-import compose.icons.tablericons.Moon
-import compose.icons.tablericons.Trash
+import compose.icons.tablericons.*
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlin.math.round
@@ -81,7 +78,7 @@ fun FavoriteWorkersRoute(
     selectedCategoryName: String? = null,
     avatarPainter: Painter? = null,
     onWorkerClick: (String) -> Unit = {},
-    onThemeClick: () -> Unit = {},
+    onCategoriesClick: () -> Unit = {},
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
     onBottomSearch: () -> Unit = {},
@@ -106,7 +103,7 @@ fun FavoriteWorkersRoute(
                 workerId = workerId
             )
         },
-        onThemeClick = onThemeClick,
+        onCategoriesClick = onCategoriesClick,
         onBottomServices = onBottomServices,
         onBottomMap = onBottomMap,
         onBottomSearch = onBottomSearch,
@@ -123,7 +120,7 @@ fun FavoriteWorkersScreen(
     avatarPainter: Painter? = null,
     onWorkerClick: (String) -> Unit = {},
     onConfirmRemoveFavorite: (String) -> Unit = {},
-    onThemeClick: () -> Unit = {},
+    onCategoriesClick: () -> Unit = {},
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
     onBottomSearch: () -> Unit = {},
@@ -176,7 +173,7 @@ fun FavoriteWorkersScreen(
         ) {
             FavoriteWorkersHeader(
                 selectedCategoryName = selectedCategoryName,
-                onThemeClick = onThemeClick
+                onCategoriesClick = onCategoriesClick
             )
 
             Surface(
@@ -218,7 +215,8 @@ fun FavoriteWorkersScreen(
                                     text = state.errorMessage ?: "Ocurrió un error.",
                                     color = BrandRed,
                                     fontSize = 15.sp,
-                                    fontWeight = FontWeight.SemiBold
+                                    fontWeight = FontWeight.SemiBold,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -431,7 +429,7 @@ private fun FavoriteDeleteDialog(
 @Composable
 private fun FavoriteWorkersHeader(
     selectedCategoryName: String?,
-    onThemeClick: () -> Unit
+    onCategoriesClick: () -> Unit
 ) {
     val subtitle = selectedCategoryName?.takeIf { it.isNotBlank() }?.let {
         "Tus profesionales favoritos en $it"
@@ -444,33 +442,50 @@ private fun FavoriteWorkersHeader(
             .systemBarsPadding()
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 8.dp, end = 4.dp)
+        ) {
+            Surface(
+                modifier = Modifier.size(72.dp),
+                shape = CircleShape,
+                color = White.copy(alpha = 0.08f)
+            ) {}
+
+            Surface(
+                modifier = Modifier
+                    .size(38.dp)
+                    .align(Alignment.BottomStart),
+                shape = CircleShape,
+                color = White.copy(alpha = 0.10f)
+            ) {}
+        }
+
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                FavoriteServiYaPill()
+                FavoriteServiYaHeaderBadge()
 
-                Box(
+                Surface(
                     modifier = Modifier
                         .size(52.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(White.copy(alpha = 0.12f))
-                        .border(
-                            width = 1.dp,
-                            color = White.copy(alpha = 0.16f),
-                            shape = RoundedCornerShape(18.dp)
-                        )
-                        .clickable(onClick = onThemeClick),
-                    contentAlignment = Alignment.Center
+                        .clickable(onClick = onCategoriesClick),
+                    shape = RoundedCornerShape(18.dp),
+                    color = White.copy(alpha = 0.13f),
+                    border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
                 ) {
-                    Icon(
-                        imageVector = TablerIcons.Moon,
-                        contentDescription = "Tema",
-                        tint = White,
-                        modifier = Modifier.size(22.dp)
-                    )
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = TablerIcons.Briefcase,
+                            contentDescription = "Categorías de servicios",
+                            tint = White,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
                 }
             }
 
@@ -497,31 +512,30 @@ private fun FavoriteWorkersHeader(
 }
 
 @Composable
-private fun FavoriteServiYaPill() {
+private fun FavoriteServiYaHeaderBadge() {
     Surface(
-        color = White,
-        shape = RoundedCornerShape(14.dp),
-        shadowElevation = 4.dp
+        shape = RoundedCornerShape(999.dp),
+        color = White.copy(alpha = 0.13f),
+        border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
     ) {
-        Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    SpanStyle(
-                        color = BrandBlue,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                ) { append("SERVI") }
+        Row(
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Servi",
+                color = White,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
 
-                withStyle(
-                    SpanStyle(
-                        color = BrandRed,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                ) { append("YA") }
-            },
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-            fontSize = 17.sp
-        )
+            Text(
+                text = "Ya",
+                color = BrandRed,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
     }
 }
 
@@ -637,9 +651,43 @@ private fun FavoriteWorkerProvinceInline(
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
     }
+}
+
+@Composable
+private fun FavoriteWorkerRatingInline(
+    rating: Double
+) {
+    val roundedRating = remember(rating) { round(rating * 10.0) / 10.0 }
+
+    Text(
+        text = "⭐ $roundedRating",
+        color = TextPrimaryAlt,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.SemiBold
+    )
+}
+
+@Composable
+private fun FavoriteWorkerPriceText(
+    price: Double
+) {
+    val text = if (price > 0.0) {
+        "Desde ₡${price.toInt()}"
+    } else {
+        "Precio a consultar"
+    }
+
+    Text(
+        text = text,
+        color = BrandBlue,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.ExtraBold,
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable
@@ -647,128 +695,43 @@ private fun FavoriteWorkerCircularPhoto(
     imageUrl: String?,
     avatarPainter: Painter?
 ) {
-    Box(
-        modifier = Modifier.size(96.dp),
-        contentAlignment = Alignment.Center
+    Surface(
+        modifier = Modifier.size(78.dp),
+        shape = CircleShape,
+        color = ImageBlueSoftAlt,
+        border = BorderStroke(1.dp, Color(0xFFDCE8F8))
     ) {
-        Box(
-            modifier = Modifier
-                .size(96.dp)
-                .clip(CircleShape)
-                .background(White)
-                .border(
-                    width = 4.dp,
-                    color = BorderBlueLight,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(86.dp)
-                    .clip(CircleShape)
-                    .background(ImageBlueSoftAlt),
-                contentAlignment = Alignment.Center
-            ) {
-                when {
-                    !imageUrl.isNullOrBlank() -> {
-                        val painterResource = asyncPainterResource(data = imageUrl)
+        Box(contentAlignment = Alignment.Center) {
+            when {
+                !imageUrl.isNullOrBlank() -> {
+                    KamelImage(
+                        resource = asyncPainterResource(imageUrl),
+                        contentDescription = "Foto del trabajador",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
-                        KamelImage(
-                            resource = painterResource,
-                            contentDescription = "Foto del trabajador",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape),
-                            onFailure = {
-                                if (avatarPainter != null) {
-                                    Image(
-                                        painter = avatarPainter,
-                                        contentDescription = "Foto del trabajador",
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .clip(CircleShape)
-                                    )
-                                } else {
-                                    Text("👷", fontSize = 34.sp)
-                                }
-                            }
-                        )
-                    }
+                avatarPainter != null -> {
+                    Image(
+                        painter = avatarPainter,
+                        contentDescription = "Avatar",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(14.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                }
 
-                    avatarPainter != null -> {
-                        Image(
-                            painter = avatarPainter,
-                            contentDescription = "Foto del trabajador",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                        )
-                    }
-
-                    else -> {
-                        Text("👷", fontSize = 34.sp)
-                    }
+                else -> {
+                    Text(
+                        text = "SV",
+                        color = BrandBlue,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun FavoriteWorkerRatingInline(
-    rating: Double,
-    reviewCount: Int? = null
-) {
-    val ratingText = remember(rating) {
-        val rounded = round(rating * 10) / 10.0
-        if (rounded % 1.0 == 0.0) "${rounded.toInt()}.0" else rounded.toString()
-    }
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "★",
-            color = Color(0xFFF4B400),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-
-        Spacer(modifier = Modifier.width(4.dp))
-
-        Text(
-            text = if (reviewCount != null) "$ratingText ($reviewCount)" else ratingText,
-            color = TextSecondary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}
-
-@Composable
-private fun FavoriteWorkerPriceText(
-    price: Double
-) {
-    val text = if (price > 0.0) formatFavoritePrice(price) else "Consultar"
-
-    Text(
-        text = "Desde $text",
-        color = BrandBlue,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.ExtraBold
-    )
-}
-
-private fun formatFavoritePrice(value: Double): String {
-    val rounded = round(value * 100) / 100.0
-    return if (rounded % 1.0 == 0.0) {
-        "₡${rounded.toInt()}"
-    } else {
-        "₡$rounded"
     }
 }
