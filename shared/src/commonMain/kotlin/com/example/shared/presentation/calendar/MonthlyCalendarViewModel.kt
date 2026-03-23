@@ -15,6 +15,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import com.example.shared.presentation.calendar.CalendarUserRole
 
 @OptIn(ExperimentalTime::class)
 class MonthlyCalendarViewModel(
@@ -39,7 +40,7 @@ class MonthlyCalendarViewModel(
 
     val uiState: StateFlow<MonthlyCalendarUiState> = _uiState.asStateFlow()
 
-    fun loadAppointments(workerId: String) {
+    fun loadAppointments(userId: String, role: CalendarUserRole) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
@@ -47,16 +48,20 @@ class MonthlyCalendarViewModel(
                 errorMessage = null
             )
 
-            appointmentRepository.getAppointmentsByWorker(workerId)
-                .onEach { appointments ->
+            val appointmentsFlow = when (role) {
+                CalendarUserRole.WORKER -> appointmentRepository.getAppointmentsByWorker(userId)
+                CalendarUserRole.CLIENT -> appointmentRepository.getAppointmentsByClient(userId)
+            }
 
+            appointmentsFlow
+                .onEach { appointments ->
                     val visibleAppointments = appointments.filter { appointment ->
                         appointment.status.equals("confirmed", ignoreCase = true) ||
                                 appointment.status.equals("in_progress", ignoreCase = true) ||
                                 appointment.status.equals("completed", ignoreCase = true)
                     }
 
-                    println("DEBUG appointments visibles en agenda: $visibleAppointments")
+                    println("DEBUG appointments visibles en agenda ($role): $visibleAppointments")
 
                     val currentSelected = _uiState.value.selectedAppointment
                     val refreshedSelected = if (currentSelected != null) {

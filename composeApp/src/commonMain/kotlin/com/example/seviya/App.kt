@@ -826,9 +826,19 @@ fun App() {
                     }
 
                     composable<ClientAgenda> {
-                        FeaturePlaceholder(
-                            title = "Agenda del cliente",
-                            subtitle = "Aquí irán las citas, historial y seguimiento del cliente."
+                        MonthlyCalendarScreen(
+                            viewModel = monthlyCalendarViewModel,
+                            userId = currentClientId,
+                            userRole = com.example.shared.presentation.calendar.CalendarUserRole.CLIENT,
+                            onBack = {
+                                clientMenuExpanded = false
+                                navController.popBackStack()
+                            },
+                            onOpenAppointmentDetail = { appointment ->
+                                navController.navigate(
+                                    ClientAppointmentDetail(bookingId = appointment.id)
+                                )
+                            }
                         )
                     }
 
@@ -901,6 +911,8 @@ fun App() {
                     composable<WorkerAgenda> {
                         MonthlyCalendarScreen(
                             viewModel = monthlyCalendarViewModel,
+                            userId = currentWorkerId,
+                            userRole = com.example.shared.presentation.calendar.CalendarUserRole.WORKER,
                             onBack = { navController.popBackStack() },
                             onOpenAppointmentDetail = { appointment ->
                                 monthlyCalendarViewModel.selectAppointment(appointment)

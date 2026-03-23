@@ -47,6 +47,7 @@ import com.example.seviya.theme.BrandRed
 import com.example.seviya.theme.InactiveSoft
 import com.example.seviya.theme.White
 import com.example.shared.domain.entity.Appointment
+import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Apps
@@ -58,6 +59,8 @@ import compose.icons.tablericons.ChevronRight
 @Composable
 fun MonthlyCalendarScreen(
     viewModel: MonthlyCalendarViewModel,
+    userId: String,
+    userRole: CalendarUserRole,
     onBack: () -> Unit = {},
     onGoServices: () -> Unit = {},
     onGoMap: () -> Unit = {},
@@ -69,8 +72,8 @@ fun MonthlyCalendarScreen(
     val state by viewModel.uiState.collectAsState()
     val isMonthMode = remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadAppointments("worker_demo_001")
+    LaunchedEffect(userId, userRole) {
+        viewModel.loadAppointments(userId, userRole)
     }
 
     val daysOfWeek = listOf("LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM")
