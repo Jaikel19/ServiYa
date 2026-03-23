@@ -30,7 +30,7 @@ val presentationModule = module {
     factory { DailyAgendaViewModel(get()) }
     factory { ProfessionalProfileViewModel(get()) }
     factory { CategoriesViewModel(get()) }
-    factory { WorkersListViewModel(get()) }
+    factory { WorkersListViewModel(get(), get())}
     factory { ClientAppointmentDetailViewModel(get(), get(), get()) }
     factory { WorkerDashboardViewModel(get(), get()) }
     factory { ClientDashboardViewModel(get()) }

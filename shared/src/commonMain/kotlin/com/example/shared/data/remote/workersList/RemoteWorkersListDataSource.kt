@@ -1,8 +1,11 @@
 package com.example.shared.data.remote.workersList
 
 import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.Category
+import com.example.shared.domain.entity.WorkZone
 import com.example.shared.domain.entity.WorkerProfile
+import com.example.shared.domain.entity.WorkerSchedule
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
@@ -59,6 +62,64 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
                 ?.data<Address>()
         } catch (e: Exception) {
             null
+        }
+    }
+
+    override suspend fun getWorkerSchedule(workerId: String): List<WorkerSchedule> {
+        return try {
+            db.collection("users")
+                .document(workerId)
+                .collection("schedule")
+                .get()
+                .documents
+                .mapNotNull { document ->
+                    try {
+                        document.data<WorkerSchedule>()
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    override suspend fun getWorkerAppointments(workerId: String): List<Appointment> {
+        return try {
+            db.collection("appointments")
+                .get()
+                .documents
+                .mapNotNull { document ->
+                    try {
+                        document.data<Appointment>()
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                .filter { appointment ->
+                    appointment.workerId == workerId
+                }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    override suspend fun getWorkerWorkZones(workerId: String): List<WorkZone> {
+        return try {
+            db.collection("users")
+                .document(workerId)
+                .collection("workZones")
+                .get()
+                .documents
+                .mapNotNull { document ->
+                    try {
+                        document.data<WorkZone>()
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 
