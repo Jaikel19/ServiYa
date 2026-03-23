@@ -2,6 +2,7 @@ package com.example.shared.presentation.workersList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shared.data.repository.Address.IAddressRepository
 import com.example.shared.data.repository.workersList.IWorkersListRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class WorkersListViewModel(
-    private val repository: IWorkersListRepository
+    private val repository: IWorkersListRepository,
+    private val addressRepository: IAddressRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkersListUiState())
@@ -18,6 +20,7 @@ class WorkersListViewModel(
 
     private var workersJob: Job? = null
     private var favoritesJob: Job? = null
+    private var addressesJob: Job? = null
 
     fun loadWorkers() {
         workersJob?.cancel()
@@ -44,6 +47,48 @@ class WorkersListViewModel(
                 )
             }
         }
+    }
+
+    fun loadClientAddresses(clientId: String) {
+        addressesJob?.cancel()
+
+        addressesJob = viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoadingAddresses = true,
+                errorMessage = null
+            )
+
+            try {
+                addressRepository.getAddressesByUser(clientId).collect { addresses ->
+                    val currentSelected = _uiState.value.selectedAddressId
+
+                    val selectedId = when {
+                        currentSelected != null && addresses.any { it.id == currentSelected } -> currentSelected
+                        else -> null
+                    }
+
+                    _uiState.value = _uiState.value.copy(
+                        isLoadingAddresses = false,
+                        savedAddresses = addresses,
+                        selectedAddressId = selectedId,
+                        errorMessage = null
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingAddresses = false,
+                    savedAddresses = emptyList(),
+                    selectedAddressId = null,
+                    errorMessage = e.message ?: "Error cargando direcciones"
+                )
+            }
+        }
+    }
+
+    fun selectAddress(addressId: String?) {
+        _uiState.value = _uiState.value.copy(
+            selectedAddressId = addressId
+        )
     }
 
     fun loadFavoriteWorkerIds(clientId: String) {

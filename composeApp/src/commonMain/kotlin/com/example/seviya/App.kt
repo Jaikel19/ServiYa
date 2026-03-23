@@ -1,14 +1,16 @@
 package com.example.seviya
 
+
+//esto se agrego para que sirva drante la migracion de booking
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +45,9 @@ import androidx.navigation.toRoute
 import com.example.seviya.UI.CategoriesCatalogRoute
 import com.example.seviya.UI.ClientAppointmentDetailScreen
 import com.example.seviya.UI.ClientDashboardRoute
+import com.example.seviya.UI.ClientMapScreen
+import com.example.seviya.UI.ClientPaymentUploadScreen
+import com.example.seviya.UI.CurrentTimeSnapshot
 import com.example.seviya.UI.FavoriteWorkersRoute
 import com.example.seviya.UI.LandingScreen
 import com.example.seviya.UI.MonthlyCalendarScreen
@@ -53,9 +58,11 @@ import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigScreen
 import com.example.seviya.UI.WorkerAppointmentDetailScreen
+import com.example.seviya.UI.WorkerDailyAppointmentsScreen
 import com.example.seviya.UI.WorkerDashboardRoute
 import com.example.seviya.UI.WorkerPaymentDetailScreen
 import com.example.seviya.UI.WorkerRequestDetailScreen
+import com.example.seviya.UI.WorkerStartAppointmentOtpScreen
 import com.example.seviya.UI.WorkersListRoute
 import com.example.seviya.components.ClientBottomBar
 import com.example.seviya.components.ClientTab
@@ -74,7 +81,9 @@ import com.example.seviya.navigation.ClientDashboard
 import com.example.seviya.navigation.ClientFavorites
 import com.example.seviya.navigation.ClientMap
 import com.example.seviya.navigation.ClientMessages
+import com.example.seviya.navigation.ClientPaymentUpload
 import com.example.seviya.navigation.ClientProfile
+import com.example.seviya.navigation.ClientRequests
 import com.example.seviya.navigation.ClientSearch
 import com.example.seviya.navigation.ClientSettings
 import com.example.seviya.navigation.Landing
@@ -90,39 +99,46 @@ import com.example.seviya.navigation.WorkerAppointmentDetail
 import com.example.seviya.navigation.WorkerConfiguration
 import com.example.seviya.navigation.WorkerDashboard
 import com.example.seviya.navigation.WorkerMessages
-
+import com.example.seviya.navigation.WorkerPaymentDetail
 import com.example.seviya.navigation.WorkerPortfolio
 import com.example.seviya.navigation.WorkerProfile
 import com.example.seviya.navigation.WorkerReports
-
+import com.example.seviya.navigation.WorkerRequestDetail
 import com.example.seviya.navigation.WorkerRequests
 import com.example.seviya.navigation.WorkerSchedule
 import com.example.seviya.navigation.WorkerServices
 import com.example.seviya.navigation.WorkerSettings
+import com.example.seviya.navigation.WorkerStartAppointmentOtp
 import com.example.seviya.navigation.WorkersList
 import com.example.seviya.theme.AppTheme
+import com.example.seviya.ui.ClientRequestsScreen
 import com.example.seviya.ui.ServicesScreen
 import com.example.seviya.ui.WorkerRequestsScreen
-
-
+import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.Appointment
+import com.example.shared.domain.entity.AppointmentLocation
+import com.example.shared.domain.entity.AppointmentService
+import com.example.shared.domain.entity.Booking
+import com.example.shared.domain.entity.Service
+import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
+import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
+import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
+import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
+import com.example.shared.presentation.clientMap.ClientMapViewModel
+import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
-
+import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
+import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppointmentsViewModel
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
-import com.example.shared.presentation.workersList.WorkersListViewModel
-import com.example.seviya.navigation.ClientPaymentUpload
-import com.example.seviya.navigation.ClientRequests
-import com.example.seviya.ui.ClientRequestsScreen
-import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
-import com.example.seviya.navigation.WorkerStartAppointmentOtp
-import com.example.seviya.UI.WorkerStartAppointmentOtpScreen
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
+import com.example.shared.presentation.workersList.WorkersListViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Briefcase
@@ -135,35 +151,11 @@ import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
-import com.example.seviya.UI.ClientDashboardRoute
-import com.example.seviya.UI.ClientMapScreen
-import com.example.seviya.UI.ClientPaymentUploadScreen
-import com.example.seviya.UI.WorkerDailyAppointmentsScreen
-import com.example.seviya.UI.WorkerPaymentDetailScreen
-import com.example.seviya.UI.WorkerRequestDetailScreen
-import com.example.seviya.navigation.WorkerPaymentDetail
-import com.example.seviya.navigation.WorkerRequestDetail
-import com.example.seviya.ui.WorkerRequestsScreen
-import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
-import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
-import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
-
-//esto se agrego para que sirva drante la migracion de booking
-import com.example.shared.domain.entity.Address
-import com.example.shared.domain.entity.Appointment
-import com.example.shared.domain.entity.AppointmentLocation
-import com.example.shared.domain.entity.AppointmentService
-import com.example.shared.domain.entity.Booking
-import com.example.shared.domain.entity.Service
-import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
-import com.example.shared.presentation.clientMap.ClientMapViewModel
-import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
-import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppointmentsViewModel
+import kotlin.time.Clock
 
 enum class SessionRole {
     GUEST,
@@ -538,9 +530,14 @@ fun App() {
                         val route = backStackEntry.toRoute<WorkersList>()
                         val viewModel: WorkersListViewModel = koinViewModel()
 
+                        val currentTimeSnapshot = remember {
+                            buildCurrentTimeSnapshot()
+                        }
+
                         WorkersListRoute(
                             clientId = currentClientId,
                             viewModel = viewModel,
+                            currentTime = currentTimeSnapshot,
                             selectedCategoryId = route.categoryId,
                             selectedCategoryName = route.categoryName,
                             onWorkerClick = { workerId ->
@@ -548,7 +545,9 @@ fun App() {
                                     ProfessionalProfile(workerId = workerId)
                                 )
                             },
-                            onThemeClick = { },
+                            onFavoritesClick = {
+                                navController.navigateSingleTop(ClientFavorites)
+                            },
                             onBottomServices = {
                                 currentClientTab = ClientTab.SERVICES
                                 navController.navigateSingleTop(CategoriesCatalog)
@@ -698,7 +697,10 @@ fun App() {
                                     ProfessionalProfile(workerId = workerId)
                                 )
                             },
-                            onThemeClick = { },
+                            onCategoriesClick = {
+                                currentClientTab = ClientTab.SERVICES
+                                navController.navigateSingleTop(CategoriesCatalog)
+                            },
                             onBottomServices = {
                                 currentClientTab = ClientTab.SERVICES
                                 navController.navigateSingleTop(CategoriesCatalog)
@@ -1674,4 +1676,32 @@ private fun extractMinutesFromDuration(duration: String): Int {
     return duration
         .filter { it.isDigit() }
         .toIntOrNull() ?: 0
+}
+
+private val APP_TIME_ZONE = TimeZone.of("America/Costa_Rica")
+
+private fun buildCurrentTimeSnapshot(): CurrentTimeSnapshot {
+    val nowInstant = Clock.System.now()
+    val now = nowInstant.toLocalDateTime(APP_TIME_ZONE)
+
+    return CurrentTimeSnapshot(
+        epochMillis = nowInstant.toEpochMilliseconds(),
+        currentDayKey = appDayKeyFromWeekday(now.date.dayOfWeek),
+        currentMinutes = (now.hour * 60) + now.minute,
+        todayYear = now.year,
+        todayMonth = now.monthNumber,
+        todayDay = now.dayOfMonth
+    )
+}
+
+private fun appDayKeyFromWeekday(dayOfWeek: DayOfWeek): String {
+    return when (dayOfWeek) {
+        DayOfWeek.MONDAY -> "monday"
+        DayOfWeek.TUESDAY -> "tuesday"
+        DayOfWeek.WEDNESDAY -> "wednesday"
+        DayOfWeek.THURSDAY -> "thursday"
+        DayOfWeek.FRIDAY -> "friday"
+        DayOfWeek.SATURDAY -> "saturday"
+        DayOfWeek.SUNDAY -> "sunday"
+    }
 }
