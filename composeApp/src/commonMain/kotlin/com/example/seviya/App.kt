@@ -835,10 +835,18 @@ fun App() {
 
                     composable<ClientDailyAppointments> { backStackEntry ->
                         val route = backStackEntry.toRoute<ClientDailyAppointments>()
+                        val viewModel: DailyAgendaViewModel = koinViewModel()
 
-                        FeaturePlaceholder(
-                            title = "Agenda semanal",
-                            subtitle = "Aquí irá la agenda diaria del cliente para ${route.clientId}."
+                        DailyAgendaScreen(
+                            viewModel = viewModel,
+                            userId = route.clientId,
+                            role = CalendarUserRole.CLIENT,
+                            onBack = { navController.popBackStack() },
+                            onOpenDetail = { appointment ->
+                                navController.navigate(
+                                    ClientAppointmentDetail(bookingId = appointment.id)
+                                )
+                            }
                         )
                     }
 
