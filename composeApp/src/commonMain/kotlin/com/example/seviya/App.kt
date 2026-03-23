@@ -106,6 +106,10 @@ import com.example.seviya.ui.WorkerRequestsScreen
 
 
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
+import com.example.seviya.UI.DailyAgendaScreen
+import com.example.seviya.navigation.WorkerDailyAppointments
+import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
+import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.categories.CategoriesViewModel
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
@@ -240,7 +244,8 @@ fun App() {
                                 currentDestination.isRoute<WorkerPortfolio>() ||
                                 currentDestination.isRoute<WorkerServices>() ||
                                 currentDestination.isRoute<WorkerSchedule>() ||
-                                currentDestination.isRoute<WorkerAppointmentDetail>()
+                                currentDestination.isRoute<WorkerAppointmentDetail>() ||
+                                currentDestination.isRoute<WorkerDailyAppointments>()
                         )
 
     val guestCurrentTab =
@@ -332,6 +337,8 @@ fun App() {
                                     workerMenuExpanded = false
                                     currentWorkerTab = WorkerTab.AGENDA
                                     navController.navigateSingleTop(WorkerAgenda)
+                                    //navController.navigate(WorkerDailyAppointments(workerId = currentWorkerId))
+
                                 },
                                 onGoRequests = {
                                     clientMenuExpanded = false
@@ -903,6 +910,22 @@ fun App() {
                             },
                             onOpenReview = { booking ->
                                 monthlyCalendarViewModel.selectAppointment(booking.toAppointment())
+                                navController.navigateSingleTop(WorkerAppointmentDetail)
+                            }
+                        )
+                    }
+
+                    composable<WorkerDailyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerDailyAppointments>()
+                        val viewModel: DailyAgendaViewModel = koinViewModel()
+
+                        DailyAgendaScreen(
+                            viewModel = viewModel,
+                            userId = route.workerId,
+                            role = CalendarUserRole.WORKER,
+                            onBack = { navController.popBackStack() },
+                            onOpenDetail = { appointment ->
+                                monthlyCalendarViewModel.selectAppointment(appointment)
                                 navController.navigateSingleTop(WorkerAppointmentDetail)
                             }
                         )
