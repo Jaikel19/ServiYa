@@ -56,7 +56,7 @@ import com.example.seviya.UI.RequestAppointmentDraft
 import com.example.seviya.UI.RequestAppointmentRoute
 import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
-import com.example.seviya.UI.TravelTimeConfigScreen
+import com.example.seviya.UI.TravelTimeConfigRoute
 import com.example.seviya.UI.WorkerAppointmentDetailScreen
 import com.example.seviya.UI.WorkerDailyAppointmentsScreen
 import com.example.seviya.UI.WorkerCategoriesRoute
@@ -152,6 +152,7 @@ import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppo
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
+import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
 import com.example.seviya.UI.ClientLocationCatalogScreen
 import com.example.seviya.navigation.ClientLocationCatalog
 import compose.icons.TablerIcons
@@ -255,8 +256,7 @@ fun App() {
                                 currentDestination.isRoute<WorkerSchedule>() ||
 
                                 currentDestination.isRoute<WorkerCategories>() ||
-                                
-
+                                currentDestination.isRoute<TravelTimeConfig>() ||
                                 currentDestination.isRoute<WorkerAppointmentDetail>() ||
                                 currentDestination.isRoute<WorkerDailyAppointments>()
 
@@ -425,23 +425,11 @@ fun App() {
                     }
 
                     composable<TravelTimeConfig> {
-                        TravelTimeConfigScreen(
-                            initialMinutes = 30,
-                            onBack = { navController.popBackStack() },
-                            onSave = { navController.popBackStack() },
-                            onGoHome = {
-                                sessionRole = SessionRole.GUEST
-                                requestAppointmentDraft = null
-                                navController.navigateSingleTop(Landing)
-                            },
-                            onGoServices = {
-                                sessionRole = SessionRole.GUEST
-                                navController.navigateSingleTop(Services)
-                            },
-                            onGoRegister = {
-                                sessionRole = SessionRole.GUEST
-                                navController.navigateSingleTop(RoleCatalog)
-                            }
+                        val viewModel: WorkerTravelTimeViewModel = koinViewModel()
+                        TravelTimeConfigRoute(
+                            workerId = currentWorkerId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
                         )
                     }
 
@@ -1559,6 +1547,16 @@ private fun workerMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(WorkerCategories)
+            }
+        ),
+        MenuOption(
+            title = "Tiempo de Traslado",
+            subtitle = "Tiempo de margen entre servicios",
+            icon = TablerIcons.Clock,
+            iconColor = Color(0xFFE2B100),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(TravelTimeConfig)
             }
         ),
         MenuOption(
