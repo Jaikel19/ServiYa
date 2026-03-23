@@ -77,6 +77,8 @@ import com.example.seviya.navigation.ClientMessages
 import com.example.seviya.navigation.ClientProfile
 import com.example.seviya.navigation.ClientSearch
 import com.example.seviya.navigation.ClientSettings
+import com.example.seviya.navigation.ClientWeeklyAppointments
+import com.example.seviya.navigation.ClientDailyAppointments
 import com.example.seviya.navigation.Landing
 import com.example.seviya.navigation.ProfessionalProfile
 import com.example.seviya.navigation.RequestAppointment
@@ -90,6 +92,7 @@ import com.example.seviya.navigation.WorkerAppointmentDetail
 import com.example.seviya.navigation.WorkerConfiguration
 import com.example.seviya.navigation.WorkerDashboard
 import com.example.seviya.navigation.WorkerMessages
+import com.example.seviya.navigation.WorkerWeeklyAppointments
 
 import com.example.seviya.navigation.WorkerPortfolio
 import com.example.seviya.navigation.WorkerProfile
@@ -337,8 +340,6 @@ fun App() {
                                     workerMenuExpanded = false
                                     currentWorkerTab = WorkerTab.AGENDA
                                     navController.navigateSingleTop(WorkerAgenda)
-                                    //navController.navigate(WorkerDailyAppointments(workerId = currentWorkerId))
-
                                 },
                                 onGoRequests = {
                                     clientMenuExpanded = false
@@ -832,19 +833,44 @@ fun App() {
                         )
                     }
 
+                    composable<ClientDailyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ClientDailyAppointments>()
+
+                        FeaturePlaceholder(
+                            title = "Agenda semanal",
+                            subtitle = "Aquí irá la agenda diaria del cliente para ${route.clientId}."
+                        )
+                    }
+
+                    composable<ClientWeeklyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ClientWeeklyAppointments>()
+
+                        FeaturePlaceholder(
+                            title = "Agenda semanal",
+                            subtitle = "Aquí irá la agenda semanal del cliente para ${route.clientId}."
+                        )
+                    }
+
                     composable<ClientAgenda> {
                         MonthlyCalendarScreen(
                             viewModel = monthlyCalendarViewModel,
                             userId = currentClientId,
-                            userRole = com.example.shared.presentation.calendar.CalendarUserRole.CLIENT,
-                            onBack = {
-                                clientMenuExpanded = false
-                                navController.popBackStack()
+                            userRole = CalendarUserRole.CLIENT,
+                            onBack = { navController.popBackStack() },
+
+                            onOpenMonthView = {
+                                navController.navigateSingleTop(ClientAgenda)
                             },
+                            onOpenWeekView = {
+                                navController.navigate(ClientWeeklyAppointments(clientId = currentClientId))
+                            },
+                            onOpenDayView = {
+                                navController.navigate(ClientDailyAppointments(clientId = currentClientId))
+                            },
+
                             onOpenAppointmentDetail = { appointment ->
-                                navController.navigate(
-                                    ClientAppointmentDetail(bookingId = appointment.id)
-                                )
+                                monthlyCalendarViewModel.selectAppointment(appointment)
+                                navController.navigateSingleTop(ClientAppointmentDetail(appointment.id))
                             }
                         )
                     }
@@ -931,12 +957,30 @@ fun App() {
                         )
                     }
 
+                    composable<WorkerWeeklyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerWeeklyAppointments>()
+
+                        FeaturePlaceholder(
+                            title = "Agenda semanal",
+                            subtitle = "Aquí irá la agenda semanal del trabajador para ${route.workerId}."
+                        )
+                    }
+
                     composable<WorkerAgenda> {
                         MonthlyCalendarScreen(
                             viewModel = monthlyCalendarViewModel,
                             userId = currentWorkerId,
-                            userRole = com.example.shared.presentation.calendar.CalendarUserRole.WORKER,
+                            userRole = CalendarUserRole.WORKER,
                             onBack = { navController.popBackStack() },
+                            onOpenMonthView = {
+                                navController.navigateSingleTop(WorkerAgenda)
+                            },
+                            onOpenWeekView = {
+                                navController.navigate(WorkerWeeklyAppointments(workerId = currentWorkerId))
+                            },
+                            onOpenDayView = {
+                                navController.navigate(WorkerDailyAppointments(workerId = currentWorkerId))
+                            },
                             onOpenAppointmentDetail = { appointment ->
                                 monthlyCalendarViewModel.selectAppointment(appointment)
                                 navController.navigateSingleTop(WorkerAppointmentDetail)
