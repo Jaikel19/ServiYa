@@ -188,6 +188,10 @@ fun App() {
         mutableStateOf<RequestAppointmentDraft?>(null)
     }
 
+    var latestCurrentTimeSnapshot by remember {
+        mutableStateOf(CurrentTimeSnapshot())
+    }
+
     var clientMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var workerMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -548,6 +552,10 @@ fun App() {
                             buildCurrentTimeSnapshot()
                         }
 
+                        LaunchedEffect(currentTimeSnapshot) {
+                            latestCurrentTimeSnapshot = currentTimeSnapshot
+                        }
+
                         WorkersListRoute(
                             clientId = currentClientId,
                             viewModel = viewModel,
@@ -625,7 +633,8 @@ fun App() {
                                     selectedServices = selectedServices,
                                     schedule = profile.schedule,
                                     travelTimeMinutes = profile.travelTime,
-                                    workerAppointments = workerAppointments
+                                    workerAppointments = workerAppointments,
+                                    currentTime = latestCurrentTimeSnapshot
                                 )
 
                                 navController.navigateSingleTop(RequestAppointment)

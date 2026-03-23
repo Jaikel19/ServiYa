@@ -364,8 +364,10 @@ fun WorkersListScreen(
                                     visibleMonth = next.second
                                 },
                                 onSelectDate = { chosenDate ->
-                                    selectedDateText = formatDateKey(chosenDate)
-                                    showCalendar = false
+                                    if (compareDates(chosenDate, safeTodayDate) >= 0) {
+                                        selectedDateText = formatDateKey(chosenDate)
+                                        showCalendar = false
+                                    }
                                 }
                             )
                         }
@@ -622,6 +624,20 @@ private fun CompactCalendarCard(
         buildCalendarMonthCells(visibleMonthYear, visibleMonth)
     }
 
+    val canGoToPreviousMonth = remember(
+        visibleMonthYear,
+        visibleMonth,
+        todayDate.year,
+        todayDate.month
+    ) {
+        compareYearMonth(
+            yearA = visibleMonthYear,
+            monthA = visibleMonth,
+            yearB = todayDate.year,
+            monthB = todayDate.month
+        ) > 0
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -642,6 +658,7 @@ private fun CompactCalendarCard(
             ) {
                 CalendarArrowButton(
                     rotate = 180f,
+                    enabled = canGoToPreviousMonth,
                     onClick = onPreviousMonth
                 )
 
@@ -660,6 +677,7 @@ private fun CompactCalendarCard(
 
                 CalendarArrowButton(
                     rotate = 0f,
+                    enabled = true,
                     onClick = onNextMonth
                 )
             }
@@ -710,20 +728,24 @@ private fun CompactCalendarCard(
 @Composable
 private fun CalendarArrowButton(
     rotate: Float,
+    enabled: Boolean,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(34.dp)
             .clip(CircleShape)
-            .background(Color(0xFFF5F7FB))
-            .clickable(onClick = onClick),
+            .background(
+                if (enabled) Color(0xFFF5F7FB)
+                else Color(0xFFF5F7FB).copy(alpha = 0.55f)
+            )
+            .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = TablerIcons.ChevronRight,
             contentDescription = null,
-            tint = TextPrimaryAlt,
+            tint = if (enabled) TextPrimaryAlt else TextSecondary.copy(alpha = 0.45f),
             modifier = Modifier
                 .size(18.dp)
                 .rotate(rotate)
@@ -741,6 +763,8 @@ private fun CalendarDayButton(
     val date = cell.date
     val isSelected = date != null && selectedDate == date
     val isToday = date != null && todayDate == date
+    val isPastDate = date != null && compareDates(date, todayDate) < 0
+    val isEnabled = date != null && !isPastDate
 
     Box(
         modifier = Modifier.padding(horizontal = 2.dp),
@@ -750,14 +774,22 @@ private fun CalendarDayButton(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(if (isSelected) BrandBlue else Color.Transparent)
+                .background(
+                    when {
+                        isSelected -> BrandBlue
+                        isPastDate -> Color(0xFFF6F7FA)
+                        else -> Color.Transparent
+                    }
+                )
                 .border(
                     width = if (isToday && !isSelected) 1.5.dp else 0.dp,
                     color = if (isToday && !isSelected) BrandBlue else Color.Transparent,
                     shape = CircleShape
                 )
-                .clickable(enabled = date != null) {
-                    if (date != null) onSelectDate(date)
+                .clickable(enabled = isEnabled) {
+                    if (date != null && !isPastDate) {
+                        onSelectDate(date)
+                    }
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -766,12 +798,36 @@ private fun CalendarDayButton(
                 color = when {
                     date == null -> Color.Transparent
                     isSelected -> White
+                    isPastDate -> TextSecondary.copy(alpha = 0.45f)
                     else -> TextPrimaryAlt
                 },
                 fontSize = 14.sp,
                 fontWeight = if (isToday || isSelected) FontWeight.ExtraBold else FontWeight.Medium
             )
         }
+    }
+}
+
+private fun compareDates(
+    first: SimpleDateValue,
+    second: SimpleDateValue
+): Int {
+    return when {
+        first.year != second.year -> first.year - second.year
+        first.month != second.month -> first.month - second.month
+        else -> first.day - second.day
+    }
+}
+
+private fun compareYearMonth(
+    yearA: Int,
+    monthA: Int,
+    yearB: Int,
+    monthB: Int
+): Int {
+    return when {
+        yearA != yearB -> yearA - yearB
+        else -> monthA - monthB
     }
 }
 
@@ -854,7 +910,7 @@ private fun WorkerSearchBar(
         shape = RoundedCornerShape(999.dp),
         placeholder = {
             Text(
-                text = "Buscar trabajador, servicio o zona",
+                text = $$"Buscar trabajador",
                 color = TextSecondary
             )
         }
