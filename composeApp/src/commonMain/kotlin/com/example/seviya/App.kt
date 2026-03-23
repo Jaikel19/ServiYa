@@ -130,6 +130,7 @@ import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
 import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.seviya.UI.DailyAgendaScreen
+import com.example.seviya.UI.WeeklyAgendaScreen
 import com.example.seviya.navigation.WorkerDailyAppointments
 import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
 import com.example.shared.presentation.calendar.CalendarUserRole
@@ -855,10 +856,18 @@ fun App() {
 
                     composable<ClientWeeklyAppointments> { backStackEntry ->
                         val route = backStackEntry.toRoute<ClientWeeklyAppointments>()
+                        val viewModel: DailyAgendaViewModel = koinViewModel()
 
-                        FeaturePlaceholder(
-                            title = "Agenda semanal",
-                            subtitle = "Aquí irá la agenda semanal del cliente para ${route.clientId}."
+                        WeeklyAgendaScreen(
+                            viewModel = viewModel,
+                            userId = route.clientId,
+                            role = CalendarUserRole.CLIENT,
+                            onBack = { navController.popBackStack() },
+                            onOpenDetail = { appointment ->
+                                navController.navigate(
+                                    ClientAppointmentDetail(bookingId = appointment.id)
+                                )
+                            }
                         )
                     }
 
@@ -970,10 +979,17 @@ fun App() {
 
                     composable<WorkerWeeklyAppointments> { backStackEntry ->
                         val route = backStackEntry.toRoute<WorkerWeeklyAppointments>()
+                        val viewModel: DailyAgendaViewModel = koinViewModel()
 
-                        FeaturePlaceholder(
-                            title = "Agenda semanal",
-                            subtitle = "Aquí irá la agenda semanal del trabajador para ${route.workerId}."
+                        WeeklyAgendaScreen(
+                            viewModel = viewModel,
+                            userId = route.workerId,
+                            role = CalendarUserRole.WORKER,
+                            onBack = { navController.popBackStack() },
+                            onOpenDetail = { appointment ->
+                                monthlyCalendarViewModel.selectAppointment(appointment)
+                                navController.navigateSingleTop(WorkerAppointmentDetail)
+                            }
                         )
                     }
 
