@@ -33,12 +33,14 @@ firebase-bom = "34.10.0"
 
 
 maps-compose = "4.4.1"
+play-services-location = "21.3.0"
 
 [libraries]
 
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "maps-compose" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location" }
 
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "composeMultiplatform" }
 composeIcons-tabler = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "devsrComposeIcons" }

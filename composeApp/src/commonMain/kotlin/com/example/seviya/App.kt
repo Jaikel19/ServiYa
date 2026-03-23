@@ -147,6 +147,9 @@ import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppoin
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
+import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
+import com.example.seviya.UI.ClientLocationCatalogScreen
+import com.example.seviya.navigation.ClientLocationCatalog
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Briefcase
@@ -155,6 +158,7 @@ import compose.icons.tablericons.ChartBar
 import compose.icons.tablericons.Clock
 import compose.icons.tablericons.Dashboard
 import compose.icons.tablericons.Logout
+import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Settings
@@ -222,7 +226,8 @@ fun App() {
                                 currentDestination.isRoute<ClientFavorites>() ||
                                 currentDestination.isRoute<RequestAppointment>()||
                                 currentDestination.isRoute<ClientRequests>() ||
-                                currentDestination.isRoute<ClientPaymentUpload>()
+                                currentDestination.isRoute<ClientPaymentUpload>() ||
+                                currentDestination.isRoute<ClientLocationCatalog>()
                         )
 
     val showWorkerBottomBar =
@@ -766,6 +771,15 @@ fun App() {
 
                         ClientPaymentUploadScreen(
                             appointmentId = route.appointmentId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable<ClientLocationCatalog> {
+                        val viewModel: ClientLocationCatalogViewModel = koinViewModel()
+                        ClientLocationCatalogScreen(
+                            clientId = currentClientId,
                             viewModel = viewModel,
                             onBack = { navController.popBackStack() }
                         )
@@ -1347,6 +1361,16 @@ private fun clientMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(ClientFavorites)
+            }
+        ),
+        MenuOption(
+            title = "Mis Ubicaciones",
+            subtitle = "Gestiona tus direcciones frecuentes",
+            icon = TablerIcons.MapPin,
+            iconColor = Color(0xFF4A9EC7),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientLocationCatalog)
             }
         ),
         MenuOption(
