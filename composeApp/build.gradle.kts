@@ -45,6 +45,7 @@ kotlin {
 
             //maps
             implementation(libs.maps.compose)
+            implementation(libs.play.services.location)
 
         }
         commonMain.dependencies {
