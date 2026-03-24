@@ -573,10 +573,6 @@ fun App() {
                             buildCurrentTimeSnapshot()
                         }
 
-                        LaunchedEffect(currentTimeSnapshot) {
-                            latestCurrentTimeSnapshot = currentTimeSnapshot
-                        }
-
                         WorkersListRoute(
                             clientId = currentClientId,
                             viewModel = viewModel,
@@ -655,7 +651,7 @@ fun App() {
                                     schedule = profile.schedule,
                                     travelTimeMinutes = profile.travelTime,
                                     workerAppointments = workerAppointments,
-                                    currentTime = latestCurrentTimeSnapshot
+                                    currentTime  = buildCurrentTimeSnapshot()
                                 )
 
                                 navController.navigateSingleTop(RequestAppointment)
@@ -1907,18 +1903,84 @@ private fun extractMinutesFromDuration(duration: String): Int {
 
 private val APP_TIME_ZONE = TimeZone.of("America/Costa_Rica")
 
+
 private fun buildCurrentTimeSnapshot(): CurrentTimeSnapshot {
-    val nowInstant = Clock.System.now()
-    val now = nowInstant.toLocalDateTime(APP_TIME_ZONE)
+    val isoNow = DateTimeUtils.nowIsoMinute()
+    val parsed = parseIsoMinute(isoNow) ?: return CurrentTimeSnapshot()
 
     return CurrentTimeSnapshot(
-        epochMillis = nowInstant.toEpochMilliseconds(),
-        currentDayKey = appDayKeyFromWeekday(now.date.dayOfWeek),
-        currentMinutes = (now.hour * 60) + now.minute,
-        todayYear = now.year,
-        todayMonth = now.monthNumber,
-        todayDay = now.dayOfMonth
+        epochMillis = 0L,
+        currentDayKey = appDayKeyFromDate(
+            year = parsed.year,
+            month = parsed.month,
+            day = parsed.day
+        ),
+        currentMinutes = (parsed.hour * 60) + parsed.minute,
+        todayYear = parsed.year,
+        todayMonth = parsed.month,
+        todayDay = parsed.day
     )
+}
+
+private data class ParsedIsoMinute(
+    val year: Int,
+    val month: Int,
+    val day: Int,
+    val hour: Int,
+    val minute: Int
+)
+
+private fun parseIsoMinute(value: String): ParsedIsoMinute? {
+    val trimmed = value.trim()
+    if (trimmed.length < 16) return null
+
+    val parts = trimmed.split("T")
+    if (parts.size != 2) return null
+
+    val dateParts = parts[0].split("-")
+    val timeParts = parts[1].split(":")
+
+    if (dateParts.size != 3 || timeParts.size < 2) return null
+
+    val year = dateParts[0].toIntOrNull() ?: return null
+    val month = dateParts[1].toIntOrNull() ?: return null
+    val day = dateParts[2].toIntOrNull() ?: return null
+    val hour = timeParts[0].toIntOrNull() ?: return null
+    val minute = timeParts[1].toIntOrNull() ?: return null
+
+    return ParsedIsoMinute(
+        year = year,
+        month = month,
+        day = day,
+        hour = hour,
+        minute = minute
+    )
+}
+
+private fun appDayKeyFromDate(
+    year: Int,
+    month: Int,
+    day: Int
+): String {
+    return when (dayOfWeekIndex(year, month, day)) {
+        0 -> "sunday"
+        1 -> "monday"
+        2 -> "tuesday"
+        3 -> "wednesday"
+        4 -> "thursday"
+        5 -> "friday"
+        else -> "saturday"
+    }
+}
+
+/**
+ * 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+ */
+private fun dayOfWeekIndex(year: Int, month: Int, day: Int): Int {
+    val monthOffsets = intArrayOf(0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4)
+    var y = year
+    if (month < 3) y -= 1
+    return (y + y / 4 - y / 100 + y / 400 + monthOffsets[month - 1] + day) % 7
 }
 
 private fun appDayKeyFromWeekday(dayOfWeek: DayOfWeek): String {
