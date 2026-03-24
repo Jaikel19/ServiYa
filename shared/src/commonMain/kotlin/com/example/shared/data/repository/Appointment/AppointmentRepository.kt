@@ -1,13 +1,13 @@
 package com.example.shared.data.repository.Appointment
 
 import com.example.shared.data.remote.appointment.IRemoteAppointmentDataSource
-import com.example.shared.domain.entity.Appointment
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import com.example.shared.data.repository.OtpAppointment.IOtpAppointmentRepository
+import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.OtpAppointment
 import com.example.shared.utils.DateTimeUtils
 import com.example.shared.utils.OtpUtils
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 
 class AppointmentRepository(
     private val remote: IRemoteAppointmentDataSource,
@@ -114,8 +114,42 @@ class AppointmentRepository(
     override suspend fun cancelAppointmentByClient(appointmentId: String) {
         remote.cancelAppointmentByClient(appointmentId)
     }
+
+    override suspend fun cancelAppointmentByClientWithRefund(
+        appointmentId: String,
+        cancelledAt: String,
+        refundPercentage: Int,
+        refundAmount: Int,
+        policyLabel: String,
+        warningMessage: String
+    ) {
+        println(
+            "CANCEL DEBUG CLIENT -> appointmentId=$appointmentId, " +
+                    "cancelledAt=$cancelledAt, refundPercentage=$refundPercentage, " +
+                    "refundAmount=$refundAmount, policyLabel=$policyLabel"
+        )
+
+        remote.cancelAppointmentByClient(appointmentId)
+    }
+
+    override suspend fun cancelAppointmentByWorkerWithRefund(
+        appointmentId: String,
+        cancelledAt: String,
+        refundPercentage: Int,
+        refundAmount: Int,
+        policyLabel: String,
+        warningMessage: String
+    ) {
+        println(
+            "CANCEL DEBUG WORKER -> appointmentId=$appointmentId, " +
+                    "cancelledAt=$cancelledAt, refundPercentage=$refundPercentage, " +
+                    "refundAmount=$refundAmount, policyLabel=$policyLabel"
+        )
+
+        remote.cancelAppointmentByWorker(appointmentId)
+    }
+
     override suspend fun markPaymentPending(appointmentId: String) {
         remote.markPaymentPending(appointmentId)
     }
-
 }
