@@ -25,6 +25,12 @@ import com.example.shared.presentation.clientMap.WorkerMapMarker
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ChevronDown
 import compose.icons.tablericons.ChevronUp
+import compose.icons.tablericons.Clock
+import compose.icons.tablericons.MapPin
+import compose.icons.tablericons.Search
+import compose.icons.tablericons.Star
+import compose.icons.tablericons.Tag
+import compose.icons.tablericons.User
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -154,7 +160,12 @@ actual fun ClientMapScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "🔍", fontSize = 16.sp)
+                    Icon(
+                        imageVector = TablerIcons.Search,
+                        contentDescription = "Buscar",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(18.dp)
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     BasicTextField(
                         value = uiState.searchQuery,
@@ -194,7 +205,12 @@ actual fun ClientMapScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "🏷️", fontSize = 14.sp)
+                        Icon(
+                            imageVector = TablerIcons.Tag,
+                            contentDescription = "Categoria",
+                            tint = Color.Gray,
+                            modifier = Modifier.size(16.dp)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         BasicTextField(
                             value = uiState.categoryQuery,
@@ -243,8 +259,15 @@ actual fun ClientMapScreen(
                                 }
                         )
 
+                        Icon(
+                            imageVector = TablerIcons.Star,
+                            contentDescription = "Estrellas",
+                            tint = White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "⭐ ${uiState.minStars?.toInt() ?: "-"}",
+                            text = "${uiState.minStars?.toInt() ?: "-"}",
                             color = White,
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Bold
@@ -293,7 +316,12 @@ actual fun ClientMapScreen(
                 shadowElevation = 4.dp
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = "📍", fontSize = 20.sp)
+                    Icon(
+                        imageVector = TablerIcons.MapPin,
+                        contentDescription = "Centrar",
+                        tint = BrandBlue,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
@@ -361,7 +389,12 @@ private fun WorkerPopup(
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "👤", fontSize = 28.sp)
+                    Icon(
+                        imageVector = TablerIcons.User,
+                        contentDescription = "Trabajador",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -388,7 +421,12 @@ private fun WorkerPopup(
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(text = "⭐", fontSize = 12.sp)
+                                    Icon(
+                                        imageVector = TablerIcons.Star,
+                                        contentDescription = null,
+                                        tint = Color(0xFF92400E),
+                                        modifier = Modifier.size(14.dp)
+                                    )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = stars.toString(),
@@ -418,14 +456,25 @@ private fun WorkerPopup(
                             shape = RoundedCornerShape(8.dp),
                             color = BrandBlue.copy(alpha = 0.10f)
                         ) {
-                            Text(
-                                text = "📍 ${marker.workZone.district}",
+                            Row(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = BrandBlue,
-                                    fontWeight = FontWeight.Bold
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = TablerIcons.MapPin,
+                                    contentDescription = null,
+                                    tint = BrandBlue,
+                                    modifier = Modifier.size(12.dp)
                                 )
-                            )
+                                Text(
+                                    text = marker.workZone.district,
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = BrandBlue,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            }
                         }
 
                         marker.user.travelTime?.let { time ->
@@ -433,14 +482,25 @@ private fun WorkerPopup(
                                 shape = RoundedCornerShape(8.dp),
                                 color = Color(0xFFE8F5E9)
                             ) {
-                                Text(
-                                    text = "🕐 ~${time} min",
+                                Row(
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = Color(0xFF2E7D32),
-                                        fontWeight = FontWeight.Bold
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = TablerIcons.Clock,
+                                        contentDescription = null,
+                                        tint = Color(0xFF2E7D32),
+                                        modifier = Modifier.size(12.dp)
                                     )
-                                )
+                                    Text(
+                                        text = "~${time} min",
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            color = Color(0xFF2E7D32),
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
