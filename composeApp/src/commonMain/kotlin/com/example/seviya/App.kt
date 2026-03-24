@@ -45,6 +45,7 @@ import androidx.navigation.toRoute
 import com.example.seviya.UI.CategoriesCatalogRoute
 import com.example.seviya.UI.ClientAppointmentDetailScreen
 import com.example.seviya.UI.ClientDashboardRoute
+import com.example.seviya.UI.ClientHomeRoute
 import com.example.seviya.UI.ClientMapScreen
 import com.example.seviya.UI.ClientPaymentUploadScreen
 import com.example.seviya.UI.CurrentTimeSnapshot
@@ -103,7 +104,7 @@ import com.example.seviya.navigation.WorkerConfiguration
 import com.example.seviya.navigation.WorkerDashboard
 import com.example.seviya.navigation.WorkerMessages
 import com.example.seviya.navigation.WorkerWeeklyAppointments
-
+import com.example.seviya.navigation.ClientHome
 import com.example.seviya.navigation.WorkerPaymentDetail
 import com.example.seviya.navigation.WorkerPortfolio
 import com.example.seviya.navigation.WorkerProfile
@@ -170,6 +171,7 @@ import compose.icons.tablericons.User
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 
@@ -219,7 +221,8 @@ fun App() {
     val showClientBottomBar =
         sessionRole == SessionRole.CLIENT &&
                 (
-                        currentDestination.isRoute<CategoriesCatalog>() ||
+                        currentDestination.isRoute<ClientHome>() ||
+                                currentDestination.isRoute<CategoriesCatalog>() ||
                                 currentDestination.isRoute<WorkersList>() ||
                                 currentDestination.isRoute<ProfessionalProfile>() ||
                                 currentDestination.isRoute<ClientMap>() ||
@@ -309,7 +312,7 @@ fun App() {
                                     clientMenuExpanded = false
                                     workerMenuExpanded = false
                                     currentClientTab = ClientTab.SERVICES
-                                    navController.navigateSingleTop(CategoriesCatalog)
+                                    navController.navigateSingleTop(ClientHome)
                                 },
                                 onGoMap = {
                                     clientMenuExpanded = false
@@ -419,6 +422,32 @@ fun App() {
                         )
                     }
 
+                    composable<ClientHome> {
+                        ClientHomeRoute(
+                            clientId = currentClientId,
+                            categoriesViewModel = koinInject(),
+                            favoriteWorkersViewModel = koinInject(),
+                            workersListViewModel = koinInject(),
+                            onWorkerClick = { workerId ->
+                                navController.navigate(ProfessionalProfile(workerId))
+                            },
+                            onFavoritesClick = {
+                                navController.navigate(ClientFavorites)
+                            },
+                            onOpenCategoriesCatalog = {
+                                navController.navigateSingleTop(CategoriesCatalog)
+                            },
+                            onCategoryClick = { category ->
+                                navController.navigate(
+                                    WorkersList(
+                                        categoryId = category.id,
+                                        categoryName = category.name
+                                    )
+                                )
+                            }
+                        )
+                    }
+
                     composable<Services> {
                         val viewModel: ServicesViewModel = koinViewModel()
                         ServicesScreen(viewModel)
@@ -463,7 +492,7 @@ fun App() {
                                 currentClientName = "Cliente Demo"
                                 currentClientTab = ClientTab.SERVICES
                                 requestAppointmentDraft = null
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onPickWorker = {
                                 sessionRole = SessionRole.WORKER
@@ -493,7 +522,7 @@ fun App() {
                                 currentClientName = "Cliente Demo"
                                 currentClientTab = ClientTab.SERVICES
                                 requestAppointmentDraft = null
-                                navController.navigateSingleTop(ClientDashboard)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onPickWorker = {
                                 sessionRole = SessionRole.WORKER
@@ -516,7 +545,7 @@ fun App() {
                             selectedCategoryId = selectedCategoryId,
                             onGoServices = {
                                 currentClientTab = ClientTab.SERVICES
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onGoMap = {
                                 currentClientTab = ClientTab.MAP
@@ -581,7 +610,7 @@ fun App() {
                             },
                             onBottomServices = {
                                 currentClientTab = ClientTab.SERVICES
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onBottomMap = {
                                 currentClientTab = ClientTab.MAP
@@ -613,7 +642,7 @@ fun App() {
                             onBack = { navController.popBackStack() },
                             onBottomServices = {
                                 currentClientTab = ClientTab.SERVICES
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onBottomMap = {
                                 currentClientTab = ClientTab.MAP
@@ -670,7 +699,7 @@ fun App() {
                                 },
                                 onOpenHome = {
                                     currentClientTab = ClientTab.SERVICES
-                                    navController.navigateSingleTop(CategoriesCatalog)
+                                    navController.navigateSingleTop(ClientHome)
                                 }
 
                             )
@@ -709,7 +738,7 @@ fun App() {
                             },
                             onOpenCategories = {
                                 currentClientTab = ClientTab.SERVICES
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onOpenMenu = {
                                 clientMenuExpanded = true
@@ -731,11 +760,11 @@ fun App() {
                             },
                             onCategoriesClick = {
                                 currentClientTab = ClientTab.SERVICES
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onBottomServices = {
                                 currentClientTab = ClientTab.SERVICES
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onBottomMap = {
                                 currentClientTab = ClientTab.MAP
@@ -822,7 +851,7 @@ fun App() {
                             onReviewClick = { },
                             onGoServices = {
                                 currentClientTab = ClientTab.SERVICES
-                                navController.navigateSingleTop(CategoriesCatalog)
+                                navController.navigateSingleTop(ClientHome)
                             },
                             onGoMap = {
                                 currentClientTab = ClientTab.MAP
