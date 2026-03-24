@@ -271,12 +271,38 @@ private fun RoleHeaderAnimated(height: Dp) {
         label = "gradT"
     )
 
-    val glowA by inf.animateFloat(0.10f, 0.18f, infiniteRepeatable(tween(2400, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "glowA")
-    val glowB by inf.animateFloat(0.08f, 0.15f, infiniteRepeatable(tween(2800, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "glowB")
-    val floatY by inf.animateFloat(0f, 10f, infiniteRepeatable(tween(2600, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "floatY")
+    val glowA by inf.animateFloat(
+        initialValue = 0.10f,
+        targetValue = 0.18f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glowA"
+    )
+
+    val glowB by inf.animateFloat(
+        initialValue = 0.08f,
+        targetValue = 0.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glowB"
+    )
+
+    val floatY by inf.animateFloat(
+        initialValue = 0f,
+        targetValue = 10f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "floatY"
+    )
 
     val headerBrush = Brush.linearGradient(
-        colors = listOf(BrandBlue, AccentBlue),
+        colors = listOf(BrandBlue, BrandBlueAlt),
         start = Offset(0f, 0f),
         end = Offset(1000f + 400f * gradT, 1300f - 250f * gradT)
     )
@@ -293,11 +319,12 @@ private fun RoleHeaderAnimated(height: Dp) {
                 .offset((-110).dp, (-110).dp)
                 .background(BrandRed.copy(alpha = glowA), CircleShape)
         )
+
         Box(
             modifier = Modifier
                 .size(200.dp)
                 .offset(x = 260.dp, y = 210.dp)
-                .background(White.copy(alpha = glowB), CircleShape)
+                .background(SubtitleOnBlue.copy(alpha = glowB), CircleShape)
         )
 
         Column(
@@ -345,6 +372,7 @@ private fun RoleHeaderAnimated(height: Dp) {
                         )
                     }
                 }
+
                 RoleAnimatedSection(200) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         FeatureGlassTileSmall(
@@ -474,21 +502,31 @@ private fun RolePickCardAnimated(
     onClick: () -> Unit
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (selected) BrandBlue else BorderUltraSoft,
+        targetValue = if (selected) BrandBlueAlt else BorderUltraSoft,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "border"
     )
+
     val bgColor by animateColorAsState(
-        targetValue = if (selected) SoftBlueRole.copy(alpha = 0.34f) else White,
+        targetValue = if (selected) SoftBlueSurface else White,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "bg"
+    )
+
+    val iconBgColor by animateColorAsState(
+        targetValue = if (selected) AvatarBlueSoft else SoftBlueSurfaceAlt,
+        animationSpec = tween(250, easing = FastOutSlowInEasing),
+        label = "icon_bg"
     )
 
     val inf = rememberInfiniteTransition(label = "role_float_$title")
     val floatY by inf.animateFloat(
         initialValue = 0f,
         targetValue = if (selected) 8f else 0f,
-        animationSpec = infiniteRepeatable(tween(1600, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(
+            animation = tween(1600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
         label = "float"
     )
 
@@ -514,17 +552,25 @@ private fun RolePickCardAnimated(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(22.dp))
-                    .background(SoftBlueRole)
-                    .shimmerOverlay(alpha = if (selected) 0.14f else 0.08f, durationMs = 2200),
+                    .background(iconBgColor)
+                    .shimmerOverlay(
+                        alpha = if (selected) 0.14f else 0.08f,
+                        durationMs = 2200
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, tint = BrandBlue, modifier = Modifier.size(28.dp))
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = BrandBlue,
+                    modifier = Modifier.size(28.dp)
+                )
             }
 
             Spacer(Modifier.height(16.dp))
 
             Text(
-                title,
+                text = title,
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
                 color = TextPrimary
             )
@@ -532,7 +578,7 @@ private fun RolePickCardAnimated(
             Spacer(Modifier.height(6.dp))
 
             Text(
-                subtitle,
+                text = subtitle,
                 style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary),
                 textAlign = TextAlign.Center
             )
