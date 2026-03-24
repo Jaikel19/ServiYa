@@ -52,4 +52,34 @@ class ReviewRepository(
         } catch (e: Exception) {
             println("ERROR deleteReview: ${e.message}")
         }
+
+    override suspend fun createWorkerToClientReview(review: Review): String =
+        try {
+            val reviewId = remote.createReview(review)
+            if (reviewId.isNotBlank()) {
+                remote.markWorkerToClientReviewCreated(
+                    appointmentId = review.appointmentId,
+                    reviewId = reviewId
+                )
+            }
+            reviewId
+        } catch (e: Exception) {
+            println("ERROR createWorkerToClientReview: ${e.message}")
+            ""
+        }
+
+    override suspend fun createClientToWorkerReview(review: Review): String =
+        try {
+            val reviewId = remote.createReview(review)
+            if (reviewId.isNotBlank()) {
+                remote.markClientToWorkerReviewCreated(
+                    appointmentId = review.appointmentId,
+                    reviewId = reviewId
+                )
+            }
+            reviewId
+        } catch (e: Exception) {
+            println("ERROR createClientToWorkerReview: ${e.message}")
+            ""
+        }
 }

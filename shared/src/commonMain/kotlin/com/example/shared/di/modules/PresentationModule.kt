@@ -21,6 +21,7 @@ import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppo
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
+import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
 import org.koin.dsl.module
 
@@ -40,7 +41,7 @@ val presentationModule = module {
     factory { RequestAppointmentViewModel(get(), get()) }
     factory { WorkerRequestsViewModel(get(), get()) }
     factory { WorkerPaymentDetailViewModel(get(), get()) }
-    factory { WorkerAppointmentDetailViewModel(get()) }
+    factory { WorkerAppointmentDetailViewModel(get(), get()) }
     factory { FavoriteWorkersViewModel(get()) }
     factory { ClientRequestsViewModel(get()) }
     factory { WorkerStartAppointmentOtpViewModel(get(), get()) }
@@ -51,4 +52,5 @@ val presentationModule = module {
     factory { ClientLocationCatalogViewModel(get()) }
     factory { WorkerCategoriesViewModel(get(), get()) }
     factory { WorkerTravelTimeViewModel(get()) }
+    factory { WorkerToClientReviewViewModel(get(), get()) }
 }

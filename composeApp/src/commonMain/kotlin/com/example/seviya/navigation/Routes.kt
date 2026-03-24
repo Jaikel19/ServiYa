@@ -69,6 +69,9 @@ data class WorkerWeeklyAppointments(val workerId: String)
 @Serializable
 data class WorkerStartAppointmentOtp(val appointmentId: String)
 
+@Serializable
+data class WorkerToClientReview(val appointmentId: String)
+
 @Serializable object ClientFavorites
 @Serializable object ClientLocationCatalog
 

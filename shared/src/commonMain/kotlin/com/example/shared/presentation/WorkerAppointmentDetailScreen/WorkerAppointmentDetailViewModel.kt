@@ -3,6 +3,7 @@ package com.example.shared.presentation.workerAppointmentDetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
+import com.example.shared.data.repository.ReviewMeta.IReviewMetaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class WorkerAppointmentDetailViewModel(
-    private val paymentReceiptRepository: IPaymentReceiptRepository
+    private val paymentReceiptRepository: IPaymentReceiptRepository,
+    private val reviewMetaRepository: IReviewMetaRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkerAppointmentDetailUiState())
@@ -44,6 +46,31 @@ class WorkerAppointmentDetailViewModel(
                         paymentReceipt = null,
                         isLoading = false,
                         errorMessage = e.message ?: "Error al cargar comprobante"
+                    )
+                }
+                .collect()
+        }
+    }
+
+    fun loadReviewMeta(appointmentId: String) {
+        viewModelScope.launch {
+            println("DEBUG loading reviewMeta for appointmentId: $appointmentId")
+
+            reviewMetaRepository.getReviewMeta(appointmentId)
+                .onEach { meta ->
+                    println("DEBUG reviewMeta loaded in ViewModel: $meta")
+
+                    _uiState.value = _uiState.value.copy(
+                        reviewMeta = meta ?: _uiState.value.reviewMeta,
+                        errorMessage = null
+                    )
+                }
+                .catch { e ->
+                    println("ERROR loading reviewMeta in ViewModel: ${e.message}")
+
+                    _uiState.value = _uiState.value.copy(
+                        reviewMeta = _uiState.value.reviewMeta,
+                        errorMessage = e.message ?: "Error al cargar reviewMeta"
                     )
                 }
                 .collect()

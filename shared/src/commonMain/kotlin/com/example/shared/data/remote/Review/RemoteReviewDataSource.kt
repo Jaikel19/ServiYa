@@ -12,7 +12,7 @@ class RemoteReviewDataSource : IRemoteReviewDataSource {
 
     // GET ALL BY TARGET (realtime)
     override suspend fun getReviewsByTarget(targetId: String): Flow<List<Review>> {
-        return db.collection("reviews")
+        return db.collection("Review")
             .where { "targetId" equalTo targetId }
             .snapshots
             .map { snapshot ->
@@ -28,7 +28,7 @@ class RemoteReviewDataSource : IRemoteReviewDataSource {
 
     // GET ALL BY APPOINTMENT (realtime)
     override suspend fun getReviewsByAppointment(appointmentId: String): Flow<List<Review>> {
-        return db.collection("reviews")
+        return db.collection("Review")
             .where { "appointmentId" equalTo appointmentId }
             .snapshots
             .map { snapshot ->
@@ -45,7 +45,7 @@ class RemoteReviewDataSource : IRemoteReviewDataSource {
     // GET ONE
     override suspend fun getReviewById(reviewId: String): Review? {
         return try {
-            val doc = db.collection("reviews")
+            val doc = db.collection("Review")
                 .document(reviewId)
                 .get()
             if (doc.exists) doc.data<Review>().copy(id = doc.id) else null
@@ -58,7 +58,7 @@ class RemoteReviewDataSource : IRemoteReviewDataSource {
     // CREATE
     override suspend fun createReview(review: Review): String {
         return try {
-            val ref = db.collection("reviews").add(review)
+            val ref = db.collection("Review").add(review)
             ref.id
         } catch (e: Exception) {
             println("ERROR createReview: ${e.message}")
@@ -69,7 +69,7 @@ class RemoteReviewDataSource : IRemoteReviewDataSource {
     // UPDATE STATUS
     override suspend fun updateReviewStatus(reviewId: String, status: String) {
         try {
-            db.collection("reviews")
+            db.collection("Review")
                 .document(reviewId)
                 .update("status" to status)
         } catch (e: Exception) {
@@ -80,11 +80,53 @@ class RemoteReviewDataSource : IRemoteReviewDataSource {
     // DELETE
     override suspend fun deleteReview(reviewId: String) {
         try {
-            db.collection("reviews")
+            db.collection("Review")
                 .document(reviewId)
                 .delete()
         } catch (e: Exception) {
             println("ERROR deleteReview: ${e.message}")
+        }
+    }
+
+    override suspend fun markWorkerToClientReviewCreated(
+        appointmentId: String,
+        reviewId: String
+    ) {
+        try {
+            db.collection("appointments")
+                .document(appointmentId)
+                .collection("reviewMeta")
+                .document("meta")
+                .set(
+                    mapOf(
+                        "workerToClientCreated" to true,
+                        "workerToClientReviewId" to reviewId
+                    ),
+                    merge = true
+                )
+        } catch (e: Exception) {
+            println("ERROR markWorkerToClientReviewCreated: ${e.message}")
+        }
+    }
+
+    override suspend fun markClientToWorkerReviewCreated(
+        appointmentId: String,
+        reviewId: String
+    ) {
+        try {
+            db.collection("appointments")
+                .document(appointmentId)
+                .collection("reviewMeta")
+                .document("meta")
+                .set(
+                    mapOf(
+                        "clientToWorkerCreated" to true,
+                        "clientToWorkerReviewId" to reviewId
+                    ),
+                    merge = true
+                )
+        } catch (e: Exception) {
+            println("ERROR markClientToWorkerReviewCreated: ${e.message}")
         }
     }
 }

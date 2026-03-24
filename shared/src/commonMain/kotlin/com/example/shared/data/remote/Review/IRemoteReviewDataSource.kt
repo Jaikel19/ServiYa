@@ -10,4 +10,14 @@ interface IRemoteReviewDataSource {
     suspend fun createReview(review: Review): String
     suspend fun updateReviewStatus(reviewId: String, status: String)
     suspend fun deleteReview(reviewId: String)
+
+    suspend fun markWorkerToClientReviewCreated(
+        appointmentId: String,
+        reviewId: String
+    )
+
+    suspend fun markClientToWorkerReviewCreated(
+        appointmentId: String,
+        reviewId: String
+    )
 }

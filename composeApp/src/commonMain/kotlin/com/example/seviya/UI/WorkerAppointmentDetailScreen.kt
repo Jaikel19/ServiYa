@@ -45,6 +45,7 @@ import com.example.seviya.theme.TextSecondaryAlt
 import com.example.seviya.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.PaymentReceipt
+import com.example.shared.domain.entity.ReviewMeta
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.CalendarEvent
@@ -58,6 +59,7 @@ import io.kamel.image.asyncPainterResource
 fun WorkerAppointmentDetailScreen(
     appointment: Appointment,
     paymentReceipt: PaymentReceipt? = null,
+    reviewMeta: ReviewMeta = ReviewMeta(),
     onBack: () -> Unit = {},
     onOpenGoogleMaps: () -> Unit = {},
     onOpenWaze: () -> Unit = {},
@@ -308,7 +310,7 @@ fun WorkerAppointmentDetailScreen(
                     )
                 }
 
-                if (canRateClient(appointment)) {
+                if (canRateClient(appointment, reviewMeta)) {
                     PrimaryActionButton(
                         text = "Calificar cliente",
                         onClick = onRateClient
@@ -641,9 +643,12 @@ private fun canFinishAppointment(appointment: Appointment): Boolean {
     return appointment.status.equals("in_progress", ignoreCase = true)
 }
 
-private fun canRateClient(appointment: Appointment): Boolean {
+private fun canRateClient(
+    appointment: Appointment,
+    reviewMeta: ReviewMeta
+): Boolean {
     return appointment.status.equals("completed", ignoreCase = true) &&
-            !appointment.workerToClientReviewDone
+            !reviewMeta.workerToClientCreated
 }
 
 private fun canCancelAppointment(appointment: Appointment): Boolean {

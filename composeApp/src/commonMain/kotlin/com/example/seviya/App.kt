@@ -155,7 +155,10 @@ import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatal
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
 import com.example.seviya.UI.ClientLocationCatalogScreen
+import com.example.seviya.UI.WorkerToClientReviewScreen
 import com.example.seviya.navigation.ClientLocationCatalog
+import com.example.seviya.navigation.WorkerToClientReview
+import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.Briefcase
@@ -1071,11 +1074,13 @@ fun App() {
 
                             LaunchedEffect(appointment.id) {
                                 detailViewModel.loadPaymentReceipt(appointment.id)
+                                detailViewModel.loadReviewMeta(appointment.id)
                             }
 
                             WorkerAppointmentDetailScreen(
                                 appointment = appointment,
                                 paymentReceipt = detailUiState.paymentReceipt,
+                                reviewMeta = detailUiState.reviewMeta,
                                 onBack = {
                                     detailViewModel.clearState()
                                     monthlyCalendarViewModel.clearSelectedAppointment()
@@ -1092,7 +1097,9 @@ fun App() {
                                 onFinishAppointment = {
                                     monthlyCalendarViewModel.completeAppointment(appointment.id)
                                 },
-                                onRateClient = {},
+                                onRateClient = {
+                                    navController.navigate(WorkerToClientReview(appointmentId = appointment.id))
+                                },
                                 onCancelAppointment = {
                                     monthlyCalendarViewModel.cancelAppointmentByWorker(appointment.id)
                                 },
@@ -1308,6 +1315,23 @@ fun App() {
                             workerId = currentWorkerId,
                             viewModel = viewModel,
                             onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable<WorkerToClientReview> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerToClientReview>()
+                        val viewModel: WorkerToClientReviewViewModel = koinViewModel()
+
+                        LaunchedEffect(route.appointmentId) {
+                            viewModel.loadAppointment(route.appointmentId)
+                        }
+
+                        WorkerToClientReviewScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() },
+                            onSubmitSuccess = {
+                                navController.popBackStack()
+                            }
                         )
                     }
                 }

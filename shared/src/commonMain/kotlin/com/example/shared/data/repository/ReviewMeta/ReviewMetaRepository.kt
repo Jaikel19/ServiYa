@@ -13,10 +13,13 @@ class ReviewMetaRepository(
         remote.getReviewMeta(appointmentId)
             .catch { e ->
                 println("ERROR fetching reviewMeta: ${e.message}")
-                emit(null)
+                emit(ReviewMeta(id = "meta"))
             }
 
-    override suspend fun createReviewMeta(appointmentId: String, reviewMeta: ReviewMeta): String =
+    override suspend fun createReviewMeta(
+        appointmentId: String,
+        reviewMeta: ReviewMeta
+    ): String =
         try {
             remote.createReviewMeta(appointmentId, reviewMeta)
         } catch (e: Exception) {
@@ -24,14 +27,20 @@ class ReviewMetaRepository(
             ""
         }
 
-    override suspend fun updateClientToWorkerReview(appointmentId: String, reviewId: String) =
+    override suspend fun updateClientToWorkerReview(
+        appointmentId: String,
+        reviewId: String
+    ) =
         try {
             remote.updateClientToWorkerReview(appointmentId, reviewId)
         } catch (e: Exception) {
             println("ERROR updateClientToWorkerReview: ${e.message}")
         }
 
-    override suspend fun updateWorkerToClientReview(appointmentId: String, reviewId: String) =
+    override suspend fun updateWorkerToClientReview(
+        appointmentId: String,
+        reviewId: String
+    ) =
         try {
             remote.updateWorkerToClientReview(appointmentId, reviewId)
         } catch (e: Exception) {
