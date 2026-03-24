@@ -126,6 +126,7 @@ val dataModule = module {
     single<IRemoteReviewMetaDataSource> { RemoteReviewMetaDataSource() }
     single<IReviewMetaRepository> { ReviewMetaRepository(get()) }
 
+
     single<IRemoteUserDataSource> { RemoteUserDataSource() }
     single<IUserRepository> { UserRepository(get()) }
 

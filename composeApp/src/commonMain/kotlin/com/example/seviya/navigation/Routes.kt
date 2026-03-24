@@ -37,6 +37,9 @@ data class ClientWeeklyAppointments(val clientId: String)
 data class ClientAppointmentDetail(
     val bookingId: String
 )
+
+@Serializable
+data class ClientToWorkerReview(val appointmentId: String)
 @Serializable
 data class WorkerDailyAppointments(val workerId: String)
 @Serializable
