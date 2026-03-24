@@ -20,4 +20,22 @@ interface IAppointmentRepository {
     suspend fun cancelAppointmentByWorker(appointmentId: String)
     suspend fun cancelAppointmentByClient(appointmentId: String)
     suspend fun markPaymentPending(appointmentId: String)
+
+    suspend fun cancelAppointmentByClientWithRefund(
+        appointmentId: String,
+        cancelledAt: String,
+        refundPercentage: Int,
+        refundAmount: Int,
+        policyLabel: String,
+        warningMessage: String
+    )
+
+    suspend fun cancelAppointmentByWorkerWithRefund(
+        appointmentId: String,
+        cancelledAt: String,
+        refundPercentage: Int,
+        refundAmount: Int,
+        policyLabel: String,
+        warningMessage: String
+    )
 }

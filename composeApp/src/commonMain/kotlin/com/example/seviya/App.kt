@@ -160,18 +160,8 @@ import com.example.seviya.navigation.ClientLocationCatalog
 import com.example.seviya.navigation.WorkerToClientReview
 import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
 import compose.icons.TablerIcons
-import compose.icons.tablericons.Adjustments
-import compose.icons.tablericons.Briefcase
-import compose.icons.tablericons.CalendarEvent
-import compose.icons.tablericons.ChartBar
-import compose.icons.tablericons.Clock
-import compose.icons.tablericons.Dashboard
-import compose.icons.tablericons.Logout
-import compose.icons.tablericons.MapPin
-import compose.icons.tablericons.Message
-import compose.icons.tablericons.Photo
-import compose.icons.tablericons.Settings
-import compose.icons.tablericons.User
+import compose.icons.tablericons.*
+import com.example.shared.utils.DateTimeUtils
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -835,8 +825,18 @@ fun App() {
                         ClientAppointmentDetailScreen(
                             uiState = uiState,
                             onBack = { navController.popBackStack() },
+                            onRequestCancellationPreview = {
+                                viewModel.prepareCancellationPreview(
+                                    currentDateTime = DateTimeUtils.nowIsoMinute()
+                                )
+                            },
                             onCancelAppointment = {
-                                viewModel.cancelAppointmentByClient()
+                                viewModel.cancelAppointmentByClient(
+                                    currentDateTime = DateTimeUtils.nowIsoMinute()
+                                )
+                            },
+                            onDismissCancellationPreview = {
+                                viewModel.dismissCancellationPreview()
                             },
                             onChatClick = { },
                             onReviewClick = { },
@@ -1100,8 +1100,17 @@ fun App() {
                                 onRateClient = {
                                     navController.navigate(WorkerToClientReview(appointmentId = appointment.id))
                                 },
+                                onRequestCancellationPreview = {
+                                    detailViewModel.prepareCancellationPreview(appointment)
+                                },
                                 onCancelAppointment = {
-                                    monthlyCalendarViewModel.cancelAppointmentByWorker(appointment.id)
+                                    detailViewModel.cancelAppointmentByWorker(
+                                        appointment = appointment,
+                                        currentDateTime = DateTimeUtils.nowIsoMinute()
+                                    )
+                                },
+                                onDismissCancellationPreview = {
+                                    detailViewModel.dismissCancellationPreview()
                                 },
                                 onGoServices = {
                                     currentWorkerTab = WorkerTab.DASHBOARD

@@ -41,7 +41,7 @@ val presentationModule = module {
     factory { RequestAppointmentViewModel(get(), get()) }
     factory { WorkerRequestsViewModel(get(), get()) }
     factory { WorkerPaymentDetailViewModel(get(), get()) }
-    factory { WorkerAppointmentDetailViewModel(get(), get()) }
+    factory { WorkerAppointmentDetailViewModel(get(), get(), get()) }
     factory { FavoriteWorkersViewModel(get()) }
     factory { ClientRequestsViewModel(get()) }
     factory { WorkerStartAppointmentOtpViewModel(get(), get()) }
