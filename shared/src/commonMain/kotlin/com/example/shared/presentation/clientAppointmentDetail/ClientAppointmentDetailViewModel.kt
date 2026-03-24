@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.IBookingRepository
 import com.example.shared.data.repository.OtpAppointment.IOtpAppointmentRepository
+import com.example.shared.presentation.cancellation.AppointmentCancellationCalculator
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -14,25 +17,30 @@ class ClientAppointmentDetailViewModel(
     private val bookingRepository: IBookingRepository
 ) : ViewModel() {
 
-    private val _uiState = kotlinx.coroutines.flow.MutableStateFlow(ClientAppointmentDetailUiState())
-    val uiState: kotlinx.coroutines.flow.StateFlow<ClientAppointmentDetailUiState> = _uiState
+    private val _uiState = MutableStateFlow(ClientAppointmentDetailUiState())
+    val uiState: StateFlow<ClientAppointmentDetailUiState> = _uiState
 
-    fun loadAppointmentDetail(appointmentId: String) {
+    fun loadAppointmentDetail(
+        appointmentId: String,
+        successMessage: String? = _uiState.value.successMessage
+    ) {
         viewModelScope.launch {
-            _uiState.value = ClientAppointmentDetailUiState(isLoading = true)
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                errorMessage = null,
+                successMessage = successMessage
+            )
 
             try {
                 val appointment = appointmentRepository
                     .getAppointmentById(appointmentId)
                     .first()
 
-                println("CLIENT OTP DEBUG 1: appointmentId = $appointmentId")
-                println("CLIENT OTP DEBUG 2: appointment = $appointment")
-
                 if (appointment == null) {
                     _uiState.value = ClientAppointmentDetailUiState(
                         isLoading = false,
-                        errorMessage = "No se encontró la cita"
+                        errorMessage = "No se encontró la cita",
+                        successMessage = successMessage
                     )
                     return@launch
                 }
@@ -40,8 +48,6 @@ class ClientAppointmentDetailViewModel(
                 val otp = otpAppointmentRepository
                     .getOtpByAppointment(appointmentId)
                     .first()
-
-                println("CLIENT OTP DEBUG 3: otp = $otp")
 
                 val cancellationPolicy =
                     bookingRepository.getCancellationPolicyByWorkerId(appointment.workerId)
@@ -55,17 +61,11 @@ class ClientAppointmentDetailViewModel(
                     otp = otp,
                     worker = worker,
                     cancellationPolicy = cancellationPolicy,
-                    errorMessage = null
+                    errorMessage = null,
+                    successMessage = successMessage
                 )
-
-                println("CLIENT OTP DEBUG 4: canShowOtp = ${_uiState.value.canShowOtp}")
-                println("CLIENT OTP DEBUG 5: otpCode = ${_uiState.value.otp?.code}")
-
             } catch (e: Exception) {
-                println("CLIENT OTP DEBUG ERROR: ${e.message}")
-                e.printStackTrace()
-
-                _uiState.value = ClientAppointmentDetailUiState(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = e.message ?: "Error al cargar el detalle de la cita"
                 )
@@ -73,22 +73,103 @@ class ClientAppointmentDetailViewModel(
         }
     }
 
-    fun cancelAppointmentByClient() {
-        val appointment = _uiState.value.appointment ?: return
+    fun prepareCancellationPreview(currentDateTime: String) {
+        val currentState = _uiState.value
+        val appointment = currentState.appointment
+
+        if (appointment == null) {
+            _uiState.value = currentState.copy(
+                errorMessage = "No se encontró la cita"
+            )
+            return
+        }
 
         if (appointment.status != "confirmed") {
-            _uiState.value = _uiState.value.copy(
+            _uiState.value = currentState.copy(
                 errorMessage = "Solo se pueden cancelar citas confirmadas"
             )
             return
         }
 
+        _uiState.value = currentState.copy(
+            isPreparingCancellationPreview = true,
+            errorMessage = null,
+            successMessage = null
+        )
+
+        val preview = AppointmentCancellationCalculator.buildClientPreview(
+            appointment = appointment,
+            cancellationPolicy = currentState.cancellationPolicy,
+            currentDateTime = currentDateTime
+        )
+
+        _uiState.value = currentState.copy(
+            cancellationPreview = preview,
+            showCancellationPreview = true,
+            isPreparingCancellationPreview = false,
+            isCancellingAppointment = false,
+            successMessage = null,
+            errorMessage = null
+        )
+    }
+
+    fun dismissCancellationPreview() {
+        _uiState.value = _uiState.value.copy(
+            showCancellationPreview = false,
+            cancellationPreview = null
+        )
+    }
+
+    fun cancelAppointmentByClient(currentDateTime: String) {
+        val currentState = _uiState.value
+        val appointment = currentState.appointment
+        val preview = currentState.cancellationPreview
+
+        if (appointment == null) {
+            _uiState.value = currentState.copy(
+                errorMessage = "No se encontró la cita"
+            )
+            return
+        }
+
+        if (appointment.status != "confirmed") {
+            _uiState.value = currentState.copy(
+                errorMessage = "Solo se pueden cancelar citas confirmadas"
+            )
+            return
+        }
+
+        if (preview == null) {
+            _uiState.value = currentState.copy(
+                errorMessage = "Primero debes revisar el cálculo de reembolso"
+            )
+            return
+        }
+
         viewModelScope.launch {
+            _uiState.value = currentState.copy(
+                isCancellingAppointment = true,
+                errorMessage = null,
+                successMessage = null
+            )
+
             try {
-                appointmentRepository.cancelAppointmentByClient(appointment.id)
-                loadAppointmentDetail(appointment.id)
+                appointmentRepository.cancelAppointmentByClientWithRefund(
+                    appointmentId = appointment.id,
+                    cancelledAt = currentDateTime,
+                    refundPercentage = preview.refundPercentage,
+                    refundAmount = preview.refundAmount,
+                    policyLabel = preview.policyLabel,
+                    warningMessage = preview.warningMessage
+                )
+
+                loadAppointmentDetail(
+                    appointmentId = appointment.id,
+                    successMessage = "La cita fue cancelada correctamente."
+                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
+                    isCancellingAppointment = false,
                     errorMessage = e.message ?: "Error al cancelar la cita"
                 )
             }
@@ -97,5 +178,9 @@ class ClientAppointmentDetailViewModel(
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
+    }
+
+    fun clearSuccess() {
+        _uiState.value = _uiState.value.copy(successMessage = null)
     }
 }
