@@ -1,5 +1,15 @@
 package com.example.seviya.UI
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,9 +22,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -43,51 +55,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.AppBackgroundAlt
-import com.example.seviya.theme.BorderSoft
-import com.example.seviya.theme.BrandBlue
-import com.example.seviya.theme.BrandBlueDeep
-import com.example.seviya.theme.BrandRed
-import com.example.seviya.theme.InactiveSoft
-import com.example.seviya.theme.TextBluePrimary
-import com.example.seviya.theme.TextSecondary
-import com.example.seviya.theme.White
+import com.example.seviya.theme.*
 import com.example.shared.domain.entity.Category
 import com.example.shared.presentation.workerCategories.WorkerCategoriesUiState
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
 import compose.icons.TablerIcons
-import compose.icons.tablericons.Apps
-import compose.icons.tablericons.Bell
-import compose.icons.tablericons.Briefcase
-import compose.icons.tablericons.Brush
-import compose.icons.tablericons.Building
-import compose.icons.tablericons.Car
-import compose.icons.tablericons.Camera
-import compose.icons.tablericons.CalendarEvent
-import compose.icons.tablericons.ChevronLeft
-import compose.icons.tablericons.X
-import compose.icons.tablericons.Droplet
-import compose.icons.tablericons.Globe
-import compose.icons.tablericons.InfoCircle
-import compose.icons.tablericons.Paint
-import compose.icons.tablericons.Plug
-import compose.icons.tablericons.Scissors
-import compose.icons.tablericons.Search
-import compose.icons.tablericons.Settings
-import compose.icons.tablericons.Tree
-import compose.icons.tablericons.User
+import compose.icons.tablericons.*
 
 @Composable
 fun WorkerCategoriesRoute(
@@ -315,122 +302,342 @@ fun WorkerCategoriesScreen(
 
 @Composable
 private fun WorkerCategoriesHeader(onBack: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(BrandBlue, BrandBlueDeep)
-                )
-            )
-            .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+    val infiniteTransition = rememberInfiniteTransition(label = "worker_categories_header")
+
+    val leftBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.035f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "left_badge_scale"
+    )
+
+    val rightBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.03f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2100, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "right_badge_scale"
+    )
+
+    val bubbleOffsetLarge by infiniteTransition.animateFloat(
+        initialValue = -4f,
+        targetValue = 6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_large"
+    )
+
+    val bubbleOffsetSmall by infiniteTransition.animateFloat(
+        initialValue = 5f,
+        targetValue = -5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_small"
+    )
+
+    val bubbleScaleLarge by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_large"
+    )
+
+    val bubbleScaleSmall by infiniteTransition.animateFloat(
+        initialValue = 0.96f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_small"
+    )
+
+    val shimmerOffset by infiniteTransition.animateFloat(
+        initialValue = -260f,
+        targetValue = 620f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer_offset"
+    )
+
+    val arrowFloat by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "arrow_float"
+    )
+
+    val entranceVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        entranceVisible.value = true
+    }
+
+    AnimatedVisibility(
+        visible = entranceVisible.value,
+        enter = fadeIn(
+            animationSpec = tween(500)
+        ) + slideInVertically(
+            initialOffsetY = { -it / 3 },
+            animationSpec = tween(600, easing = FastOutSlowInEasing)
+        )
     ) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(White.copy(alpha = 0.18f))
-        ) {
-            Icon(
-                imageVector = TablerIcons.ChevronLeft,
-                contentDescription = "Volver",
-                tint = White,
-                modifier = Modifier.size(22.dp)
-            )
-        }
-
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Mis Categorías",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-                color = White
-            )
-            Text(
-                text = "CONFIGURACIÓN DE PERFIL",
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp,
-                    fontSize = 9.sp
-                ),
-                color = White.copy(alpha = 0.70f)
-            )
-        }
-
         Box(
             modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(White.copy(alpha = 0.18f)),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .height(140.dp)
+                .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
+                .background(BrandBlue)
         ) {
-            Icon(
-                imageVector = TablerIcons.InfoCircle,
-                contentDescription = "Información",
-                tint = White,
-                modifier = Modifier.size(22.dp)
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(140.dp)
+                        .offset(x = shimmerOffset.dp)
+                        .graphicsLayer {
+                            rotationZ = -18f
+                            alpha = 0.16f
+                        }
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    White.copy(alpha = 0.45f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 20.dp, top = 42.dp)
+                    .graphicsLayer {
+                        scaleX = leftBadgeScale
+                        scaleY = leftBadgeScale
+                    }
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(White.copy(alpha = 0.14f))
+                    .border(
+                        width = 1.dp,
+                        color = White.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(999.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .graphicsLayer {
+                            translationY = arrowFloat
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.14f))
+                        .clickable { onBack() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.ArrowLeft,
+                        contentDescription = "Volver",
+                        tint = White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Servi",
+                        color = White,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Text(
+                        text = "Ya",
+                        color = BrandRed,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
+
+            Text(
+                text = "CONFIGURACIÓN",
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 20.dp, top = 42.dp)
+                    .graphicsLayer {
+                        scaleX = rightBadgeScale
+                        scaleY = rightBadgeScale
+                    }
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(White.copy(alpha = 0.14f))
+                    .border(
+                        width = 1.dp,
+                        color = White.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(999.dp)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                color = White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
             )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 24.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(82.dp)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetLarge
+                            scaleX = bubbleScaleLarge
+                            scaleY = bubbleScaleLarge
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.08f))
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .align(Alignment.BottomStart)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetSmall
+                            scaleX = bubbleScaleSmall
+                            scaleY = bubbleScaleSmall
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.10f))
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = White,
-        shadowElevation = 2.dp,
+private fun SearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit
+) {
+    Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        TextField(
-            value = query,
-            onValueChange = onQueryChange,
-            placeholder = {
-                Text(
-                    "Buscar categorías (ej. Plomería)",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = InactiveSoft
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = TablerIcons.Search,
-                    contentDescription = null,
-                    tint = InactiveSoft,
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            trailingIcon = if (query.isNotBlank()) {
-                {
-                    IconButton(onClick = { onQueryChange("") }) {
+        Text(
+            text = "BUSCAR CATEGORÍA",
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.1.sp
+            ),
+            color = TextSecondary
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = White,
+            shadowElevation = 6.dp,
+            border = androidx.compose.foundation.BorderStroke(
+                width = 1.dp,
+                color = if (query.isNotBlank()) BrandBlue.copy(alpha = 0.18f) else BorderSoft
+            )
+        ) {
+            TextField(
+                value = query,
+                onValueChange = onQueryChange,
+                placeholder = {
+                    Text(
+                        text = "Buscar categorías (ej. Plomería)",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = InactiveSoft
+                    )
+                },
+                leadingIcon = {
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (query.isNotBlank()) SoftBlueSurface else AppBackground
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Icon(
-                            imageVector = TablerIcons.X,
-                            contentDescription = "Limpiar",
-                            tint = InactiveSoft,
+                            imageVector = TablerIcons.Search,
+                            contentDescription = null,
+                            tint = if (query.isNotBlank()) BrandBlue else InactiveSoft,
                             modifier = Modifier.size(18.dp)
                         )
                     }
-                }
-            } else null,
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = BrandBlue
-            ),
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = TextBluePrimary)
-        )
+                },
+                trailingIcon = if (query.isNotBlank()) {
+                    {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(SoftSurface)
+                                .clickable { onQueryChange("") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = TablerIcons.X,
+                                contentDescription = "Limpiar",
+                                tint = BlueGrayText,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                } else null,
+                singleLine = true,
+                shape = RoundedCornerShape(24.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    cursorColor = BrandBlue,
+                    focusedTextColor = TextBluePrimary,
+                    unfocusedTextColor = TextBluePrimary
+                ),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = TextBluePrimary,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 

@@ -349,7 +349,7 @@ private fun RoleAdmissionHeaderAnimated(height: Dp) {
     )
 
     val headerBrush = Brush.linearGradient(
-        colors = listOf(BrandBlue, AccentBlue),
+        colors = listOf(BrandBlue, BrandBlueAlt),
         start = Offset(0f, 0f),
         end = Offset(1000f + 400f * gradT, 1300f - 250f * gradT)
     )
@@ -371,7 +371,7 @@ private fun RoleAdmissionHeaderAnimated(height: Dp) {
             modifier = Modifier
                 .size(200.dp)
                 .offset(x = 260.dp, y = 210.dp)
-                .background(White.copy(alpha = glowB), CircleShape)
+                .background(SubtitleOnBlue.copy(alpha = glowB), CircleShape)
         )
 
         Column(
@@ -580,15 +580,21 @@ private fun RoleAdmissionPickCardAnimated(
     onClick: () -> Unit
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (selected) BrandBlue else BorderUltraSoft,
+        targetValue = if (selected) BrandBlueAlt else BorderUltraSoft,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "border"
     )
 
     val bgColor by animateColorAsState(
-        targetValue = if (selected) SoftBlueRole.copy(alpha = 0.34f) else White,
+        targetValue = if (selected) SoftBlueSurface else White,
         animationSpec = tween(250, easing = FastOutSlowInEasing),
         label = "bg"
+    )
+
+    val iconBgColor by animateColorAsState(
+        targetValue = if (selected) AvatarBlueSoft else SoftBlueSurfaceAlt,
+        animationSpec = tween(250, easing = FastOutSlowInEasing),
+        label = "icon_bg"
     )
 
     val inf = rememberInfiniteTransition(label = "roleAdmission_float_$title")
@@ -626,7 +632,7 @@ private fun RoleAdmissionPickCardAnimated(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(22.dp))
-                    .background(SoftBlueRole)
+                    .background(iconBgColor)
                     .shimmerOverlay(
                         alpha = if (selected) 0.14f else 0.08f,
                         durationMs = 2200

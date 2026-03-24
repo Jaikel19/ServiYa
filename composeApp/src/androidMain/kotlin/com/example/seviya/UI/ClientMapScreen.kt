@@ -17,17 +17,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.BrandBlue
-import com.example.seviya.theme.BrandRed
-import com.example.seviya.theme.White
+import com.example.seviya.theme.*
 import com.example.shared.presentation.clientMap.ClientMapViewModel
 import com.example.shared.presentation.clientMap.WorkerMapMarker
 import compose.icons.TablerIcons
-import compose.icons.tablericons.ChevronDown
-import compose.icons.tablericons.ChevronUp
+import compose.icons.tablericons.*
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
+
 
 @Composable
 actual fun ClientMapScreen(
@@ -91,185 +106,30 @@ actual fun ClientMapScreen(
             }
         }
 
-        // Header
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(BrandBlue)
-                .statusBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
-                .align(Alignment.TopCenter)
-        ) {
-            // Logo + MAPA pill
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Servi",
-                        color = White,
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    )
-                    Text(
-                        text = "Ya",
-                        color = BrandRed,
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    )
+        ClientMapPremiumHeader(
+            searchQuery = uiState.searchQuery,
+            categoryQuery = uiState.categoryQuery,
+            minStars = uiState.minStars,
+            onSearchQueryChange = { viewModel.onSearchQueryChanged(it) },
+            onCategoryQueryChange = { viewModel.onCategoryQueryChanged(it) },
+            onDecreaseStars = {
+                val current = uiState.minStars?.toInt() ?: 1
+                if (current <= 1) {
+                    viewModel.onMinStarsSelected(null)
+                } else {
+                    viewModel.onMinStarsSelected((current - 1).toDouble())
                 }
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = White.copy(alpha = 0.13f),
-                    border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
-                ) {
-                    Box(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "MAPA",
-                            color = White,
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        )
-                    }
+            },
+            onIncreaseStars = {
+                val current = uiState.minStars?.toInt() ?: 0
+                if (current >= 5) {
+                    viewModel.onMinStarsSelected(5.0)
+                } else {
+                    viewModel.onMinStarsSelected((current + 1).toDouble())
                 }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Barra de búsqueda por nombre
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                color = White
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "🔍", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    BasicTextField(
-                        value = uiState.searchQuery,
-                        onValueChange = { viewModel.onSearchQueryChanged(it) },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        decorationBox = { innerTextField ->
-                            if (uiState.searchQuery.isEmpty()) {
-                                Text(
-                                    text = "Buscar trabajador por nombre...",
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = Color.Gray
-                                    )
-                                )
-                            }
-                            innerTextField()
-                        }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Fila: búsqueda por categoría + control de estrellas
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Búsqueda por categoría
-                Surface(
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(16.dp),
-                    color = White
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "🏷️", fontSize = 14.sp)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        BasicTextField(
-                            value = uiState.categoryQuery,
-                            onValueChange = { viewModel.onCategoryQueryChanged(it) },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            decorationBox = { innerTextField ->
-                                if (uiState.categoryQuery.isEmpty()) {
-                                    Text(
-                                        text = "Categoría...",
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            color = Color.Gray
-                                        )
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        )
-                    }
-                }
-
-                // Control de estrellas
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = White.copy(alpha = 0.15f),
-                    border = BorderStroke(1.dp, White.copy(alpha = 0.25f))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = TablerIcons.ChevronDown,
-                            contentDescription = "Bajar estrellas",
-                            tint = White,
-                            modifier = Modifier
-                                .size(20.dp)
-                                .clickable {
-                                    val current = uiState.minStars?.toInt() ?: 1
-                                    if (current <= 1) {
-                                        viewModel.onMinStarsSelected(null)
-                                    } else {
-                                        viewModel.onMinStarsSelected((current - 1).toDouble())
-                                    }
-                                }
-                        )
-
-                        Text(
-                            text = "⭐ ${uiState.minStars?.toInt() ?: "-"}",
-                            color = White,
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-
-                        Icon(
-                            imageVector = TablerIcons.ChevronUp,
-                            contentDescription = "Subir estrellas",
-                            tint = White,
-                            modifier = Modifier
-                                .size(20.dp)
-                                .clickable {
-                                    val current = uiState.minStars?.toInt() ?: 0
-                                    if (current >= 5) {
-                                        viewModel.onMinStarsSelected(5.0)
-                                    } else {
-                                        viewModel.onMinStarsSelected((current + 1).toDouble())
-                                    }
-                                }
-                        )
-                    }
-                }
-            }
-        }
+            },
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
 
         // Botón centrar
         Column(
@@ -320,6 +180,457 @@ actual fun ClientMapScreen(
                     .align(Alignment.BottomCenter)
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun ClientMapPremiumHeader(
+    searchQuery: String,
+    categoryQuery: String,
+    minStars: Double?,
+    onSearchQueryChange: (String) -> Unit,
+    onCategoryQueryChange: (String) -> Unit,
+    onDecreaseStars: () -> Unit,
+    onIncreaseStars: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "client_map_header")
+
+    val leftBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.035f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "left_badge_scale"
+    )
+
+    val rightBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.03f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2100, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "right_badge_scale"
+    )
+
+    val bubbleOffsetLarge by infiniteTransition.animateFloat(
+        initialValue = -4f,
+        targetValue = 6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_large"
+    )
+
+    val bubbleOffsetSmall by infiniteTransition.animateFloat(
+        initialValue = 5f,
+        targetValue = -5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_small"
+    )
+
+    val bubbleScaleLarge by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_large"
+    )
+
+    val bubbleScaleSmall by infiniteTransition.animateFloat(
+        initialValue = 0.96f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_small"
+    )
+
+    val shimmerOffset by infiniteTransition.animateFloat(
+        initialValue = -260f,
+        targetValue = 620f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer_offset"
+    )
+
+    val entranceVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        entranceVisible.value = true
+    }
+
+    AnimatedVisibility(
+        visible = entranceVisible.value,
+        enter = fadeIn(
+            animationSpec = tween(500)
+        ) + slideInVertically(
+            initialOffsetY = { -it / 3 },
+            animationSpec = tween(600, easing = FastOutSlowInEasing)
+        )
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+                .background(BrandBlue)
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(140.dp)
+                        .offset(x = shimmerOffset.dp)
+                        .graphicsLayer {
+                            rotationZ = -18f
+                            alpha = 0.14f
+                        }
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    White.copy(alpha = 0.42f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 22.dp, top = 20.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetLarge
+                            scaleX = bubbleScaleLarge
+                            scaleY = bubbleScaleLarge
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.08f))
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .align(Alignment.BottomStart)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetSmall
+                            scaleX = bubbleScaleSmall
+                            scaleY = bubbleScaleSmall
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.10f))
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(start = 18.dp, end = 18.dp, top = 6.dp, bottom = 10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .graphicsLayer {
+                                scaleX = leftBadgeScale
+                                scaleY = leftBadgeScale
+                            }
+                            .clip(RoundedCornerShape(999.dp))
+                            .background(White.copy(alpha = 0.14f))
+                            .border(
+                                width = 1.dp,
+                                color = White.copy(alpha = 0.16f),
+                                shape = RoundedCornerShape(999.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Servi",
+                            color = White,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = "Ya",
+                            color = BrandRed,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+
+                    Text(
+                        text = "MAPA",
+                        modifier = Modifier
+                            .graphicsLayer {
+                                scaleX = rightBadgeScale
+                                scaleY = rightBadgeScale
+                            }
+                            .clip(RoundedCornerShape(999.dp))
+                            .background(White.copy(alpha = 0.14f))
+                            .border(
+                                width = 1.dp,
+                                color = White.copy(alpha = 0.16f),
+                                shape = RoundedCornerShape(999.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        color = White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Encuentra trabajadores por nombre, categoría o calificación",
+                    color = White.copy(alpha = 0.88f),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(22.dp),
+                    color = White.copy(alpha = 0.10f),
+                    border = BorderStroke(1.dp, White.copy(alpha = 0.12f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        PremiumMapSearchField(
+                            value = searchQuery,
+                            onValueChange = onSearchQueryChange,
+                            placeholder = "Buscar trabajador por nombre...",
+                            leadingIcon = TablerIcons.User
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            PremiumMapSearchField(
+                                value = categoryQuery,
+                                onValueChange = onCategoryQueryChange,
+                                placeholder = "Categoría...",
+                                leadingIcon = TablerIcons.Tag,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            PremiumStarsControl(
+                                minStars = minStars,
+                                onDecrease = onDecreaseStars,
+                                onIncrease = onIncreaseStars
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumMapSearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    leadingIcon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        shape = RoundedCornerShape(18.dp),
+        color = White,
+        border = BorderStroke(
+            1.dp,
+            if (value.isNotBlank()) BrandBlue.copy(alpha = 0.18f) else BorderSoft
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(if (value.isNotBlank()) SoftBlueSurface else AppBackground),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = null,
+                    tint = if (value.isNotBlank()) BrandBlue else InactiveSoft,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    color = TextBluePrimary,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (value.isEmpty()) {
+                            Text(
+                                text = placeholder,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = InactiveSoft
+                                )
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+
+            if (value.isNotBlank()) {
+                Spacer(modifier = Modifier.width(6.dp))
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(SoftSurface)
+                        .clickable { onValueChange("") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.X,
+                        contentDescription = "Limpiar",
+                        tint = BlueGrayText,
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumStarsControl(
+    minStars: Double?,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.height(48.dp),
+        shape = RoundedCornerShape(18.dp),
+        color = White,
+        border = BorderStroke(1.dp, ClientSectionCardBorder)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(26.dp)
+                    .clip(CircleShape)
+                    .background(SoftSurface)
+                    .clickable { onDecrease() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = TablerIcons.ChevronDown,
+                    contentDescription = "Bajar estrellas",
+                    tint = BlueGrayText,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = SoftBlueSurface
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.Star,
+                        contentDescription = null,
+                        tint = BrandBlue,
+                        modifier = Modifier.size(13.dp)
+                    )
+
+                    Text(
+                        text = minStars?.toInt()?.toString() ?: "-",
+                        color = BrandBlue,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(26.dp)
+                    .clip(CircleShape)
+                    .background(SoftSurface)
+                    .clickable { onIncrease() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = TablerIcons.ChevronUp,
+                    contentDescription = "Subir estrellas",
+                    tint = BlueGrayText,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
         }
     }
 }

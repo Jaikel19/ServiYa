@@ -71,6 +71,8 @@ val AccentYellow = Color(0xFFFBBF24)
 val Success = Color(0xFF16A34A)
 val Warning = Color(0xFFF59E0B)
 val Info = Color(0xFF3B82F6)
+val ErrorRedSoft = Color(0xFFFFF1F0)
+val ErrorText = Color(0xFFDC2626)
 
 // Dark mode base
 val DarkBackground = Color(0xFF0F172A)
@@ -115,7 +117,7 @@ val StatusCompletedText = BrandBlue
 val StatusCancelledBackground = Color(0xFFFCE9E9)
 val StatusCancelledText = BrandRed
 
-//Dashboard
+// Dashboard
 val VibrantRed = Color(0xFFFF3B30)
 val ActiveChipBackground = Color(0xFFFFE7E3)
 val ActiveChipText = Color(0xFFFF3B30)

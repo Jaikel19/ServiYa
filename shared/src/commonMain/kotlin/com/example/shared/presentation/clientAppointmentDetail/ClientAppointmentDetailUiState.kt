@@ -39,6 +39,4 @@ data class ClientAppointmentDetailUiState(
     val canReview: Boolean
         get() = appointment?.status.equals("completed", ignoreCase = true) &&
                 !reviewMeta.clientToWorkerCreated
-
-
 }

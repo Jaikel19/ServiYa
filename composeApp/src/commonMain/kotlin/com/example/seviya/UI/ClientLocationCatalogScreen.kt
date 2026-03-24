@@ -1,21 +1,34 @@
 package com.example.seviya.UI
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -46,35 +59,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.AppBackground
-import com.example.seviya.theme.AvatarBlueSoft
-import com.example.seviya.theme.BlueGrayText
-import com.example.seviya.theme.BorderSoft
-import com.example.seviya.theme.BrandBlue
-import com.example.seviya.theme.BrandRed
-import com.example.seviya.theme.CardSurface
-import com.example.seviya.theme.DividerSoft
-import com.example.seviya.theme.SubtitleOnBlue
-import com.example.seviya.theme.TextPrimary
-import com.example.seviya.theme.TextSecondary
-import com.example.seviya.theme.White
+import com.example.seviya.theme.*
 import com.example.shared.domain.entity.Address
 import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
 import compose.icons.TablerIcons
-import compose.icons.tablericons.ArrowLeft
-import compose.icons.tablericons.Briefcase
-import compose.icons.tablericons.Pencil
-import compose.icons.tablericons.Home
-import compose.icons.tablericons.MapPin
-import compose.icons.tablericons.Trash
-import compose.icons.tablericons.X
+import compose.icons.tablericons.*
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,48 +95,22 @@ fun ClientLocationCatalogScreen(
     }
 
     Scaffold(
-        containerColor = AppBackground
+        containerColor = White
     ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                // --- Header ---
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = BrandBlue,
-                            shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-                        )
-                        .systemBarsPadding()
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 16.dp, bottom = 32.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(White.copy(alpha = 0.2f))
-                            .clickable { onBack() }
-                            .align(Alignment.CenterStart),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = TablerIcons.ArrowLeft,
-                            contentDescription = "Volver",
-                            tint = White,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
-                    Text(
-                        text = "Mis Ubicaciones",
-                        color = White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(White)
+            ) {
+                ClientLocationCatalogTopHeader(
+                    onBack = onBack
+                )
 
-                // --- Content ---
                 if (uiState.isLoading) {
                     Box(
                         modifier = Modifier
@@ -150,11 +124,12 @@ fun ClientLocationCatalogScreen(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                            .padding(innerPadding)
+                            .background(White),
+                        contentPadding = PaddingValues(
                             start = 16.dp,
                             end = 16.dp,
-                            top = 16.dp,
+                            top = 1.dp,
                             bottom = 100.dp
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -181,7 +156,6 @@ fun ClientLocationCatalogScreen(
                 }
             }
 
-            // --- FAB: Agregar ubicación ---
             Button(
                 onClick = {
                     editingAddress = null
@@ -207,7 +181,6 @@ fun ClientLocationCatalogScreen(
         }
     }
 
-    // --- Bottom Sheet: Agregar / Editar ---
     if (showSheet) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
@@ -234,6 +207,261 @@ fun ClientLocationCatalogScreen(
 }
 
 @Composable
+private fun ClientLocationCatalogTopHeader(
+    onBack: () -> Unit
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "location_catalog_header")
+
+    val leftBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.035f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "left_badge_scale"
+    )
+
+    val rightBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.03f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2100, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "right_badge_scale"
+    )
+
+    val bubbleOffsetLarge by infiniteTransition.animateFloat(
+        initialValue = -4f,
+        targetValue = 6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_large"
+    )
+
+    val bubbleOffsetSmall by infiniteTransition.animateFloat(
+        initialValue = 5f,
+        targetValue = -5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_small"
+    )
+
+    val bubbleScaleLarge by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_large"
+    )
+
+    val bubbleScaleSmall by infiniteTransition.animateFloat(
+        initialValue = 0.96f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_small"
+    )
+
+    val shimmerOffset by infiniteTransition.animateFloat(
+        initialValue = -260f,
+        targetValue = 620f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer_offset"
+    )
+
+    val arrowFloat by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "arrow_float"
+    )
+
+    val entranceVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        entranceVisible.value = true
+    }
+
+    AnimatedVisibility(
+        visible = entranceVisible.value,
+        enter = fadeIn(
+            animationSpec = tween(500)
+        ) + slideInVertically(
+            initialOffsetY = { -it / 3 },
+            animationSpec = tween(600, easing = FastOutSlowInEasing)
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+                .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
+                .background(BrandBlue)
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(140.dp)
+                        .offset(x = shimmerOffset.dp)
+                        .graphicsLayer {
+                            rotationZ = -18f
+                            alpha = 0.16f
+                        }
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    White.copy(alpha = 0.45f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .statusBarsPadding()
+                    .padding(start = 20.dp, top = 6.dp)
+                    .graphicsLayer {
+                        scaleX = leftBadgeScale
+                        scaleY = leftBadgeScale
+                    }
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(White.copy(alpha = 0.14f))
+                    .border(
+                        width = 1.dp,
+                        color = White.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(999.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .graphicsLayer {
+                            translationY = arrowFloat
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.14f))
+                        .clickable { onBack() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.ArrowLeft,
+                        contentDescription = "Volver",
+                        tint = White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Servi",
+                        color = White,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Text(
+                        text = "Ya",
+                        color = BrandRed,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
+
+            Text(
+                text = "UBICACIONES",
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .statusBarsPadding()
+                    .padding(end = 20.dp, top = 6.dp)
+                    .graphicsLayer {
+                        scaleX = rightBadgeScale
+                        scaleY = rightBadgeScale
+                    }
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(White.copy(alpha = 0.14f))
+                    .border(
+                        width = 1.dp,
+                        color = White.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(999.dp)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                color = White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 24.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(82.dp)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetLarge
+                            scaleX = bubbleScaleLarge
+                            scaleY = bubbleScaleLarge
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.08f))
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .align(Alignment.BottomStart)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetSmall
+                            scaleX = bubbleScaleSmall
+                            scaleY = bubbleScaleSmall
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.10f))
+                )
+            }
+        }
+    }
+}
+
+private fun formatCoordinate(value: Double): String {
+    val rounded = (value * 100000.0).roundToInt() / 100000.0
+    return rounded.toString()
+}
+
+private fun formatLocationLabel(lat: Double, lng: Double): String {
+    return "${formatCoordinate(lat)}, ${formatCoordinate(lng)}"
+}
+
+@Composable
 private fun LocationCard(
     address: Address,
     onEdit: () -> Unit,
@@ -248,7 +476,6 @@ private fun LocationCard(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Icon background
         Box(
             modifier = Modifier
                 .size(52.dp)
@@ -257,7 +484,8 @@ private fun LocationCard(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = if (address.alias.lowercase().contains("trabajo") ||
+                imageVector = if (
+                    address.alias.lowercase().contains("trabajo") ||
                     address.alias.lowercase().contains("oficina")
                 ) TablerIcons.Briefcase else TablerIcons.Home,
                 contentDescription = null,
@@ -302,7 +530,6 @@ private fun LocationCard(
 
         Spacer(modifier = Modifier.width(4.dp))
 
-        // Edit button
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -318,7 +545,6 @@ private fun LocationCard(
             )
         }
 
-        // Delete button
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -395,8 +621,11 @@ private fun AddEditLocationForm(
     var longitude by remember(initial) { mutableStateOf(initial?.longitude ?: 0.0) }
     var locationLabel by remember(initial) {
         mutableStateOf(
-            if ((initial?.latitude ?: 0.0) != 0.0) "%.5f, %.5f".format(initial!!.latitude, initial.longitude)
-            else "Sin ubicación GPS"
+            if ((initial?.latitude ?: 0.0) != 0.0) {
+                formatLocationLabel(initial!!.latitude, initial.longitude)
+            } else {
+                "Sin ubicación GPS"
+            }
         )
     }
 
@@ -412,7 +641,6 @@ private fun AddEditLocationForm(
             .padding(bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Sheet handle / title row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -443,7 +671,6 @@ private fun AddEditLocationForm(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Step 1: Map placeholder
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -471,7 +698,9 @@ private fun AddEditLocationForm(
                     letterSpacing = 1.sp
                 )
             }
+
             Spacer(modifier = Modifier.height(12.dp))
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -503,7 +732,7 @@ private fun AddEditLocationForm(
                 onLocationObtained = { lat, lng, prov, cant, dist ->
                     latitude = lat
                     longitude = lng
-                    locationLabel = "%.5f, %.5f".format(lat, lng)
+                    locationLabel = formatLocationLabel(lat, lng)
                     if (prov.isNotBlank()) province = prov
                     if (cant.isNotBlank()) canton = cant
                     if (dist.isNotBlank()) district = dist
@@ -514,7 +743,6 @@ private fun AddEditLocationForm(
             )
         }
 
-        // Step 2: Form
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -622,7 +850,11 @@ private fun AddEditLocationForm(
             shape = RoundedCornerShape(16.dp)
         ) {
             if (isSaving) {
-                CircularProgressIndicator(color = White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(
+                    color = White,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
             } else {
                 Text(
                     text = if (isEditing) "Actualizar Ubicación" else "Guardar Ubicación",
