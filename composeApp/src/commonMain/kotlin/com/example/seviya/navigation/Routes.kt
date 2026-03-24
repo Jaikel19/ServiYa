@@ -18,6 +18,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable object ClientRequests
 
+@Serializable object ClientHome
+
 @Serializable object ClientDashboard
 @Serializable object ClientAgenda
 @Serializable object ClientProfile
