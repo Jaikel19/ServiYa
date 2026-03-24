@@ -1,16 +1,44 @@
 package com.example.seviya.UI
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,126 +47,148 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.seviya.theme.AppBackgroundAlt
+import com.example.seviya.theme.BorderSoft
+import com.example.seviya.theme.BrandBlue
+import com.example.seviya.theme.BrandBlueDeep
+import com.example.seviya.theme.BrandRed
+import com.example.seviya.theme.InactiveSoft
+import com.example.seviya.theme.SoftBlueSurface
+import com.example.seviya.theme.TextBluePrimary
+import com.example.seviya.theme.TextSecondary
+import com.example.seviya.theme.White
+import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeUiState
+import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Check
+import compose.icons.tablericons.ChevronLeft
+import compose.icons.tablericons.Clock
+import compose.icons.tablericons.InfoCircle
 
-private object Brand {
-    val Blue = Color(0xFF004AAD)
-    val BlueDark = Color(0xFF002D69)
-    val Red = Color(0xFFEF4444)
-    val Bg = Color(0xFFF8FAFC)
-    val TextMuted = Color(0xFF64748B)
-    val Border = Color(0xFFEAEAF2)
+@Composable
+fun TravelTimeConfigRoute(
+    workerId: String,
+    viewModel: WorkerTravelTimeViewModel,
+    onBack: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(workerId) {
+        viewModel.loadData(workerId)
+    }
+
+    TravelTimeConfigScreen(
+        uiState = uiState,
+        onBack = onBack,
+        onMinutesChange = { viewModel.updateMinutesText(it) },
+        onSave = { viewModel.save(workerId) },
+        onClearSaveSuccess = { viewModel.clearSaveSuccess() }
+    )
 }
-
-private enum class BottomTab { HOME, SERVICES, LOGIN, REGISTER }
 
 @Composable
 fun TravelTimeConfigScreen(
-    initialMinutes: Int? = null,
+    uiState: WorkerTravelTimeUiState,
     onBack: () -> Unit,
-    onSave: (minutes: Int) -> Unit,
-    // para que también se vea como el wireframe de Categorías con bottom bar:
-    onGoHome: () -> Unit = {},
-    onGoServices: () -> Unit = {},
-    onGoRegister: () -> Unit = {}
+    onMinutesChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onClearSaveSuccess: () -> Unit
 ) {
-    var minutesText by rememberSaveable { mutableStateOf(initialMinutes?.toString() ?: "") }
-    val minutesValue = minutesText.toIntOrNull()
-    val isValid = minutesValue != null && minutesValue in 0..600
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.saveSuccess) {
+        if (uiState.saveSuccess) {
+            snackbarHostState.showSnackbar("Tiempo de traslado guardado correctamente")
+            onClearSaveSuccess()
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
 
     Scaffold(
-        containerColor = Brand.Bg,
-
-    ) { padding ->
-
+        containerColor = AppBackgroundAlt,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(snackbarData = data, containerColor = BrandBlue, contentColor = White)
+            }
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header tipo Categorías (ola)
-            HeaderWave(
-                title = "Configuración",
-                onBack = onBack
-            )
+            TravelTimeHeader(onBack = onBack)
 
-            // Contenido
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 18.dp, bottom = 22.dp)
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
-                // Ícono circular centrado (puedes reemplazar "🚗" por imagen luego)
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .clip(CircleShape)
-                            .background(Brand.Blue.copy(alpha = 0.10f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("🚗", fontSize = 38.sp)
-                    }
-                }
-
-                Spacer(Modifier.height(18.dp))
-
                 Text(
-                    text = "Tiempo de Traslado",
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    ),
-                    color = Color(0xFF0F172A)
+                    text = "Configurar Tiempo de Traslado",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = TextBluePrimary
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Ajusta el tiempo de margen para tus desplazamientos.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
                 )
 
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(20.dp))
 
-                Text(
-                    text = "Este tiempo se utilizará para bloquear automáticamente tu agenda entre servicios, " +
-                            "permitiéndote desplazarte sin contratiempos entre un cliente y otro.",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = Brand.TextMuted,
-                        lineHeight = 22.sp
-                    )
-                )
-
-                Spacer(Modifier.height(18.dp))
-
-                // Card input estilo moderno
                 Card(
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(Modifier.padding(18.dp)) {
+                    Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                            text = "Minutos de traslado estimados",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                            color = Color(0xFF334155)
+                            text = "TIEMPO DE TRASLADO (MINUTOS)",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.1.sp
+                            ),
+                            color = TextSecondary
                         )
-
                         Spacer(Modifier.height(10.dp))
-
                         OutlinedTextField(
-                            value = minutesText,
-                            onValueChange = { raw ->
-                                minutesText = raw.filter { it.isDigit() }.take(3)
+                            value = uiState.minutesText,
+                            onValueChange = onMinutesChange,
+                            placeholder = {
+                                Text(
+                                    "Ej. 30",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = InactiveSoft
+                                )
                             },
-                            placeholder = { Text("Ej: 30") },
                             trailingIcon = {
-                                Text("🕒", fontSize = 18.sp, color = Color(0xFF94A3B8))
+                                Text(
+                                    "min",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = TextSecondary,
+                                    modifier = Modifier.padding(end = 4.dp)
+                                )
                             },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -146,246 +196,259 @@ fun TravelTimeConfigScreen(
                                 .fillMaxWidth()
                                 .height(58.dp),
                             shape = RoundedCornerShape(16.dp),
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = BrandBlue
+                            ),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Brand.Blue,
-                                unfocusedBorderColor = Color(0xFFCBD5E1),
-                                cursorColor = Brand.Blue
+                                focusedBorderColor = BrandBlue,
+                                unfocusedBorderColor = BorderSoft,
+                                cursorColor = BrandBlue
                             )
                         )
 
-                        Spacer(Modifier.height(8.dp))
+                        if (!uiState.isValid && uiState.minutesText.isNotBlank()) {
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                text = "Ingresa un valor entre 0 y 600.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = BrandRed
+                            )
+                        }
 
-                        Text(
-                            text = "Sugerencia: 20–40 minutos suele ser lo habitual.",
-                            style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFF94A3B8))
-                        )
+                        Spacer(Modifier.height(16.dp))
+
+                        InfoNote(text = "Este tiempo se usará automáticamente para bloquear tu agenda entre servicios.")
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Button(
+                            onClick = onSave,
+                            enabled = uiState.isValid && !uiState.isSaving,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = BrandBlue,
+                                disabledContainerColor = InactiveSoft.copy(alpha = 0.35f),
+                                contentColor = White,
+                                disabledContentColor = White.copy(alpha = 0.75f)
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                        ) {
+                            if (uiState.isSaving) {
+                                CircularProgressIndicator(
+                                    color = White,
+                                    strokeWidth = 2.dp,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Text(
+                                    "Guardar Cambios",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Icon(
+                                    imageVector = TablerIcons.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
                     }
                 }
 
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(20.dp))
 
-                // Nota roja (alerta)
-                WarningNote(
-                    text = "Asegúrate de que este tiempo sea realista para evitar retrasos con tus próximos clientes."
-                )
-
-                Spacer(Modifier.height(18.dp))
-
-                Button(
-                    onClick = { minutesValue?.let(onSave) },
-                    enabled = isValid,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Brand.Blue,
-                        disabledContainerColor = Brand.Blue.copy(alpha = 0.35f)
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
-                ) {
-                    Text("💾", fontSize = 16.sp)
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        "Guardar Cambios",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                        color = Color.White
-                    )
-                }
-
-                if (!isValid && minutesText.isNotBlank()) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "Ingresa un número válido (0–600).",
-                        color = Brand.Red,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+                AgendaPreviewCard(travelMinutes = uiState.minutesValue ?: 30)
             }
         }
     }
 }
 
 @Composable
-private fun HeaderWave(
-    title: String,
-    onBack: () -> Unit
-) {
+private fun TravelTimeHeader(onBack: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(190.dp)
-            .drawBehind {
-                // Fondo gradient
-                drawRect(
-                    brush = Brush.linearGradient(
-                        colors = listOf(Brand.Blue, Brand.BlueDark),
-                        start = Offset(0f, 0f),
-                        end = Offset(size.width, size.height)
-                    )
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(Color(0xFF003D96), Color(0xFF0052C2))
                 )
-
-                // Recorte tipo “ellipse/ola” (similar al wireframe Categorías)
-                val w = size.width
-                val h = size.height
-                val path = Path().apply {
-                    moveTo(0f, 0f)
-                    lineTo(w, 0f)
-                    lineTo(w, h * 0.78f)
-                    cubicTo(
-                        w * 0.75f, h * 1.05f,
-                        w * 0.25f, h * 1.05f,
-                        0f, h * 0.78f
-                    )
-                    close()
-                }
-                // Pintamos una “máscara” encima? No hace falta: ya es fondo completo.
-                // La sensación de ola la da el contenido debajo (bg claro).
-            }
+            )
+            .statusBarsPadding()
+            .padding(horizontal = 8.dp)
+            .height(56.dp),
+        contentAlignment = Alignment.CenterStart
     ) {
-        // Top row: back + title centrado (como config)
-        Row(
+        IconButton(
+            onClick = onBack,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 44.dp, start = 16.dp, end = 16.dp),
+                .size(40.dp)
+                .clip(CircleShape)
+        ) {
+            Icon(
+                imageVector = TablerIcons.ChevronLeft,
+                contentDescription = "Volver",
+                tint = White,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Back (círculo transparente)
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center
-            ) {
-                TextButton(onClick = onBack, contentPadding = PaddingValues(0.dp)) {
-                    Text("‹", color = Color.White, fontSize = 28.sp)
-                }
-            }
-
-            Spacer(Modifier.weight(1f))
-
             Text(
-                text = title,
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
-                textAlign = TextAlign.Center
+                text = buildAnnotatedString {
+                    withStyle(
+                        SpanStyle(
+                            color = White,
+                            fontWeight = FontWeight.Black,
+                            fontStyle = FontStyle.Italic
+                        )
+                    ) { append("Servi") }
+                    withStyle(
+                        SpanStyle(
+                            color = BrandRed,
+                            fontWeight = FontWeight.Black,
+                            fontStyle = FontStyle.Italic
+                        )
+                    ) { append("Ya") }
+                },
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 22.sp)
             )
-
-            Spacer(Modifier.weight(1f))
-
-            // placeholder para balance (mismo ancho que el back)
-            Spacer(Modifier.width(40.dp))
         }
+
+        Text(
+            text = "Configuración",
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+                fontSize = 10.sp
+            ),
+            color = White.copy(alpha = 0.70f),
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 16.dp)
+        )
     }
 }
 
 @Composable
-private fun WarningNote(text: String) {
+private fun InfoNote(text: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(Brand.Red.copy(alpha = 0.10f))
-            .leftAccent(Brand.Red, 4.dp)
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .clip(RoundedCornerShape(14.dp))
+            .background(SoftBlueSurface)
+            .blueLeftBorder(BrandBlue, 4.dp)
+            .padding(12.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Box(
-            modifier = Modifier
-                .size(30.dp)
-                .clip(CircleShape)
-                .background(Brand.Red.copy(alpha = 0.18f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("i", color = Brand.Red, fontWeight = FontWeight.Black)
-        }
-        Spacer(Modifier.width(12.dp))
+        Icon(
+            imageVector = TablerIcons.InfoCircle,
+            contentDescription = null,
+            tint = BrandBlue,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(Modifier.width(10.dp))
         Text(
             text = text,
-            color = Brand.Red,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+            style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.sp),
+            color = TextBluePrimary
         )
     }
 }
 
-private fun Modifier.leftAccent(color: Color, width: Dp): Modifier =
-    this.then(
-        Modifier.drawBehind {
-            drawRect(
-                color = color,
-                topLeft = Offset(0f, 0f),
-                size = Size(width.toPx(), size.height)
-            )
-        }
-    )
-
 @Composable
-private fun ConfigBottomBar(
-    active: BottomTab,
-    onHome: () -> Unit,
-    onServices: () -> Unit,
-    onLogin: () -> Unit,
-    onRegister: () -> Unit
-) {
-    NavigationBar(
-        containerColor = Color.White.copy(alpha = 0.92f),
-        tonalElevation = 10.dp,
-        modifier = Modifier.border(1.dp, Brand.Border)
+private fun AgendaPreviewCard(travelMinutes: Int) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.70f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        BottomItem(
-            label = "Inicio",
-            glyph = "🏠",
-            active = active == BottomTab.HOME,
-            onClick = onHome
-        )
-        BottomItem(
-            label = "Servicios",
-            glyph = "🧭",
-            active = active == BottomTab.SERVICES,
-            onClick = onServices
-        )
-        BottomItem(
-            label = "Ingresar",
-            glyph = "🔑",
-            active = active == BottomTab.LOGIN,
-            onClick = onLogin
-        )
-        BottomItem(
-            label = "Registrarse",
-            glyph = "👤+",
-            active = active == BottomTab.REGISTER,
-            onClick = onRegister
-        )
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = TablerIcons.Clock,
+                    contentDescription = null,
+                    tint = BrandBlue,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = "Vista previa en agenda",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    color = TextBluePrimary
+                )
+            }
+
+            Spacer(Modifier.height(14.dp))
+
+            val endTotalMinutes = 11 * 60 + travelMinutes
+            val endHour = endTotalMinutes / 60
+            val endMin = endTotalMinutes % 60
+            val endTime = "$endHour:${endMin.toString().padStart(2, '0')}"
+
+            AgendaRow(time = "10:00", label = "Servicio: Limpieza", isTravel = false)
+            Spacer(Modifier.height(6.dp))
+            AgendaRow(time = "11:00", label = "Traslado ($travelMinutes min)", isTravel = true)
+            Spacer(Modifier.height(6.dp))
+            AgendaRow(time = endTime, label = "Servicio: Jardinería", isTravel = false)
+        }
     }
 }
 
 @Composable
-private fun RowScope.BottomItem(
-    label: String,
-    glyph: String,
-    active: Boolean,
-    onClick: () -> Unit
-) {
-    NavigationBarItem(
-        selected = active,
-        onClick = onClick,
-        icon = {
-            Text(
-                text = glyph,
-                fontSize = 18.sp,
-                color = if (active) Brand.Blue else Color(0xFF94A3B8)
-            )
-        },
-        label = {
+private fun AgendaRow(time: String, label: String, isTravel: Boolean) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = time,
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = if (isTravel) BrandBlue else TextSecondary,
+            modifier = Modifier.width(44.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(if (isTravel) 28.dp else 40.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(
+                    if (isTravel) BrandBlue.copy(alpha = 0.10f) else White
+                )
+                .then(
+                    if (isTravel) Modifier else Modifier.background(White)
+                ),
+            contentAlignment = Alignment.CenterStart
+        ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                color = if (active) Brand.Blue else Color(0xFF94A3B8)
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = if (isTravel) FontWeight.Bold else FontWeight.SemiBold,
+                    letterSpacing = if (isTravel) 0.5.sp else 0.sp
+                ),
+                color = if (isTravel) BrandBlue else TextBluePrimary,
+                modifier = Modifier.padding(horizontal = 10.dp)
             )
-        },
-        colors = NavigationBarItemDefaults.colors(
-            indicatorColor = Color.Transparent
-        )
-    )
+        }
+    }
 }
+
+private fun Modifier.blueLeftBorder(color: Color, width: Dp): Modifier =
+    this.drawBehind {
+        drawRect(
+            color = color,
+            topLeft = Offset(0f, 0f),
+            size = Size(width.toPx(), size.height)
+        )
+    }

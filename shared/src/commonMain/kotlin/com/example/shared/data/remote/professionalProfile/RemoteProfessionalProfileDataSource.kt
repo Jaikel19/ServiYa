@@ -191,4 +191,19 @@ class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource
             .document(workerId)
             .update("categories" to categoryIds)
     }
+
+    override suspend fun getWorkerTravelTime(workerId: String): Flow<Int> {
+        return db.collection("users")
+            .document(workerId)
+            .snapshots
+            .map { snapshot ->
+                snapshot.get<Long>("travelTime")?.toInt() ?: 0
+            }
+    }
+
+    override suspend fun updateTravelTime(workerId: String, minutes: Int) {
+        db.collection("users")
+            .document(workerId)
+            .update("travelTime" to minutes)
+    }
 }

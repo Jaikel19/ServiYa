@@ -25,4 +25,6 @@ interface IRemoteProfessionalProfileDataSource {
     suspend fun addFavorite(clientId: String, workerId: String)
     suspend fun removeFavorite(clientId: String, workerId: String)
     suspend fun updateWorkerCategories(workerId: String, categoryIds: List<String>)
+    suspend fun getWorkerTravelTime(workerId: String): Flow<Int>
+    suspend fun updateTravelTime(workerId: String, minutes: Int)
 }
