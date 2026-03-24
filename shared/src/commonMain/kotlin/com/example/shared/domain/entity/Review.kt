@@ -8,15 +8,15 @@ data class Review(
     val appointmentId: String = "",
     val authorId: String = "",
     val authorRole: String = "",
+    val targetId: String = "",
+    val targetRole: String = "",
     val clientName: String = "",
     val workerName: String = "",
-    val comment: String = "",
-    val createdAt: Long = 0L,
-    val direction: String = "",
-    val images: List<String> = emptyList(),
     val rating: Int = 0,
-    val serviceSummary: List<String> = emptyList(),
-    val status: String = "",
-    val targetId: String = "",
-    val targetRole: String = ""
+    val comment: String = "",
+    val images: List<String> = emptyList(),
+    val direction: String = "",
+    val status: String = "published",
+    val serviceSummary: String = "",
+    val createdAt: String = ""
 )

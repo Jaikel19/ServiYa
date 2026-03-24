@@ -15,6 +15,10 @@ import com.example.shared.data.remote.OtpAppointment.IRemoteOtpAppointmentDataSo
 import com.example.shared.data.remote.OtpAppointment.RemoteOtpAppointmentDataSource
 import com.example.shared.data.remote.PaymentReceipt.IRemotePaymentReceiptDataSource
 import com.example.shared.data.remote.PaymentReceipt.RemotePaymentReceiptDataSource
+import com.example.shared.data.remote.Review.IRemoteReviewDataSource
+import com.example.shared.data.remote.Review.RemoteReviewDataSource
+import com.example.shared.data.remote.ReviewMeta.IRemoteReviewMetaDataSource
+import com.example.shared.data.remote.ReviewMeta.RemoteReviewMetaDataSource
 import com.example.shared.data.remote.User.IRemoteUserDataSource
 import com.example.shared.data.remote.User.RemoteUserDataSource
 import com.example.shared.data.remote.appointment.IRemoteAppointmentDataSource
@@ -41,6 +45,10 @@ import com.example.shared.data.repository.OtpAppointment.IOtpAppointmentReposito
 import com.example.shared.data.repository.OtpAppointment.OtpAppointmentRepository
 import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
 import com.example.shared.data.repository.PaymentReceipt.PaymentReceiptRepository
+import com.example.shared.data.repository.Review.IReviewRepository
+import com.example.shared.data.repository.Review.ReviewRepository
+import com.example.shared.data.repository.ReviewMeta.IReviewMetaRepository
+import com.example.shared.data.repository.ReviewMeta.ReviewMetaRepository
 import com.example.shared.data.repository.User.IUserRepository
 import com.example.shared.data.repository.User.UserRepository
 import com.example.shared.data.repository.categories.CategoryRepository
@@ -110,6 +118,13 @@ val dataModule = module {
     single<IRemoteFavoriteWorkersDataSource> { RemoteFavoriteWorkersDataSource() }
     single<IFavoriteWorkersRepository> { FavoriteWorkersRepository(get(), get()) }
 
+    // review
+    single<IRemoteReviewDataSource> { RemoteReviewDataSource() }
+    single<IReviewRepository> { ReviewRepository(get()) }
+
+    // reviewMeta
+    single<IRemoteReviewMetaDataSource> { RemoteReviewMetaDataSource() }
+    single<IReviewMetaRepository> { ReviewMetaRepository(get()) }
 
     single<IRemoteUserDataSource> { RemoteUserDataSource() }
     single<IUserRepository> { UserRepository(get()) }

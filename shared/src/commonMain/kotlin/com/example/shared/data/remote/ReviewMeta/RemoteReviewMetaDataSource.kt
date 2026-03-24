@@ -10,74 +10,80 @@ class RemoteReviewMetaDataSource : IRemoteReviewMetaDataSource {
 
     private val db = Firebase.firestore
 
-    // GET (realtime)
     override suspend fun getReviewMeta(appointmentId: String): Flow<ReviewMeta?> {
         return db.collection("appointments")
             .document(appointmentId)
             .collection("reviewMeta")
+            .document("meta")
             .snapshots
-            .map { snapshot ->
-                snapshot.documents.firstOrNull()?.let { doc ->
-                    try {
+            .map { doc ->
+                try {
+                    if (doc.exists) {
                         doc.data<ReviewMeta>().copy(id = doc.id)
-                    } catch (e: Exception) {
-                        println("ERROR parsing reviewMeta: ${e.message}")
-                        null
+                    } else {
+                        ReviewMeta(id = "meta")
                     }
+                } catch (e: Exception) {
+                    println("ERROR parsing reviewMeta: ${e.message}")
+                    ReviewMeta(id = "meta")
                 }
             }
     }
 
-    // CREATE
-    override suspend fun createReviewMeta(appointmentId: String, reviewMeta: ReviewMeta): String {
+    override suspend fun createReviewMeta(
+        appointmentId: String,
+        reviewMeta: ReviewMeta
+    ): String {
         return try {
-            val ref = db.collection("appointments")
+            db.collection("appointments")
                 .document(appointmentId)
                 .collection("reviewMeta")
-                .add(reviewMeta)
-            ref.id
+                .document("meta")
+                .set(reviewMeta.copy(id = "meta"))
+
+            "meta"
         } catch (e: Exception) {
             println("ERROR createReviewMeta: ${e.message}")
             ""
         }
     }
 
-    // UPDATE CLIENT TO WORKER
-    override suspend fun updateClientToWorkerReview(appointmentId: String, reviewId: String) {
+    override suspend fun updateClientToWorkerReview(
+        appointmentId: String,
+        reviewId: String
+    ) {
         try {
-            val snapshot = db.collection("appointments")
-                .document(appointmentId)
-                .collection("reviewMeta")
-                .get()
-            val docId = snapshot.documents.firstOrNull()?.id ?: return
             db.collection("appointments")
                 .document(appointmentId)
                 .collection("reviewMeta")
-                .document(docId)
-                .update(
-                    "clientToWorkerCreated" to true,
-                    "clientToWorkerReviewId" to reviewId
+                .document("meta")
+                .set(
+                    mapOf(
+                        "clientToWorkerCreated" to true,
+                        "clientToWorkerReviewId" to reviewId
+                    ),
+                    merge = true
                 )
         } catch (e: Exception) {
             println("ERROR updateClientToWorkerReview: ${e.message}")
         }
     }
 
-    // UPDATE WORKER TO CLIENT
-    override suspend fun updateWorkerToClientReview(appointmentId: String, reviewId: String) {
+    override suspend fun updateWorkerToClientReview(
+        appointmentId: String,
+        reviewId: String
+    ) {
         try {
-            val snapshot = db.collection("appointments")
-                .document(appointmentId)
-                .collection("reviewMeta")
-                .get()
-            val docId = snapshot.documents.firstOrNull()?.id ?: return
             db.collection("appointments")
                 .document(appointmentId)
                 .collection("reviewMeta")
-                .document(docId)
-                .update(
-                    "workerToClientCreated" to true,
-                    "workerToClientReviewId" to reviewId
+                .document("meta")
+                .set(
+                    mapOf(
+                        "workerToClientCreated" to true,
+                        "workerToClientReviewId" to reviewId
+                    ),
+                    merge = true
                 )
         } catch (e: Exception) {
             println("ERROR updateWorkerToClientReview: ${e.message}")

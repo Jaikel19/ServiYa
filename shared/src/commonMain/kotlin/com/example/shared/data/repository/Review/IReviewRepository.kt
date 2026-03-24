@@ -10,4 +10,6 @@ interface IReviewRepository {
     suspend fun createReview(review: Review): String
     suspend fun updateReviewStatus(reviewId: String, status: String)
     suspend fun deleteReview(reviewId: String)
+    suspend fun createWorkerToClientReview(review: Review): String
+    suspend fun createClientToWorkerReview(review: Review): String
 }
