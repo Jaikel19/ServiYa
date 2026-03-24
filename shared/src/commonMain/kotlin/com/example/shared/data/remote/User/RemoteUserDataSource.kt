@@ -8,30 +8,29 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class RemoteUserDataSource : IRemoteUserDataSource {
 
     private val db = Firebase.firestore
 
-    override suspend fun getAllWorkers(): Flow<List<User>> {
-        return db.collection("users")
-            .snapshots
-            .map { snapshot ->
-                println("DEBUG total docs encontrados: ${snapshot.documents.size}")
-                snapshot.documents.mapNotNull { doc ->
-                    try {
-                        if (doc.id == "_schema") return@mapNotNull null
-                        val user = parseUser(doc)
-                        if (user.role != "worker") return@mapNotNull null
-                        println("DEBUG parseado OK: ${user.name} - ${user.uid}")
-                        user
-                    } catch (e: Exception) {
-                        println("ERROR parsing user ${doc.id}: ${e.message}")
-                        null
-                    }
-                }
+    override suspend fun getAllWorkers(): Flow<List<User>> = flow {
+        val snapshot = db.collection("users").get()
+        println("DEBUG total docs encontrados: ${snapshot.documents.size}")
+        val workers = snapshot.documents.mapNotNull { doc ->
+            try {
+                if (doc.id == "_schema") return@mapNotNull null
+                val user = parseUser(doc)
+                if (user.role != "worker") return@mapNotNull null
+                println("DEBUG parseado OK: ${user.name} - ${user.uid}")
+                user
+            } catch (e: Exception) {
+                println("ERROR parsing user ${doc.id}: ${e.message}")
+                null
             }
+        }
+        emit(workers)
     }
 
     override suspend fun getUserById(userId: String): Flow<User?> {
@@ -48,22 +47,21 @@ class RemoteUserDataSource : IRemoteUserDataSource {
             }
     }
 
-    override suspend fun getWorkZonesByUser(userId: String): Flow<List<WorkZone>> {
-        return db.collection("users")
+    override suspend fun getWorkZonesByUser(userId: String): Flow<List<WorkZone>> = flow {
+        val snapshot = db.collection("users")
             .document(userId)
             .collection("workZones")
-            .snapshots
-            .map { snapshot ->
-                snapshot.documents.mapNotNull { doc ->
-                    try {
-                        if (doc.id == "_schema") return@mapNotNull null
-                        doc.data<WorkZone>().copy(id = doc.id)
-                    } catch (e: Exception) {
-                        println("ERROR parsing workZone ${doc.id}: ${e.message}")
-                        null
-                    }
-                }
+            .get()
+        val zones = snapshot.documents.mapNotNull { doc ->
+            try {
+                if (doc.id == "_schema") return@mapNotNull null
+                doc.data<WorkZone>().copy(id = doc.id)
+            } catch (e: Exception) {
+                println("ERROR parsing workZone ${doc.id}: ${e.message}")
+                null
             }
+        }
+        emit(zones)
     }
 
     override suspend fun getAddressesByUser(userId: String): Flow<List<Address>> {
@@ -95,18 +93,18 @@ class RemoteUserDataSource : IRemoteUserDataSource {
 
         return User(
             uid = doc.id,
-            name = doc.get<String>("name") ?: "",
-            email = doc.get<String>("email") ?: "",
-            identification = doc.get<String>("identification") ?: "",
-            phone = doc.get<String>("phone") ?: "",
-            status = doc.get<String>("status") ?: "",
-            profilePicture = doc.get<String>("profilePicture") ?: "",
-            role = doc.get<String>("role") ?: "",
+            name = doc.get<String?>("name") ?: "",
+            email = doc.get<String?>("email") ?: "",
+            identification = doc.get<String?>("identification") ?: "",
+            phone = doc.get<String?>("phone") ?: "",
+            status = doc.get<String?>("status") ?: "",
+            profilePicture = doc.get<String?>("profilePicture") ?: "",
+            role = doc.get<String?>("role") ?: "",
             stars = doc.get<Double>("stars"),
             trustScore = doc.get<Long>("trustScore")?.toInt(),
             travelTime = doc.get<Long>("travelTime")?.toInt(),
             categories = categories,
-            createdAt = doc.get<String>("createdAt") ?: ""
+            createdAt = doc.get<String?>("createdAt") ?: ""
         )
     }
 }

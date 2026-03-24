@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.User.IUserRepository
 import kotlin.math.PI
 import com.example.shared.domain.entity.Address
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +18,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
-import kotlinx.coroutines.withTimeoutOrNull
+
 class ClientMapViewModel(
     private val userRepository: IUserRepository
 ) : ViewModel() {
@@ -74,37 +77,36 @@ class ClientMapViewModel(
         _state.value = _state.value.copy(isLoading = true)
 
         try {
-            val workers = withTimeoutOrNull(10000) {
-                userRepository.getAllWorkers()
-                    .catch { emit(emptyList()) }
-                    .first { it.isNotEmpty() }
-            } ?: emptyList()
+            val workers = userRepository.getAllWorkers()
+                .catch { emit(emptyList()) }
+                .first()
 
             println("DEBUG workers encontrados: ${workers.size}")
 
-            val markers = mutableListOf<WorkerMapMarker>()
+            val markers = coroutineScope {
+                workers.map { worker ->
+                    async {
+                        val workZones = userRepository
+                            .getWorkZonesByUser(worker.uid)
+                            .first()
+                            .filter { !it.blocked }
 
-            for (worker in workers) {
-                println("DEBUG worker: ${worker.name} - ${worker.uid}")
-                val workZones = userRepository
-                    .getWorkZonesByUser(worker.uid)
-                    .first()
-                    .filter { !it.blocked }
+                        println("DEBUG [${worker.uid}] zones=${workZones.size} clientLat=${address.latitude} clientLon=${address.longitude}")
 
-                println("DEBUG workZones de ${worker.name}: ${workZones.size}")
+                        val match = workZones.firstOrNull { zone ->
+                            val dist = haversineDistance(
+                                address.latitude, address.longitude,
+                                zone.latitude, zone.longitude
+                            )
+                            println("DEBUG [${worker.uid}] zone lat=${zone.latitude} lon=${zone.longitude} dist=$dist")
+                            dist <= 600.0
+                        }
 
-                for (zone in workZones) {
-                    val distance = haversineDistance(
-                        address.latitude, address.longitude,
-                        zone.latitude, zone.longitude
-                    )
-                    println("DEBUG distancia de ${worker.name}: $distance km - zone: ${zone.latitude}, ${zone.longitude}")
-                    println("DEBUG client address: ${address.latitude}, ${address.longitude}")
-                    if (distance <= 250.0) {
-                        markers.add(WorkerMapMarker(user = worker, workZone = zone))
-                        break
+                        if (match == null) println("DEBUG [${worker.uid}] SIN MATCH")
+
+                        match?.let { zone -> WorkerMapMarker(user = worker, workZone = zone) }
                     }
-                }
+                }.awaitAll().filterNotNull()
             }
 
             println("DEBUG markers totales: ${markers.size}")
