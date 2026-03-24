@@ -363,17 +363,21 @@ fun ClientAppointmentDetailScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                ClientActionButton(
-                                    text = "CHATEAR",
-                                    icon = TablerIcons.MessageCircle,
-                                    backgroundColor = if (uiState.canChat) BrandBlue else Color(0xFFE7EDF5),
-                                    contentColor = if (uiState.canChat) White else Color(0xFF9AA5B5),
-                                    borderColor = if (uiState.canChat) BrandBlue else BorderSoft,
-                                    modifier = Modifier.weight(1f),
-                                    enabled = uiState.canChat,
-                                    onClick = onChatClick
-                                )
 
+
+                                if (uiState.canChat && !uiState.appointment?.status.equals("completed", true)) {
+                                    ClientActionButton(
+                                        text = "CHATEAR",
+                                        icon = TablerIcons.MessageCircle,
+                                        backgroundColor = BrandBlue,
+                                        contentColor = White,
+                                        borderColor = BrandBlue,
+                                        modifier = Modifier.weight(1f),
+                                        enabled = true,
+                                        onClick = onChatClick
+                                    )
+                                }
+                                
                                 ClientActionButton(
                                     text = "RESEÑA",
                                     icon = TablerIcons.Star,

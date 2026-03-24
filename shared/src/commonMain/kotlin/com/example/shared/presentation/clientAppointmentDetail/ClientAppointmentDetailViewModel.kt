@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.IBookingRepository
 import com.example.shared.data.repository.OtpAppointment.IOtpAppointmentRepository
+import com.example.shared.data.repository.ReviewMeta.IReviewMetaRepository
 import com.example.shared.presentation.cancellation.AppointmentCancellationCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 class ClientAppointmentDetailViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val otpAppointmentRepository: IOtpAppointmentRepository,
-    private val bookingRepository: IBookingRepository
+    private val bookingRepository: IBookingRepository,
+    private val reviewMetaRepository: IReviewMetaRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ClientAppointmentDetailUiState())
@@ -55,12 +57,17 @@ class ClientAppointmentDetailViewModel(
                 val worker =
                     bookingRepository.getWorkerProfile(appointment.workerId)
 
+                val reviewMeta = reviewMetaRepository
+                    .getReviewMeta(appointmentId)
+                    .first() ?: com.example.shared.domain.entity.ReviewMeta()
+
                 _uiState.value = ClientAppointmentDetailUiState(
                     isLoading = false,
                     appointment = appointment,
                     otp = otp,
                     worker = worker,
                     cancellationPolicy = cancellationPolicy,
+                    reviewMeta = reviewMeta,
                     errorMessage = null,
                     successMessage = successMessage
                 )

@@ -155,8 +155,10 @@ import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatal
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
 import com.example.seviya.UI.ClientLocationCatalogScreen
+import com.example.seviya.UI.ClientToWorkerReviewScreen
 import com.example.seviya.UI.WorkerToClientReviewScreen
 import com.example.seviya.navigation.ClientLocationCatalog
+import com.example.seviya.navigation.ClientToWorkerReview
 import com.example.seviya.navigation.WorkerToClientReview
 import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
 import compose.icons.TablerIcons
@@ -839,7 +841,11 @@ fun App() {
                                 viewModel.dismissCancellationPreview()
                             },
                             onChatClick = { },
-                            onReviewClick = { },
+                            onReviewClick = {
+                                navController.navigate(
+                                    ClientToWorkerReview(appointmentId = route.bookingId)
+                                )
+                            },
                             onGoServices = {
                                 currentClientTab = ClientTab.SERVICES
                                 navController.navigateSingleTop(ClientHome)
@@ -943,6 +949,15 @@ fun App() {
                                 monthlyCalendarViewModel.selectAppointment(appointment)
                                 navController.navigateSingleTop(ClientAppointmentDetail(appointment.id))
                             }
+                        )
+                    }
+
+                    composable<ClientToWorkerReview> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ClientToWorkerReview>()
+
+                        ClientToWorkerReviewScreen(
+                            appointmentId = route.appointmentId,
+                            onBack = { navController.popBackStack() }
                         )
                     }
 
