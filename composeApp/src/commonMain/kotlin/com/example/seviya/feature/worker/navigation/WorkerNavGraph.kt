@@ -32,14 +32,14 @@ import com.example.seviya.core.navigation.WorkerWeeklyAppointments
 import com.example.seviya.feature.shared.DailyAgendaScreen
 import com.example.seviya.feature.shared.MonthlyCalendarScreen
 import com.example.seviya.feature.shared.WeeklyAgendaScreen
-import com.example.seviya.feature.worker.WorkerAppointmentDetailRoute
+import com.example.seviya.feature.worker.WorkerAppointmentDetailScreen
 import com.example.seviya.feature.worker.WorkerCategoriesScreen
-import com.example.seviya.feature.worker.WorkerDailyAppointmentsRoute
+import com.example.seviya.feature.worker.WorkerDailyAppointmentsScreen
 import com.example.seviya.feature.worker.WorkerDashboardScreen
-import com.example.seviya.feature.worker.WorkerPaymentDetailRoute
-import com.example.seviya.feature.worker.WorkerRequestDetailRoute
-import com.example.seviya.feature.worker.WorkerStartAppointmentOtpRoute
-import com.example.seviya.feature.worker.WorkerToClientReviewRoute
+import com.example.seviya.feature.worker.WorkerPaymentDetailScreen
+import com.example.seviya.feature.worker.WorkerRequestDetailScreen
+import com.example.seviya.feature.worker.WorkerStartAppointmentOtpScreen
+import com.example.seviya.feature.worker.WorkerToClientReviewScreen
 import com.example.seviya.feature.worker.WorkerRequestsScreen
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.CalendarUserRole
@@ -92,7 +92,7 @@ fun NavGraphBuilder.workerNavGraph(
     composable<WorkerDailyAppointments> { backStackEntry ->
         val route = backStackEntry.toRoute<WorkerDailyAppointments>()
 
-        WorkerDailyAppointmentsRoute(
+        WorkerDailyAppointmentsScreen(
             workerId = route.workerId,
             onBack = { navController.popBackStack() },
             onOpenMaps = { _, _, _ -> }
@@ -151,7 +151,7 @@ fun NavGraphBuilder.workerNavGraph(
 
     composable<WorkerAppointmentDetail> {
         selectedAppointment?.let { appointment ->
-            WorkerAppointmentDetailRoute(
+            WorkerAppointmentDetailScreen(
                 appointment = appointment,
                 monthlyCalendarViewModel = monthlyCalendarViewModel,
                 onBack = { navController.popBackStack() },
@@ -187,7 +187,7 @@ fun NavGraphBuilder.workerNavGraph(
 
     composable<WorkerStartAppointmentOtp> { backStackEntry ->
         val route = backStackEntry.toRoute<WorkerStartAppointmentOtp>()
-        WorkerStartAppointmentOtpRoute(
+        WorkerStartAppointmentOtpScreen(
             appointmentId = route.appointmentId,
             onBack = { navController.popBackStack() },
             onStartSuccess = {
@@ -211,7 +211,7 @@ fun NavGraphBuilder.workerNavGraph(
 
     composable<WorkerRequestDetail> { backStackEntry ->
         val route = backStackEntry.toRoute<WorkerRequestDetail>()
-        WorkerRequestDetailRoute(
+        WorkerRequestDetailScreen(
             bookingId = route.bookingId,
             onBack = { navController.popBackStack() }
         )
@@ -219,7 +219,7 @@ fun NavGraphBuilder.workerNavGraph(
 
     composable<WorkerPaymentDetail> { backStackEntry ->
         val route = backStackEntry.toRoute<WorkerPaymentDetail>()
-        WorkerPaymentDetailRoute(
+        WorkerPaymentDetailScreen(
             bookingId = route.bookingId,
             onBack = { navController.popBackStack() }
         )
@@ -298,7 +298,7 @@ fun NavGraphBuilder.workerNavGraph(
     composable<WorkerToClientReview> { backStackEntry ->
         val route = backStackEntry.toRoute<WorkerToClientReview>()
 
-        WorkerToClientReviewRoute(
+        WorkerToClientReviewScreen(
             appointmentId = route.appointmentId,
             onBack = { navController.popBackStack() },
             onSubmitSuccess = {

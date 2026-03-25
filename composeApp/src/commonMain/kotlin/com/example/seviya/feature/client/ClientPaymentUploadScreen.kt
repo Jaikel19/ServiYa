@@ -6,7 +6,7 @@ import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadVi
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ClientPaymentUploadRoute(
+fun ClientPaymentUploadScreen(
     appointmentId: String,
     onBack: () -> Unit
 ) {
@@ -16,7 +16,7 @@ fun ClientPaymentUploadRoute(
         viewModel.loadData(appointmentId)
     }
 
-    ClientPaymentUploadScreen(
+    ClientPaymentUploadPlatformScreen(
         appointmentId = appointmentId,
         viewModel = viewModel,
         onBack = onBack
@@ -25,7 +25,7 @@ fun ClientPaymentUploadRoute(
 
 
 @Composable
-expect fun ClientPaymentUploadScreen(
+expect fun ClientPaymentUploadPlatformScreen(
     appointmentId: String,
     viewModel: ClientPaymentUploadViewModel,
     onBack: () -> Unit

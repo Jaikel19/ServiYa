@@ -6,7 +6,7 @@ import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppoin
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerDailyAppointmentsRoute(
+fun WorkerDailyAppointmentsScreen(
     workerId: String,
     onBack: () -> Unit,
     onOpenMaps: (latitude: Double, longitude: Double, clientName: String) -> Unit
@@ -17,7 +17,7 @@ fun WorkerDailyAppointmentsRoute(
         viewModel.loadAppointments(workerId)
     }
 
-    WorkerDailyAppointmentsScreen(
+    WorkerDailyAppointmentsPlatformScreen(
         workerId = workerId,
         viewModel = viewModel,
         onBack = onBack,
@@ -26,7 +26,7 @@ fun WorkerDailyAppointmentsRoute(
 }
 
 @Composable
-expect fun WorkerDailyAppointmentsScreen(
+expect fun WorkerDailyAppointmentsPlatformScreen(
     workerId: String,
     viewModel: WorkerDailyAppointmentsViewModel,
     onBack: () -> Unit,

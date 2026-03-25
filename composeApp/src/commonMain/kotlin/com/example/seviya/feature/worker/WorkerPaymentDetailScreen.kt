@@ -55,7 +55,7 @@ import io.kamel.image.asyncPainterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerPaymentDetailRoute(
+fun WorkerPaymentDetailScreen(
     bookingId: String,
     onBack: () -> Unit
 ) {
@@ -73,7 +73,7 @@ fun WorkerPaymentDetailRoute(
     }
 
     uiState.appointment?.let { appointment ->
-        WorkerPaymentDetailScreen(
+        WorkerPaymentDetailContent(
             appointment = appointment,
             paymentReceipt = uiState.paymentReceipt,
             onBack = onBack,
@@ -93,7 +93,7 @@ fun WorkerPaymentDetailRoute(
 }
 
 @Composable
-fun WorkerPaymentDetailScreen(
+private fun WorkerPaymentDetailContent(
     appointment: Appointment,
     paymentReceipt: PaymentReceipt?,
     onBack: () -> Unit,

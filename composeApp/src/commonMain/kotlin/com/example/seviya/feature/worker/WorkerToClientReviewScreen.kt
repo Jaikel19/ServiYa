@@ -43,7 +43,7 @@ import com.example.shared.presentation.workerToClientReview.WorkerToClientReview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerToClientReviewRoute(
+fun WorkerToClientReviewScreen(
     appointmentId: String,
     onBack: () -> Unit,
     onSubmitSuccess: () -> Unit
@@ -54,7 +54,7 @@ fun WorkerToClientReviewRoute(
         viewModel.loadAppointment(appointmentId)
     }
 
-    WorkerToClientReviewScreen(
+    WorkerToClientReviewContent(
         viewModel = viewModel,
         onBack = onBack,
         onSubmitSuccess = onSubmitSuccess
@@ -62,7 +62,7 @@ fun WorkerToClientReviewRoute(
 }
 
 @Composable
-fun WorkerToClientReviewScreen(
+private fun WorkerToClientReviewContent(
     viewModel: WorkerToClientReviewViewModel,
     onBack: () -> Unit,
     onSubmitSuccess: () -> Unit

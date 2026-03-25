@@ -84,7 +84,7 @@ import io.kamel.image.asyncPainterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ClientAppointmentDetailRoute(
+fun ClientAppointmentDetailScreen(
     bookingId: String,
     onBack: () -> Unit = {},
     onReviewClick: () -> Unit = {},
@@ -101,7 +101,7 @@ fun ClientAppointmentDetailRoute(
         viewModel.loadAppointmentDetail(bookingId)
     }
 
-    ClientAppointmentDetailScreen(
+    ClientAppointmentDetailContent(
         uiState = uiState,
         onBack = onBack,
         onRequestCancellationPreview = {
@@ -127,7 +127,7 @@ fun ClientAppointmentDetailRoute(
 }
 
 @Composable
-fun ClientAppointmentDetailScreen(
+private fun ClientAppointmentDetailContent(
     uiState: ClientAppointmentDetailUiState,
     onBack: () -> Unit = {},
     onRequestCancellationPreview: () -> Unit = {},

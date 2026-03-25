@@ -26,7 +26,7 @@ import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerReques
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerRequestDetailRoute(
+fun WorkerRequestDetailScreen(
     bookingId: String,
     onBack: () -> Unit
 ) {
@@ -38,7 +38,7 @@ fun WorkerRequestDetailRoute(
     }
 
     uiState.appointment?.let { appointment ->
-        WorkerRequestDetailScreen(
+        WorkerRequestDetailContent(
             booking = appointment,
             onBack = onBack,
             onAccept = {
@@ -57,7 +57,7 @@ fun WorkerRequestDetailRoute(
 }
 
 @Composable
-fun WorkerRequestDetailScreen(
+private fun WorkerRequestDetailContent(
     booking: Appointment,
     onBack: () -> Unit,
     onAccept: () -> Unit,

@@ -30,7 +30,7 @@ import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppo
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerStartAppointmentOtpRoute(
+fun WorkerStartAppointmentOtpScreen(
     appointmentId: String,
     onBack: () -> Unit = {},
     onStartSuccess: () -> Unit = {}
@@ -48,7 +48,7 @@ fun WorkerStartAppointmentOtpRoute(
         }
     }
 
-    WorkerStartAppointmentOtpScreen(
+    WorkerStartAppointmentOtpContent(
         uiState = uiState,
         onBack = onBack,
         onOtpChange = viewModel::onOtpChanged,
@@ -57,7 +57,7 @@ fun WorkerStartAppointmentOtpRoute(
 }
 
 @Composable
-fun WorkerStartAppointmentOtpScreen(
+private fun WorkerStartAppointmentOtpContent(
     uiState: WorkerStartAppointmentOtpUiState,
     onBack: () -> Unit = {},
     onOtpChange: (String) -> Unit = {},

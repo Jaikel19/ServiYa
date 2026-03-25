@@ -83,7 +83,7 @@ import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.Check
 
 @Composable
-actual fun WorkerDailyAppointmentsScreen(
+actual fun WorkerDailyAppointmentsPlatformScreen(
     workerId: String,
     viewModel: WorkerDailyAppointmentsViewModel,
     onBack: () -> Unit,
@@ -92,10 +92,6 @@ actual fun WorkerDailyAppointmentsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var selectedAppointment by remember { mutableStateOf<Appointment?>(null) }
-
-    LaunchedEffect(workerId) {
-        viewModel.loadAppointments(workerId)
-    }
 
     val defaultLatLng = LatLng(9.9281, -84.0907)
 

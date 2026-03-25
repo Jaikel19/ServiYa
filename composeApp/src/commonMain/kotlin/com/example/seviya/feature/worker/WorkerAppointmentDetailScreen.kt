@@ -66,7 +66,7 @@ import io.kamel.image.asyncPainterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerAppointmentDetailRoute(
+fun WorkerAppointmentDetailScreen(
     appointment: Appointment,
     monthlyCalendarViewModel: MonthlyCalendarViewModel,
     onBack: () -> Unit,
@@ -86,7 +86,7 @@ fun WorkerAppointmentDetailRoute(
         detailViewModel.loadReviewMeta(appointment.id)
     }
 
-    WorkerAppointmentDetailScreen(
+    WorkerAppointmentDetailContent(
         appointment = appointment,
         paymentReceipt = detailUiState.paymentReceipt,
         reviewMeta = detailUiState.reviewMeta,
@@ -131,7 +131,7 @@ fun WorkerAppointmentDetailRoute(
 }
 
 @Composable
-fun WorkerAppointmentDetailScreen(
+private fun WorkerAppointmentDetailContent(
     appointment: Appointment,
     uiState: WorkerAppointmentDetailUiState = WorkerAppointmentDetailUiState(),
     paymentReceipt: PaymentReceipt? = null,

@@ -11,7 +11,7 @@ import com.example.shared.presentation.clientToWorkerReview.ClientToWorkerReview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ClientToWorkerReviewRoute(
+fun ClientToWorkerReviewScreen(
     appointmentId: String,
     onBack: () -> Unit
 ) {
@@ -21,14 +21,14 @@ fun ClientToWorkerReviewRoute(
         viewModel.loadAppointment(appointmentId)
     }
 
-    ClientToWorkerReviewScreen(
+    ClientToWorkerReviewContent(
         viewModel = viewModel,
         onBack = onBack
     )
 }
 
 @Composable
-fun ClientToWorkerReviewScreen(
+private fun ClientToWorkerReviewContent(
     viewModel: ClientToWorkerReviewViewModel,
     onBack: () -> Unit
 ) {

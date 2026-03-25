@@ -28,13 +28,13 @@ import com.example.seviya.core.navigation.ClientToWorkerReview
 import com.example.seviya.core.navigation.ClientWeeklyAppointments
 import com.example.seviya.core.navigation.ProfessionalProfile
 import com.example.seviya.core.navigation.WorkersList
-import com.example.seviya.feature.client.ClientAppointmentDetailRoute
+import com.example.seviya.feature.client.ClientAppointmentDetailScreen
 import com.example.seviya.feature.client.ClientDashboardScreen
 import com.example.seviya.feature.client.ClientHomeScreen
 import com.example.seviya.feature.client.ClientLocationCatalogScreen
-import com.example.seviya.feature.client.ClientMapRoute
-import com.example.seviya.feature.client.ClientPaymentUploadRoute
-import com.example.seviya.feature.client.ClientToWorkerReviewRoute
+import com.example.seviya.feature.client.ClientMapScreen
+import com.example.seviya.feature.client.ClientPaymentUploadScreen
+import com.example.seviya.feature.client.ClientToWorkerReviewScreen
 import com.example.seviya.feature.shared.DailyAgendaScreen
 import com.example.seviya.feature.shared.MonthlyCalendarScreen
 import com.example.seviya.feature.shared.WeeklyAgendaScreen
@@ -166,7 +166,7 @@ fun NavGraphBuilder.clientNavGraph(
 
     composable<ClientPaymentUpload> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientPaymentUpload>()
-        ClientPaymentUploadRoute(
+        ClientPaymentUploadScreen(
             appointmentId = route.appointmentId,
             onBack = { navController.popBackStack() }
         )
@@ -181,7 +181,7 @@ fun NavGraphBuilder.clientNavGraph(
 
     composable<ClientAppointmentDetail> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientAppointmentDetail>()
-        ClientAppointmentDetailRoute(
+        ClientAppointmentDetailScreen(
             bookingId = route.bookingId,
             onBack = { navController.popBackStack() },
             onChatClick = { },
@@ -214,7 +214,7 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientMap> {
-        ClientMapRoute(
+        ClientMapScreen(
             clientId = currentClientId,
             onWorkerClick = { workerId ->
                 navController.navigate(ProfessionalProfile(workerId = workerId))
@@ -291,7 +291,7 @@ fun NavGraphBuilder.clientNavGraph(
     composable<ClientToWorkerReview> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientToWorkerReview>()
 
-        ClientToWorkerReviewRoute(
+        ClientToWorkerReviewScreen(
             appointmentId = route.appointmentId,
             onBack = { navController.popBackStack() }
         )

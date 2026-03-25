@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppointmentsViewModel
 
 @Composable
-actual fun WorkerDailyAppointmentsScreen(
+actual fun WorkerDailyAppointmentsPlatformScreen(
     workerId: String,
     viewModel: WorkerDailyAppointmentsViewModel,
     onBack: () -> Unit,
