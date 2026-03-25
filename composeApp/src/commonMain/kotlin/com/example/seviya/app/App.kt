@@ -123,9 +123,9 @@ fun App() {
                         navController.navigateToLandingClearingStack()
                     }
                 ) { innerPadding ->
-                    AppNavGraph(
+                    AppNavigationContent(
+                        innerPadding = innerPadding,
                         navController = navController,
-                        modifier = Modifier.padding(innerPadding),
                         currentWorkerId = currentWorkerId,
                         onCurrentWorkerIdChange = { currentWorkerId = it },
                         currentClientId = currentClientId,
@@ -162,9 +162,9 @@ fun App() {
                         navController.navigateToLandingClearingStack()
                     }
                 ) { innerPadding ->
-                    AppNavGraph(
+                    AppNavigationContent(
+                        innerPadding = innerPadding,
                         navController = navController,
-                        modifier = Modifier.padding(innerPadding),
                         currentWorkerId = currentWorkerId,
                         onCurrentWorkerIdChange = { currentWorkerId = it },
                         currentClientId = currentClientId,
@@ -184,57 +184,96 @@ fun App() {
             }
 
             else -> {
-            Scaffold(
-                containerColor = MaterialTheme.colorScheme.background,
-                bottomBar = {
-                    if (showGuestBottomBar) {
-                        GuestBottomBar(
-                            currentTab = guestCurrentTab,
-                            onHome = {
-                                sessionRole = SessionRole.GUEST
-                                clientMenuExpanded = false
-                                workerMenuExpanded = false
-                                requestAppointmentDraft = null
-                                navController.navigateSingleTop(Landing)
-                            },
-                            onLogin = {
-                                sessionRole = SessionRole.GUEST
-                                clientMenuExpanded = false
-                                workerMenuExpanded = false
-                                navController.navigateSingleTop(RoleAdmissionCatalog)
-                            },
-                            onRegister = {
-                                sessionRole = SessionRole.GUEST
-                                clientMenuExpanded = false
-                                workerMenuExpanded = false
-                                navController.navigateSingleTop(RoleCatalog)
-                            }
-                        )
+                Scaffold(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    bottomBar = {
+                        if (showGuestBottomBar) {
+                            GuestBottomBar(
+                                currentTab = guestCurrentTab,
+                                onHome = {
+                                    sessionRole = SessionRole.GUEST
+                                    clientMenuExpanded = false
+                                    workerMenuExpanded = false
+                                    requestAppointmentDraft = null
+                                    navController.navigateSingleTop(Landing)
+                                },
+                                onLogin = {
+                                    sessionRole = SessionRole.GUEST
+                                    clientMenuExpanded = false
+                                    workerMenuExpanded = false
+                                    navController.navigateSingleTop(RoleAdmissionCatalog)
+                                },
+                                onRegister = {
+                                    sessionRole = SessionRole.GUEST
+                                    clientMenuExpanded = false
+                                    workerMenuExpanded = false
+                                    navController.navigateSingleTop(RoleCatalog)
+                                }
+                            )
+                        }
                     }
+                ) { innerPadding ->
+                    AppNavigationContent(
+                        innerPadding = innerPadding,
+                        navController = navController,
+                        currentWorkerId = currentWorkerId,
+                        onCurrentWorkerIdChange = { currentWorkerId = it },
+                        currentClientId = currentClientId,
+                        onCurrentClientIdChange = { currentClientId = it },
+                        currentClientName = currentClientName,
+                        onCurrentClientNameChange = { currentClientName = it },
+                        requestAppointmentDraft = requestAppointmentDraft,
+                        onRequestAppointmentDraftChange = { requestAppointmentDraft = it },
+                        onSessionRoleChange = { sessionRole = it },
+                        onCurrentClientTabChange = { currentClientTab = it },
+                        onCurrentWorkerTabChange = { currentWorkerTab = it },
+                        onClientMenuExpandedChange = { clientMenuExpanded = it },
+                        onWorkerMenuExpandedChange = { workerMenuExpanded = it },
+                        monthlyCalendarViewModel = monthlyCalendarViewModel
+                    )
                 }
-            ) { innerPadding ->
-                AppNavGraph(
-                    navController = navController,
-                    modifier = Modifier.padding(innerPadding),
-                    currentWorkerId = currentWorkerId,
-                    onCurrentWorkerIdChange = { currentWorkerId = it },
-                    currentClientId = currentClientId,
-                    onCurrentClientIdChange = { currentClientId = it },
-                    currentClientName = currentClientName,
-                    onCurrentClientNameChange = { currentClientName = it },
-                    requestAppointmentDraft = requestAppointmentDraft,
-                    onRequestAppointmentDraftChange = { requestAppointmentDraft = it },
-                    onSessionRoleChange = { sessionRole = it },
-                    onCurrentClientTabChange = { currentClientTab = it },
-                    onCurrentWorkerTabChange = { currentWorkerTab = it },
-                    onClientMenuExpandedChange = { clientMenuExpanded = it },
-                    onWorkerMenuExpandedChange = { workerMenuExpanded = it },
-                    monthlyCalendarViewModel = monthlyCalendarViewModel
-                )
-            }
             }
         }
     }
+}
+
+@Composable
+private fun AppNavigationContent(
+    innerPadding: androidx.compose.foundation.layout.PaddingValues,
+    navController: NavHostController,
+    currentWorkerId: String,
+    onCurrentWorkerIdChange: (String) -> Unit,
+    currentClientId: String,
+    onCurrentClientIdChange: (String) -> Unit,
+    currentClientName: String,
+    onCurrentClientNameChange: (String) -> Unit,
+    requestAppointmentDraft: RequestAppointmentDraft?,
+    onRequestAppointmentDraftChange: (RequestAppointmentDraft?) -> Unit,
+    onSessionRoleChange: (SessionRole) -> Unit,
+    onCurrentClientTabChange: (ClientTab) -> Unit,
+    onCurrentWorkerTabChange: (WorkerTab) -> Unit,
+    onClientMenuExpandedChange: (Boolean) -> Unit,
+    onWorkerMenuExpandedChange: (Boolean) -> Unit,
+    monthlyCalendarViewModel: MonthlyCalendarViewModel
+) {
+    AppNavGraph(
+        navController = navController,
+        modifier = Modifier.padding(innerPadding),
+        currentWorkerId = currentWorkerId,
+        onCurrentWorkerIdChange = onCurrentWorkerIdChange,
+        currentClientId = currentClientId,
+        onCurrentClientIdChange = onCurrentClientIdChange,
+        currentClientName = currentClientName,
+        onCurrentClientNameChange = onCurrentClientNameChange,
+        requestAppointmentDraft = requestAppointmentDraft,
+        onRequestAppointmentDraftChange = onRequestAppointmentDraftChange,
+        onSessionRoleChange = onSessionRoleChange,
+        onCurrentClientTabChange = onCurrentClientTabChange,
+        onCurrentWorkerTabChange = onCurrentWorkerTabChange,
+        onClientMenuExpandedChange = onClientMenuExpandedChange,
+        onWorkerMenuExpandedChange = onWorkerMenuExpandedChange,
+        monthlyCalendarViewModel = monthlyCalendarViewModel
+    )
 }
 
 @Composable
