@@ -70,6 +70,9 @@ data class WorkerPaymentDetail(val bookingId: String)
 data class WorkerWeeklyAppointments(val workerId: String)
 
 @Serializable
+data class WorkerDailyAgenda(val workerId: String)
+
+@Serializable
 data class WorkerStartAppointmentOtp(val appointmentId: String)
 
 @Serializable

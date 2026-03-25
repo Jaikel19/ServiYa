@@ -14,13 +14,44 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,9 +70,17 @@ import com.example.shared.presentation.workerDailyAppointments.DailyView
 import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppointmentsViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import compose.icons.TablerIcons
+import compose.icons.tablericons.AlertCircle
 import compose.icons.tablericons.ArrowLeft
+import compose.icons.tablericons.CalendarEvent
+import compose.icons.tablericons.Check
 
 @Composable
 actual fun WorkerDailyAppointmentsScreen(
@@ -78,56 +117,89 @@ actual fun WorkerDailyAppointmentsScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = false),
-            uiSettings = MapUiSettings(zoomControlsEnabled = false)
-        ) {
-            uiState.appointments.forEach { appointment ->
-                if (appointment.location.latitude != 0.0 && appointment.location.longitude != 0.0) {
-                    Marker(
-                        state = MarkerState(
-                            LatLng(appointment.location.latitude, appointment.location.longitude)
-                        ),
-                        title = appointment.clientName,
-                        snippet = appointment.services.firstOrNull()?.name ?: "",
-                        onClick = {
-                            selectedAppointment = appointment
-                            false
+        when (uiState.currentView) {
+            DailyView.MAP -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState,
+                        properties = MapProperties(isMyLocationEnabled = false),
+                        uiSettings = MapUiSettings(zoomControlsEnabled = false)
+                    ) {
+                        uiState.appointments.forEach { appointment ->
+                            if (appointment.location.latitude != 0.0 && appointment.location.longitude != 0.0) {
+                                Marker(
+                                    state = MarkerState(
+                                        LatLng(
+                                            appointment.location.latitude,
+                                            appointment.location.longitude
+                                        )
+                                    ),
+                                    title = appointment.clientName,
+                                    snippet = appointment.services.firstOrNull()?.name ?: "",
+                                    onClick = {
+                                        selectedAppointment = appointment
+                                        false
+                                    }
+                                )
+                            }
                         }
+                    }
+
+                    WorkerDailyAppointmentsHeader(
+                        appointmentsCount = uiState.appointments.size,
+                        currentView = uiState.currentView,
+                        onBack = onBack,
+                        onChangeView = viewModel::onViewChanged,
+                        modifier = Modifier.align(Alignment.TopCenter)
                     )
+
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 16.dp)
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .clickable {
+                                val first = uiState.appointments.firstOrNull()
+                                first?.let {
+                                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                                        LatLng(it.location.latitude, it.location.longitude),
+                                        14f
+                                    )
+                                }
+                            },
+                        color = White,
+                        shadowElevation = 4.dp
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(text = "📍", fontSize = 20.sp)
+                        }
+                    }
                 }
             }
-        }
 
-        WorkerDailyAppointmentsHeader(
-            appointmentsCount = uiState.appointments.size,
-            currentView = uiState.currentView,
-            onBack = onBack,
-            onChangeView = viewModel::onViewChanged,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
+            DailyView.LIST -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFFF4F6F8))
+                ) {
+                    WorkerDailyAppointmentsHeader(
+                        appointmentsCount = uiState.appointments.size,
+                        currentView = uiState.currentView,
+                        onBack = onBack,
+                        onChangeView = viewModel::onViewChanged
+                    )
 
-        Surface(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 16.dp)
-                .size(48.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .clickable {
-                    val first = uiState.appointments.firstOrNull()
-                    first?.let {
-                        cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                            LatLng(it.location.latitude, it.location.longitude), 14f
-                        )
-                    }
-                },
-            color = White,
-            shadowElevation = 4.dp
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(text = "📍", fontSize = 20.sp)
+                    WorkerDailyAgendaListContent(
+                        appointments = uiState.appointments,
+                        onAppointmentClick = { appointment ->
+                            selectedAppointment = appointment
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
 
@@ -164,6 +236,258 @@ actual fun WorkerDailyAppointmentsScreen(
             )
         }
     }
+}
+
+@Composable
+private fun WorkerDailyAgendaListContent(
+    appointments: List<Appointment>,
+    onAppointmentClick: (Appointment) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val sortedAppointments = remember(appointments) {
+        appointments.sortedBy { it.serviceStartAt }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFFF4F6F8))
+            .padding(horizontal = 18.dp, vertical = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "Agenda del día",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF182033)
+                    )
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "${appointments.size} citas programadas",
+                    color = Color(0xFF7B8798),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Surface(
+                modifier = Modifier.size(42.dp),
+                shape = CircleShape,
+                color = White,
+                shadowElevation = 4.dp
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = TablerIcons.CalendarEvent,
+                        contentDescription = null,
+                        tint = Color(0xFF6E7A90),
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                color = Color(0xFFD9E0E8)
+            )
+            Text(
+                text = "HOY",
+                modifier = Modifier.padding(horizontal = 12.dp),
+                color = Color(0xFF97A3B6),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                color = Color(0xFFD9E0E8)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        if (sortedAppointments.isEmpty()) {
+            EmptyDailyAgendaState()
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                items(sortedAppointments, key = { it.id }) { appointment ->
+                    WorkerDailyListAppointmentCard(
+                        appointment = appointment,
+                        onClick = { onAppointmentClick(appointment) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyDailyAgendaState() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 22.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "No hay citas programadas para hoy",
+                color = Color(0xFF7B8798),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Cuando tengas citas confirmadas aparecerán aquí en formato de agenda.",
+                color = Color(0xFF97A3B6),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun WorkerDailyListAppointmentCard(
+    appointment: Appointment,
+    onClick: () -> Unit
+) {
+    val isAlert = appointment.status.equals("cancelled", true) ||
+            appointment.status.equals("rejected", true)
+
+    val accent = if (isAlert) Color(0xFFFF4A4A) else BrandBlue
+    val iconTint = if (isAlert) Color(0xFFFF8A8A) else Color(0xFFA8C0E8)
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(8.dp)
+                    .height(104.dp)
+                    .background(accent)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val time = appointmentTimeText(appointment.serviceStartAt)
+                val hour = time.substringBefore(":").toIntOrNull() ?: 0
+                val amPm = if (hour < 12) "AM" else "PM"
+
+                Column(
+                    modifier = Modifier.width(70.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = time,
+                        color = accent,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    )
+                    Text(
+                        text = amPm,
+                        color = Color(0xFFA0AAB9),
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(52.dp)
+                        .background(Color(0xFFE7ECF2))
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = appointment.clientName.ifBlank { "Cliente" },
+                        color = Color(0xFF161D2D),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Text(
+                        text = appointment.services.firstOrNull()?.name ?: "Servicio",
+                        color = Color(0xFF77849A),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    val district = appointment.location.district
+                    if (district.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = district,
+                            color = Color(0xFF97A3B6),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                Icon(
+                    imageVector = if (isAlert) TablerIcons.AlertCircle else TablerIcons.Check,
+                    contentDescription = null,
+                    tint = iconTint,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        }
+    }
+}
+
+private fun appointmentTimeText(value: String): String {
+    val raw = when {
+        value.contains("T") -> value.substringAfter("T")
+        value.contains(" ") -> value.substringAfter(" ")
+        else -> value
+    }
+
+    return raw.take(5).takeIf { it.length == 5 } ?: "--:--"
 }
 
 @Composable
@@ -287,8 +611,8 @@ private fun WorkerDailyAppointmentsHeader(
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(140.dp)
-                        .offset(x = shimmerOffset.dp)
                         .graphicsLayer {
+                            translationX = shimmerOffset
                             rotationZ = -18f
                             alpha = 0.16f
                         }
@@ -477,7 +801,6 @@ private fun AppointmentPopup(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-
             Box(
                 modifier = Modifier
                     .width(40.dp)
@@ -529,7 +852,7 @@ private fun AppointmentPopup(
                     color = Color(0xFFFFF8E1)
                 ) {
                     Text(
-                        text = appointment.serviceStartAt.takeLast(5),
+                        text = appointmentTimeText(appointment.serviceStartAt),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
