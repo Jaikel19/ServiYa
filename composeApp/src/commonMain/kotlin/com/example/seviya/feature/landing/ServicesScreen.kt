@@ -10,6 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.shared.domain.entity.Service
 import com.example.shared.presentation.services.ServicesViewModel
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun ServicesRoute() {
+    val viewModel: ServicesViewModel = koinViewModel()
+    ServicesScreen(viewModel = viewModel)
+}
 
 @Composable
 fun ServicesScreen(viewModel: ServicesViewModel) {

@@ -1,8 +1,5 @@
 package com.example.seviya.feature.client.navigation
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -31,31 +28,21 @@ import com.example.seviya.core.navigation.ClientToWorkerReview
 import com.example.seviya.core.navigation.ClientWeeklyAppointments
 import com.example.seviya.core.navigation.ProfessionalProfile
 import com.example.seviya.core.navigation.WorkersList
-import com.example.seviya.feature.client.ClientAppointmentDetailScreen
+import com.example.seviya.feature.client.ClientAppointmentDetailRoute
 import com.example.seviya.feature.client.ClientDashboardRoute
 import com.example.seviya.feature.client.ClientHomeRoute
-import com.example.seviya.feature.client.ClientLocationCatalogScreen
-import com.example.seviya.feature.client.ClientMapScreen
-import com.example.seviya.feature.client.ClientPaymentUploadScreen
-import com.example.seviya.feature.client.ClientToWorkerReviewScreen
-import com.example.seviya.feature.shared.DailyAgendaScreen
+import com.example.seviya.feature.client.ClientLocationCatalogRoute
+import com.example.seviya.feature.client.ClientMapRoute
+import com.example.seviya.feature.client.ClientPaymentUploadRoute
+import com.example.seviya.feature.client.ClientToWorkerReviewRoute
+import com.example.seviya.feature.shared.DailyAgendaRoute
 import com.example.seviya.feature.shared.MonthlyCalendarScreen
-import com.example.seviya.feature.shared.WeeklyAgendaScreen
+import com.example.seviya.feature.shared.WeeklyAgendaRoute
 import com.example.seviya.feature.worker.FavoriteWorkersRoute
-import com.example.seviya.ui.ClientRequestsScreen
+import com.example.seviya.ui.ClientRequestsRoute
 import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
-import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
-import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
-import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
-import com.example.shared.presentation.clientMap.ClientMapViewModel
-import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
-import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
-import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
-import com.example.shared.utils.DateTimeUtils
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
 
 fun NavGraphBuilder.clientNavGraph(
     navController: NavHostController,
@@ -68,9 +55,6 @@ fun NavGraphBuilder.clientNavGraph(
     composable<ClientHome> {
         ClientHomeRoute(
             clientId = currentClientId,
-            categoriesViewModel = koinInject(),
-            favoriteWorkersViewModel = koinInject(),
-            workersListViewModel = koinInject(),
             onWorkerClick = { workerId ->
                 navController.navigate(ProfessionalProfile(workerId))
             },
@@ -92,11 +76,8 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientDashboard> {
-        val viewModel: ClientDashboardViewModel = koinViewModel()
-
         ClientDashboardRoute(
             clientId = currentClientId,
-            viewModel = viewModel,
             onOpenAppointmentDetail = { bookingId ->
                 navController.navigate(
                     ClientAppointmentDetail(bookingId = bookingId)
@@ -133,11 +114,8 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientFavorites> {
-        val viewModel: FavoriteWorkersViewModel = koinViewModel()
-
         FavoriteWorkersRoute(
             clientId = currentClientId,
-            viewModel = viewModel,
             onWorkerClick = { workerId ->
                 navController.navigate(
                     ProfessionalProfile(workerId = workerId)
@@ -171,15 +149,8 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientRequests> {
-        val viewModel: ClientRequestsViewModel = koinViewModel()
-        val uiState by viewModel.uiState.collectAsState()
-
-        LaunchedEffect(currentClientId) {
-            viewModel.loadRequests(currentClientId)
-        }
-
-        ClientRequestsScreen(
-            uiState = uiState,
+        ClientRequestsRoute(
+            clientId = currentClientId,
             onOpenRequestDetail = { appointmentId ->
                 navController.navigate(
                     ClientAppointmentDetail(bookingId = appointmentId)
@@ -195,53 +166,24 @@ fun NavGraphBuilder.clientNavGraph(
 
     composable<ClientPaymentUpload> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientPaymentUpload>()
-        val viewModel: ClientPaymentUploadViewModel = koinViewModel()
-
-        LaunchedEffect(route.appointmentId) {
-            viewModel.loadData(route.appointmentId)
-        }
-
-        ClientPaymentUploadScreen(
+        ClientPaymentUploadRoute(
             appointmentId = route.appointmentId,
-            viewModel = viewModel,
             onBack = { navController.popBackStack() }
         )
     }
 
     composable<ClientLocationCatalog> {
-        val viewModel: ClientLocationCatalogViewModel = koinViewModel()
-        ClientLocationCatalogScreen(
+        ClientLocationCatalogRoute(
             clientId = currentClientId,
-            viewModel = viewModel,
             onBack = { navController.popBackStack() }
         )
     }
 
     composable<ClientAppointmentDetail> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientAppointmentDetail>()
-        val viewModel: ClientAppointmentDetailViewModel = koinViewModel()
-        val uiState by viewModel.uiState.collectAsState()
-
-        LaunchedEffect(route.bookingId) {
-            viewModel.loadAppointmentDetail(route.bookingId)
-        }
-
-        ClientAppointmentDetailScreen(
-            uiState = uiState,
+        ClientAppointmentDetailRoute(
+            bookingId = route.bookingId,
             onBack = { navController.popBackStack() },
-            onRequestCancellationPreview = {
-                viewModel.prepareCancellationPreview(
-                    currentDateTime = DateTimeUtils.nowIsoMinute()
-                )
-            },
-            onCancelAppointment = {
-                viewModel.cancelAppointmentByClient(
-                    currentDateTime = DateTimeUtils.nowIsoMinute()
-                )
-            },
-            onDismissCancellationPreview = {
-                viewModel.dismissCancellationPreview()
-            },
             onChatClick = { },
             onReviewClick = {
                 navController.navigate(
@@ -272,10 +214,8 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientMap> {
-        val viewModel: ClientMapViewModel = koinViewModel()
-        ClientMapScreen(
+        ClientMapRoute(
             clientId = currentClientId,
-            viewModel = viewModel,
             onWorkerClick = { workerId ->
                 navController.navigate(ProfessionalProfile(workerId = workerId))
             }
@@ -298,10 +238,8 @@ fun NavGraphBuilder.clientNavGraph(
 
     composable<ClientDailyAppointments> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientDailyAppointments>()
-        val viewModel: DailyAgendaViewModel = koinViewModel()
 
-        DailyAgendaScreen(
-            viewModel = viewModel,
+        DailyAgendaRoute(
             userId = route.clientId,
             role = CalendarUserRole.CLIENT,
             onBack = { navController.popBackStack() },
@@ -315,10 +253,8 @@ fun NavGraphBuilder.clientNavGraph(
 
     composable<ClientWeeklyAppointments> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientWeeklyAppointments>()
-        val viewModel: DailyAgendaViewModel = koinViewModel()
 
-        WeeklyAgendaScreen(
-            viewModel = viewModel,
+        WeeklyAgendaRoute(
             userId = route.clientId,
             role = CalendarUserRole.CLIENT,
             onBack = { navController.popBackStack() },
@@ -355,7 +291,7 @@ fun NavGraphBuilder.clientNavGraph(
     composable<ClientToWorkerReview> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientToWorkerReview>()
 
-        ClientToWorkerReviewScreen(
+        ClientToWorkerReviewRoute(
             appointmentId = route.appointmentId,
             onBack = { navController.popBackStack() }
         )

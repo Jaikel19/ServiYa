@@ -79,13 +79,14 @@ import com.example.seviya.core.designsystem.theme.SoftBlueSurface
 import com.example.seviya.core.designsystem.theme.TextBluePrimary
 import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun TravelTimeConfigRoute(
     workerId: String,
-    viewModel: WorkerTravelTimeViewModel,
     onBack: () -> Unit
 ) {
+    val viewModel: WorkerTravelTimeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(workerId) {

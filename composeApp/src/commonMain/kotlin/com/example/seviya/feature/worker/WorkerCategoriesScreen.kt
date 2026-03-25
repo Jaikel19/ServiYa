@@ -85,13 +85,14 @@ import com.example.shared.presentation.workerCategories.WorkerCategoriesUiState
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.*
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WorkerCategoriesRoute(
     workerId: String,
-    viewModel: WorkerCategoriesViewModel,
     onBack: () -> Unit
 ) {
+    val viewModel: WorkerCategoriesViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(workerId) {

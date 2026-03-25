@@ -30,6 +30,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +67,8 @@ import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.CancellationPolicy
 import com.example.shared.presentation.cancellation.AppointmentCancellationPreview
 import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailUiState
+import com.example.shared.presentation.clientAppointmentDetail.ClientAppointmentDetailViewModel
+import com.example.shared.utils.DateTimeUtils
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.CalendarEvent
@@ -76,6 +81,50 @@ import compose.icons.tablericons.User
 import compose.icons.tablericons.X
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun ClientAppointmentDetailRoute(
+    bookingId: String,
+    onBack: () -> Unit = {},
+    onReviewClick: () -> Unit = {},
+    onGoServices: () -> Unit = {},
+    onGoMap: () -> Unit = {},
+    onGoSearch: () -> Unit = {},
+    onGoAlerts: () -> Unit = {},
+    onGoMenu: () -> Unit = {}
+) {
+    val viewModel: ClientAppointmentDetailViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(bookingId) {
+        viewModel.loadAppointmentDetail(bookingId)
+    }
+
+    ClientAppointmentDetailScreen(
+        uiState = uiState,
+        onBack = onBack,
+        onRequestCancellationPreview = {
+            viewModel.prepareCancellationPreview(
+                currentDateTime = DateTimeUtils.nowIsoMinute()
+            )
+        },
+        onCancelAppointment = {
+            viewModel.cancelAppointmentByClient(
+                currentDateTime = DateTimeUtils.nowIsoMinute()
+            )
+        },
+        onDismissCancellationPreview = {
+            viewModel.dismissCancellationPreview()
+        },
+        onReviewClick = onReviewClick,
+        onGoServices = onGoServices,
+        onGoMap = onGoMap,
+        onGoSearch = onGoSearch,
+        onGoAlerts = onGoAlerts,
+        onGoMenu = onGoMenu
+    )
+}
 
 @Composable
 fun ClientAppointmentDetailScreen(

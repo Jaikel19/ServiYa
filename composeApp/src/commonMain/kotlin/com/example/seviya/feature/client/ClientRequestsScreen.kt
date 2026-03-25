@@ -74,8 +74,32 @@ import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.clientRequests.ClientRequestsUiState
+import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun ClientRequestsRoute(
+    clientId: String,
+    onBack: () -> Unit = {},
+    onOpenRequestDetail: (appointmentId: String) -> Unit = {},
+    onOpenPaymentUpload: (appointmentId: String) -> Unit = {}
+) {
+    val viewModel: ClientRequestsViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(clientId) {
+        viewModel.loadRequests(clientId)
+    }
+
+    ClientRequestsScreen(
+        uiState = uiState,
+        onBack = onBack,
+        onOpenRequestDetail = onOpenRequestDetail,
+        onOpenPaymentUpload = onOpenPaymentUpload
+    )
+}
 
 enum class ClientRequestFilter {
     PENDING,

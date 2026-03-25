@@ -78,6 +78,7 @@ import compose.icons.tablericons.Heart
 import compose.icons.tablericons.MapPin
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 
 private data class SimpleDateValue(
@@ -93,7 +94,6 @@ private data class CalendarDayCell(
 @Composable
 fun WorkersListRoute(
     clientId: String,
-    viewModel: WorkersListViewModel,
     currentTime: CurrentTimeSnapshot,
     selectedCategoryId: String? = null,
     selectedCategoryName: String? = null,
@@ -106,6 +106,7 @@ fun WorkersListRoute(
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {}
 ) {
+    val viewModel: WorkersListViewModel = koinViewModel()
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(clientId) {

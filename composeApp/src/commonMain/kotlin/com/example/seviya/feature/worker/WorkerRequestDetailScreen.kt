@@ -17,10 +17,44 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.seviya.app.FeaturePlaceholder
 import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.BrandRed
 import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
+import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerRequestDetailViewModel
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun WorkerRequestDetailRoute(
+    bookingId: String,
+    onBack: () -> Unit
+) {
+    val viewModel: WorkerRequestDetailViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(bookingId) {
+        viewModel.loadBooking(bookingId)
+    }
+
+    uiState.appointment?.let { appointment ->
+        WorkerRequestDetailScreen(
+            booking = appointment,
+            onBack = onBack,
+            onAccept = {
+                viewModel.acceptRequest()
+                onBack()
+            },
+            onReject = {
+                viewModel.rejectRequest()
+                onBack()
+            }
+        )
+    } ?: FeaturePlaceholder(
+        title = "Solicitud",
+        subtitle = "No se encontró la solicitud."
+    )
+}
 
 @Composable
 fun WorkerRequestDetailScreen(

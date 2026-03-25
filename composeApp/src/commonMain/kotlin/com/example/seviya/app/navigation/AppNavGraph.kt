@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.seviya.feature.shared.ProfessionalProfileRoute
 import com.example.seviya.feature.shared.RequestAppointmentRoute
+import com.example.seviya.feature.landing.ServicesRoute
 import com.example.seviya.feature.landing.RoleAdmissionCatalogScreen
 import com.example.seviya.feature.landing.RoleCatalogScreen
 import com.example.seviya.feature.client.navigation.clientNavGraph
@@ -61,18 +62,9 @@ import com.example.seviya.core.navigation.WorkerDashboard
 import com.example.seviya.core.navigation.WorkersList
 import com.example.seviya.feature.categories.CategoriesCatalogRoute
 import com.example.seviya.feature.landing.LandingScreen
-import com.example.seviya.ui.ServicesScreen
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
-import com.example.shared.presentation.categories.CategoriesViewModel
-import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentDraft
-import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
-import com.example.shared.presentation.services.ServicesViewModel
-import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
-import com.example.shared.presentation.workersList.WorkersListViewModel
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AppNavGraph(
@@ -190,15 +182,12 @@ fun NavGraphBuilder.homeNavGraph(
     )
 
     composable<Services> {
-        val viewModel: ServicesViewModel = koinViewModel()
-        ServicesScreen(viewModel)
+        ServicesRoute()
     }
 
     composable<TravelTimeConfig> {
-        val viewModel: WorkerTravelTimeViewModel = koinViewModel()
         TravelTimeConfigRoute(
             workerId = currentWorkerId,
-            viewModel = viewModel,
             onBack = { navController.popBackStack() }
         )
     }
@@ -244,13 +233,10 @@ fun NavGraphBuilder.homeNavGraph(
     }
 
     composable<CategoriesCatalog> {
-        val viewModel: CategoriesViewModel = koinViewModel()
-
         var selectedCategoryId by rememberSaveable { mutableStateOf<String?>(null) }
         var selectedCategoryName by rememberSaveable { mutableStateOf<String?>(null) }
 
         CategoriesCatalogRoute(
-            viewModel = viewModel,
             selectedCategoryId = selectedCategoryId,
             onGoServices = {
                 onCurrentClientTabChange(ClientTab.SERVICES)
@@ -293,7 +279,6 @@ fun NavGraphBuilder.homeNavGraph(
 
     composable<WorkersList> { backStackEntry ->
         val route = backStackEntry.toRoute<WorkersList>()
-        val viewModel: WorkersListViewModel = koinViewModel()
 
         val currentTimeSnapshot = remember {
             buildCurrentTimeSnapshot()
@@ -301,7 +286,6 @@ fun NavGraphBuilder.homeNavGraph(
 
         WorkersListRoute(
             clientId = currentClientId,
-            viewModel = viewModel,
             currentTime = currentTimeSnapshot,
             selectedCategoryId = route.categoryId,
             selectedCategoryName = route.categoryName,
@@ -338,12 +322,10 @@ fun NavGraphBuilder.homeNavGraph(
 
     composable<ProfessionalProfile> { backStackEntry ->
         val route = backStackEntry.toRoute<ProfessionalProfile>()
-        val viewModel: ProfessionalProfileViewModel = koinViewModel()
 
         ProfessionalProfileRoute(
             clientId = currentClientId,
             workerId = route.workerId,
-            viewModel = viewModel,
             onBack = { navController.popBackStack() },
             onBottomServices = {
                 onCurrentClientTabChange(ClientTab.SERVICES)
@@ -388,8 +370,6 @@ fun NavGraphBuilder.homeNavGraph(
     }
 
     composable<RequestAppointment> {
-        val viewModel: RequestAppointmentViewModel = koinViewModel()
-
         if (requestAppointmentDraft == null) {
             FeaturePlaceholder(
                 title = "Solicitud de cita",
@@ -398,7 +378,6 @@ fun NavGraphBuilder.homeNavGraph(
         } else {
             RequestAppointmentRoute(
                 draft = requestAppointmentDraft,
-                viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onOpenRequests = {
                     navController.navigateSingleTop(ClientRequests)

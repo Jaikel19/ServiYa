@@ -82,6 +82,7 @@ import compose.icons.tablericons.Scissors
 import compose.icons.tablericons.Tree
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 
 private const val HOME_CATEGORY_LIMIT = 8
@@ -108,15 +109,15 @@ private data class HomeCategoryVisuals(
 @Composable
 fun ClientHomeRoute(
     clientId: String,
-    categoriesViewModel: CategoriesViewModel,
-    favoriteWorkersViewModel: FavoriteWorkersViewModel,
-    workersListViewModel: WorkersListViewModel,
     avatarPainter: Painter? = null,
     onWorkerClick: (String) -> Unit = {},
     onFavoritesClick: () -> Unit = {},
     onOpenCategoriesCatalog: () -> Unit = {},
     onCategoryClick: (Category) -> Unit = {}
 ) {
+    val categoriesViewModel: CategoriesViewModel = koinViewModel()
+    val favoriteWorkersViewModel: FavoriteWorkersViewModel = koinViewModel()
+    val workersListViewModel: WorkersListViewModel = koinViewModel()
     val categoriesState by categoriesViewModel.uiState.collectAsState()
     val favoritesState by favoriteWorkersViewModel.uiState.collectAsState()
     val workersState by workersListViewModel.uiState.collectAsState()

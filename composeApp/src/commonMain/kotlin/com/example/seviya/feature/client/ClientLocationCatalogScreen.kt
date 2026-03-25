@@ -83,7 +83,21 @@ import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatal
 import compose.icons.TablerIcons
 import compose.icons.tablericons.*
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
+
+@Composable
+fun ClientLocationCatalogRoute(
+    clientId: String,
+    onBack: () -> Unit
+) {
+    val viewModel: ClientLocationCatalogViewModel = koinViewModel()
+    ClientLocationCatalogScreen(
+        clientId = clientId,
+        viewModel = viewModel,
+        onBack = onBack
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -43,13 +43,54 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.seviya.app.FeaturePlaceholder
 import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.BrandRed
 import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.PaymentReceipt
+import com.example.shared.presentation.WorkerPaymentDetail.WorkerPaymentDetailViewModel
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun WorkerPaymentDetailRoute(
+    bookingId: String,
+    onBack: () -> Unit
+) {
+    val viewModel: WorkerPaymentDetailViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(bookingId) {
+        viewModel.loadPaymentDetail(bookingId)
+    }
+
+    LaunchedEffect(uiState.paymentVerified) {
+        if (uiState.paymentVerified) {
+            onBack()
+        }
+    }
+
+    uiState.appointment?.let { appointment ->
+        WorkerPaymentDetailScreen(
+            appointment = appointment,
+            paymentReceipt = uiState.paymentReceipt,
+            onBack = onBack,
+            onVerifyPayment = {
+                viewModel.verifyPayment()
+                onBack()
+            },
+            onReportProblem = {
+                viewModel.reportProblem()
+                onBack()
+            }
+        )
+    } ?: FeaturePlaceholder(
+        title = "Comprobante",
+        subtitle = "No se encontró el pago."
+    )
+}
 
 @Composable
 fun WorkerPaymentDetailScreen(

@@ -93,13 +93,13 @@ import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 import kotlin.time.Clock
 
 @Composable
 fun ClientDashboardRoute(
     clientId: String,
-    viewModel: ClientDashboardViewModel,
     avatarPainter: Painter? = null,
     onOpenAppointmentDetail: (String) -> Unit = {},
     onOpenAgenda: () -> Unit = {},
@@ -111,6 +111,7 @@ fun ClientDashboardRoute(
     onOpenCategories: () -> Unit = {},
     onOpenMenu: () -> Unit = {}
 ) {
+    val viewModel: ClientDashboardViewModel = koinViewModel()
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(clientId) {

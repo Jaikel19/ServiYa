@@ -11,16 +11,28 @@ import com.example.shared.presentation.clientToWorkerReview.ClientToWorkerReview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ClientToWorkerReviewScreen(
+fun ClientToWorkerReviewRoute(
     appointmentId: String,
     onBack: () -> Unit
 ) {
     val viewModel: ClientToWorkerReviewViewModel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(appointmentId) {
         viewModel.loadAppointment(appointmentId)
     }
+
+    ClientToWorkerReviewScreen(
+        viewModel = viewModel,
+        onBack = onBack
+    )
+}
+
+@Composable
+fun ClientToWorkerReviewScreen(
+    viewModel: ClientToWorkerReviewViewModel,
+    onBack: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier

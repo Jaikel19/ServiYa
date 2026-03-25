@@ -26,8 +26,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,26 @@ import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.BrandRed
 import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun WorkerToClientReviewRoute(
+    appointmentId: String,
+    onBack: () -> Unit,
+    onSubmitSuccess: () -> Unit
+) {
+    val viewModel: WorkerToClientReviewViewModel = koinViewModel()
+
+    LaunchedEffect(appointmentId) {
+        viewModel.loadAppointment(appointmentId)
+    }
+
+    WorkerToClientReviewScreen(
+        viewModel = viewModel,
+        onBack = onBack,
+        onSubmitSuccess = onSubmitSuccess
+    )
+}
 
 @Composable
 fun WorkerToClientReviewScreen(

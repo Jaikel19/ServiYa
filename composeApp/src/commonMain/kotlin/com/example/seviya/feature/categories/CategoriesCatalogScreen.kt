@@ -41,10 +41,10 @@ import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Category
 import com.example.shared.presentation.categories.CategoriesUiState
 import com.example.shared.presentation.categories.CategoriesViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun CategoriesCatalogRoute(
-    viewModel: CategoriesViewModel,
     selectedCategoryId: String?,
     onGoServices: () -> Unit,
     onGoMap: () -> Unit,
@@ -59,6 +59,7 @@ fun CategoriesCatalogRoute(
     onCategoryClick: (Category) -> Unit = {},
     onContinueWithSelectedCategory: () -> Unit
 ) {
+    val viewModel: CategoriesViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     CategoriesCatalogScreen(

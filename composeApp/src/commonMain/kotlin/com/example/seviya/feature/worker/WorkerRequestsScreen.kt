@@ -76,8 +76,37 @@ import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsUiState
+import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun WorkerRequestsRoute(
+    workerId: String,
+    onOpenRequestDetail: (appointmentId: String) -> Unit = {},
+    onOpenPaymentDetail: (appointmentId: String) -> Unit = {},
+    onBack: () -> Unit = {}
+) {
+    val viewModel: WorkerRequestsViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(workerId) {
+        viewModel.loadRequests(workerId)
+    }
+
+    WorkerRequestsScreen(
+        uiState = uiState,
+        onAccept = { appointment -> viewModel.acceptRequest(appointment) },
+        onReject = { appointment -> viewModel.rejectRequest(appointment) },
+        onConfirm = { appointment -> viewModel.confirmPayment(appointment) },
+        onCancel = { appointment -> viewModel.cancelPayment(appointment) },
+        onLoadPaymentPending = { viewModel.loadPaymentPending(workerId) },
+        onOpenRequestDetail = onOpenRequestDetail,
+        onOpenPaymentDetail = onOpenPaymentDetail,
+        onBack = onBack
+    )
+}
 
 enum class RequestFilter {
     PENDING,

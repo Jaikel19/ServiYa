@@ -74,6 +74,24 @@ import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.BrandRed
 import com.example.seviya.core.designsystem.theme.White
 import compose.icons.tablericons.ArrowLeft
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun DailyAgendaRoute(
+    userId: String,
+    role: CalendarUserRole,
+    onBack: () -> Unit,
+    onOpenDetail: (Appointment) -> Unit
+) {
+    val viewModel: DailyAgendaViewModel = koinViewModel()
+    DailyAgendaScreen(
+        viewModel = viewModel,
+        userId = userId,
+        role = role,
+        onBack = onBack,
+        onOpenDetail = onOpenDetail
+    )
+}
 
 @OptIn(ExperimentalTime::class)
 @Composable
