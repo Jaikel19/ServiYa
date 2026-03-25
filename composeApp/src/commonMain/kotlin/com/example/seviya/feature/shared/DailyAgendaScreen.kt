@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -509,7 +509,7 @@ private fun DayPill(
         color = bg,
         shadowElevation = if (selected) 10.dp else 1.dp,
         border = if (selected) null
-        else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE7ECF2))
+        else BorderStroke(1.dp, Color(0xFFE7ECF2))
     ) {
         Column(
             modifier = Modifier

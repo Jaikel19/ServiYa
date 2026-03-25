@@ -737,7 +737,7 @@ private fun AddEditLocationForm(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            _root_ide_package_.com.example.seviya.UI.CurrentLocationButton(
+            CurrentLocationButton(
                 onLocationObtained = { lat, lng, prov, cant, dist ->
                     latitude = lat
                     longitude = lng

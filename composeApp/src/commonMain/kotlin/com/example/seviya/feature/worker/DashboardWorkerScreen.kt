@@ -1,5 +1,6 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.worker
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,6 +47,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -423,7 +425,7 @@ private fun CurrentAppointmentSection(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(32.dp),
                 color = CardSurface,
-                border = androidx.compose.foundation.BorderStroke(1.dp, BorderSoft),
+                border = BorderStroke(1.dp, BorderSoft),
                 shadowElevation = 2.dp
             ) {
                 Box(
@@ -449,7 +451,7 @@ private fun CurrentAppointmentSection(
                 .clickable { onOpenAppointmentDetail(booking) },
             shape = RoundedCornerShape(34.dp),
             color = CardSurface,
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSoft),
+            border = BorderStroke(1.dp, BorderSoft),
             shadowElevation = 6.dp
         ) {
             Column(
@@ -732,7 +734,7 @@ private fun QuickAccessSection(
 @Composable
 private fun QuickAccessItem(
     title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     iconTint: Color,
     background: Color,
     onClick: () -> Unit
@@ -787,7 +789,7 @@ private fun UpcomingAppointmentsSection(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(28.dp),
                 color = CardSurface,
-                border = androidx.compose.foundation.BorderStroke(1.dp, BorderSoft)
+                border = BorderStroke(1.dp, BorderSoft)
             ) {
                 Box(
                     modifier = Modifier
@@ -842,7 +844,7 @@ private fun UpcomingAppointmentCard(
             .clickable { onClick() },
         shape = RoundedCornerShape(30.dp),
         color = background,
-        border = if (dark) null else androidx.compose.foundation.BorderStroke(1.dp, BorderSoft),
+        border = if (dark) null else BorderStroke(1.dp, BorderSoft),
         shadowElevation = 4.dp
     ) {
         Column(
@@ -977,7 +979,7 @@ private fun MetricCard(
         modifier = modifier,
         shape = RoundedCornerShape(26.dp),
         color = CardSurface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, BorderSoft),
+        border = BorderStroke(1.dp, BorderSoft),
         shadowElevation = 2.dp
     ) {
         Column(

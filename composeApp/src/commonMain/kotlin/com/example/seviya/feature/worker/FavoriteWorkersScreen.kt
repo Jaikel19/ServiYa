@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.worker
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

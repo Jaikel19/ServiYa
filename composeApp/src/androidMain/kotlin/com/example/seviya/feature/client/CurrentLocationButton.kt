@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
 import android.Manifest
 import android.annotation.SuppressLint

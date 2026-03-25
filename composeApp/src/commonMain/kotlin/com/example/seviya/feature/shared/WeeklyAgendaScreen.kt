@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -68,6 +68,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.BrandRed
 import com.example.seviya.core.designsystem.theme.White
@@ -473,7 +474,7 @@ private fun WeeklyAgendaHeader(
 
 @Composable
 private fun CircleIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Surface(
