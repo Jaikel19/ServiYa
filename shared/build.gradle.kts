@@ -2,15 +2,16 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidKotlinMultiplatformLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.androidLint)
     alias(libs.plugins.sqlDelight)
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
+    jvmToolchain(21)
 
-    androidLibrary {
+    android {
         namespace = "com.example.shared"
         compileSdk = 36
         minSdk = 24

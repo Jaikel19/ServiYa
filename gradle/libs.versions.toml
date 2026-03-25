@@ -9,21 +9,21 @@ kamel = "1.0.9"
 sqldelight = "2.2.1"
 google-services = "4.4.4"
 
-agp = "8.11.2"
+agp = "9.1.0"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activity = "1.12.2"
+androidx-activity = "1.13.0"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.17.0"
 androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.9.6"
 androidx-testExt = "1.3.0"
-composeMultiplatform = "1.10.0"
+composeMultiplatform = "1.10.2"
 junit = "4.13.2"
-kotlin = "2.3.0"
+kotlin = "2.3.20"
 material3 = "1.10.0-alpha05"
-kotlinStdlib = "2.3.0"
+kotlinStdlib = "2.3.20"
 runner = "1.7.0"
 core = "1.7.0"
 composeIcons = "1.7.3"
@@ -117,11 +117,10 @@ androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
