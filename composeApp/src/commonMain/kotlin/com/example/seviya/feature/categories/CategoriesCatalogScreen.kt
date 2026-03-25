@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.categories
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -28,7 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.seviya.theme.*
+import com.example.seviya.UI.CategoriesHeader
+import com.example.seviya.UI.CategoriesMenuOverlay
+import com.example.seviya.UI.CategoryCard
+import com.example.seviya.UI.ContinueButtonBar
+import com.example.seviya.core.designsystem.theme.AppBackgroundAlt
+import com.example.seviya.core.designsystem.theme.BackgroundTopBlue
+import com.example.seviya.core.designsystem.theme.BorderSoftAlt
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.TextBluePrimary
+import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Category
 import com.example.shared.presentation.categories.CategoriesUiState
 import com.example.shared.presentation.categories.CategoriesViewModel

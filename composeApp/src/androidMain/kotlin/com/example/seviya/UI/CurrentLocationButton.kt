@@ -18,8 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.AvatarBlueSoft
-import com.example.seviya.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.AvatarBlueSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import java.util.Locale

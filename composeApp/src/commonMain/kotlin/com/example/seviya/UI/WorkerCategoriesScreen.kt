@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -41,7 +40,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -69,7 +67,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.*
+import com.example.seviya.core.designsystem.theme.AppBackground
+import com.example.seviya.core.designsystem.theme.AppBackgroundAlt
+import com.example.seviya.core.designsystem.theme.BlueGrayText
+import com.example.seviya.core.designsystem.theme.BorderSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.InactiveSoft
+import com.example.seviya.core.designsystem.theme.SoftBlueSurface
+import com.example.seviya.core.designsystem.theme.SoftSurface
+import com.example.seviya.core.designsystem.theme.TextBluePrimary
+import com.example.seviya.core.designsystem.theme.TextSecondary
+import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Category
 import com.example.shared.presentation.workerCategories.WorkerCategoriesUiState
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel

@@ -1,4 +1,4 @@
-package com.example.seviya.navigation
+package com.example.seviya.core.navigation
 
 import kotlinx.serialization.Serializable
 

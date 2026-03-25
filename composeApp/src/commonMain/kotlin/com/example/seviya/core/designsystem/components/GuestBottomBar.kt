@@ -1,13 +1,15 @@
-package com.example.seviya.components
+package com.example.seviya.core.designsystem.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +40,7 @@ fun GuestBottomBar(
     NavigationBar(
         containerColor = Color.White.copy(alpha = 0.92f),
         tonalElevation = 10f.dp,
-        modifier = androidx.compose.ui.Modifier.border(1.dp, GuestNavColors.Border)
+        modifier = Modifier.border(1.dp, GuestNavColors.Border)
     ) {
         GuestBottomItem(
             label = "INICIO",
@@ -80,7 +82,7 @@ private fun RowScope.GuestBottomItem(
         selected = active,
         onClick = onClick,
         icon = {
-            androidx.compose.material3.Icon(
+            Icon(
                 imageVector = icon,
                 contentDescription = label,
                 tint = color

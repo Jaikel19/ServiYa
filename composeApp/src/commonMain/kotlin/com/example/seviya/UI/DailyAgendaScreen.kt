@@ -41,7 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.seviya.theme.*
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
@@ -51,7 +50,6 @@ import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -70,10 +68,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.sp
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.White
 import compose.icons.tablericons.ArrowLeft
 
 @OptIn(ExperimentalTime::class)

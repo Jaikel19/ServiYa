@@ -4,8 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
@@ -17,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.*
 import com.example.shared.presentation.clientMap.ClientMapViewModel
 import com.example.shared.presentation.clientMap.WorkerMapMarker
 import compose.icons.TablerIcons
@@ -42,6 +39,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import com.example.seviya.core.designsystem.theme.AppBackground
+import com.example.seviya.core.designsystem.theme.BlueGrayText
+import com.example.seviya.core.designsystem.theme.BorderSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.ClientSectionCardBorder
+import com.example.seviya.core.designsystem.theme.InactiveSoft
+import com.example.seviya.core.designsystem.theme.SoftBlueSurface
+import com.example.seviya.core.designsystem.theme.SoftSurface
+import com.example.seviya.core.designsystem.theme.TextBluePrimary
+import com.example.seviya.core.designsystem.theme.White
 
 
 @Composable

@@ -11,7 +11,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -44,12 +43,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.offset
-import androidx.compose.ui.draw.scale
+import com.example.seviya.core.designsystem.theme.AvatarBlueSoft
+import com.example.seviya.core.designsystem.theme.BorderUltraSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandBlueAlt
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.SoftBlueSurface
+import com.example.seviya.core.designsystem.theme.SoftBlueSurfaceAlt
+import com.example.seviya.core.designsystem.theme.SubtitleOnBlue
+import com.example.seviya.core.designsystem.theme.TextPrimary
+import com.example.seviya.core.designsystem.theme.TextSecondary
+import com.example.seviya.core.designsystem.theme.White
 
 // ✅ Tabler Icons (Compose Icons)
 import compose.icons.TablerIcons
 import compose.icons.tablericons.*
-import com.example.seviya.theme.*
 
 private enum class RolesTab { HOME, LOGIN, REGISTER }
 private enum class SelectedRole { CLIENT, WORKER }

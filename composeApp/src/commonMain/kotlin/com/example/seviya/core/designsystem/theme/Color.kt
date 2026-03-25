@@ -1,4 +1,4 @@
-package com.example.seviya.theme
+package com.example.seviya.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

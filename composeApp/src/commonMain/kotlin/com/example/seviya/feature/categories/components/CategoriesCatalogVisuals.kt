@@ -2,7 +2,7 @@ package com.example.seviya.UI
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.seviya.theme.White
+import com.example.seviya.core.designsystem.theme.White
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Apps
 import compose.icons.tablericons.Briefcase

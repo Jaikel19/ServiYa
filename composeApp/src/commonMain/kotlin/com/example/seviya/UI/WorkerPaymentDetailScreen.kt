@@ -43,9 +43,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.seviya.theme.BrandBlue
-import com.example.seviya.theme.BrandRed
-import com.example.seviya.theme.White
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.PaymentReceipt
 import io.kamel.image.KamelImage

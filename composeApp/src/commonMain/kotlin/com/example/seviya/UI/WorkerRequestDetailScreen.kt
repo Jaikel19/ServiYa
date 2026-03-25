@@ -17,9 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.BrandBlue
-import com.example.seviya.theme.BrandRed
-import com.example.seviya.theme.White
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 
 @Composable

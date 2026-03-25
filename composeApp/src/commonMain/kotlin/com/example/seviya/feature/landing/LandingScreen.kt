@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.landing
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -48,7 +48,23 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
-import com.example.seviya.theme.*
+import com.example.seviya.core.designsystem.theme.AccentBlue
+import com.example.seviya.core.designsystem.theme.AccentYellow
+import com.example.seviya.core.designsystem.theme.AppBackgroundAlt
+import com.example.seviya.core.designsystem.theme.BlueTextSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandBlueAlt
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.CardBorderLight
+import com.example.seviya.core.designsystem.theme.DividerLight
+import com.example.seviya.core.designsystem.theme.FooterBlueSoft
+import com.example.seviya.core.designsystem.theme.NeutralText
+import com.example.seviya.core.designsystem.theme.NeutralTextStrong
+import com.example.seviya.core.designsystem.theme.SkyBlue
+import com.example.seviya.core.designsystem.theme.SkyBlueSoft
+import com.example.seviya.core.designsystem.theme.TextOnBlueSoft
+import com.example.seviya.core.designsystem.theme.TextSecondaryAlt
+import com.example.seviya.core.designsystem.theme.White
 
 // ✅ Tabler Icons (compose-icons)
 import compose.icons.TablerIcons

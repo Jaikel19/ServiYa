@@ -13,7 +13,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -39,7 +38,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,18 +67,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.seviya.core.designsystem.theme.AvatarBlueSoft
+import com.example.seviya.core.designsystem.theme.BorderUltraSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandBlueAlt
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.SoftBlueSurface
+import com.example.seviya.core.designsystem.theme.SoftBlueSurfaceAlt
+import com.example.seviya.core.designsystem.theme.SubtitleOnBlue
+import com.example.seviya.core.designsystem.theme.TextPrimary
+import com.example.seviya.core.designsystem.theme.TextSecondary
+import com.example.seviya.core.designsystem.theme.White
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Briefcase
 import compose.icons.tablericons.Coin
-import compose.icons.tablericons.Home
-import compose.icons.tablericons.Login
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Search
 import compose.icons.tablericons.ShieldCheck
 import compose.icons.tablericons.User
-import compose.icons.tablericons.UserPlus
 import kotlinx.coroutines.delay
-import com.example.seviya.theme.*
 
 private enum class RolesAdmissionTab { HOME, LOGIN, REGISTER }
 private enum class SelectedRoleAdmission { CLIENT, WORKER }

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -35,7 +34,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -57,16 +55,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.*
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeUiState
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
 import compose.icons.TablerIcons
@@ -77,6 +70,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.graphicsLayer
+import com.example.seviya.core.designsystem.theme.AppBackgroundAlt
+import com.example.seviya.core.designsystem.theme.BorderSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.InactiveSoft
+import com.example.seviya.core.designsystem.theme.SoftBlueSurface
+import com.example.seviya.core.designsystem.theme.TextBluePrimary
+import com.example.seviya.core.designsystem.theme.TextSecondary
+import com.example.seviya.core.designsystem.theme.White
 
 @Composable
 fun TravelTimeConfigRoute(

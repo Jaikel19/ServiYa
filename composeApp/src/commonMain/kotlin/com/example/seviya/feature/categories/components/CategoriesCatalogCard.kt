@@ -42,10 +42,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.BorderSoftAlt
-import com.example.seviya.theme.TextBluePrimary
-import com.example.seviya.theme.TextSecondary
-import com.example.seviya.theme.White
+import com.example.seviya.core.designsystem.theme.BorderSoftAlt
+import com.example.seviya.core.designsystem.theme.TextBluePrimary
+import com.example.seviya.core.designsystem.theme.TextSecondary
+import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Category
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ChevronRight

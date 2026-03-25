@@ -68,7 +68,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.theme.*
+import com.example.seviya.core.designsystem.theme.AppBackground
+import com.example.seviya.core.designsystem.theme.AvatarBlueSoft
+import com.example.seviya.core.designsystem.theme.BlueGrayText
+import com.example.seviya.core.designsystem.theme.BorderSoft
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.CardSurface
+import com.example.seviya.core.designsystem.theme.TextPrimary
+import com.example.seviya.core.designsystem.theme.TextSecondary
+import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Address
 import com.example.shared.presentation.clientLocationCatalog.ClientLocationCatalogViewModel
 import compose.icons.TablerIcons

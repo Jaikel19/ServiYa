@@ -40,10 +40,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.seviya.theme.SoftBlueSurface
-import com.example.seviya.theme.SoftSurface
-import com.example.seviya.theme.TextSecondaryAlt
-import com.example.seviya.theme.White
+import com.example.seviya.core.designsystem.theme.SoftBlueSurface
+import com.example.seviya.core.designsystem.theme.SoftSurface
+import com.example.seviya.core.designsystem.theme.TextSecondaryAlt
+import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.PaymentReceipt
 import com.example.shared.domain.entity.ReviewMeta

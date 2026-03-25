@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.seviya.theme.BorderSoftAlt
-import com.example.seviya.theme.BrandBlue
-import com.example.seviya.theme.InactiveSoft
-import com.example.seviya.theme.White
+import com.example.seviya.core.designsystem.theme.BorderSoftAlt
+import com.example.seviya.core.designsystem.theme.BrandBlue
+import com.example.seviya.core.designsystem.theme.InactiveSoft
+import com.example.seviya.core.designsystem.theme.White
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 @Composable

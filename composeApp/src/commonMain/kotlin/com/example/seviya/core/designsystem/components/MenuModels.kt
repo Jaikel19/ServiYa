@@ -1,4 +1,4 @@
-package com.example.seviya.components
+package com.example.seviya.core.designsystem.components
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
