@@ -48,12 +48,10 @@ import com.example.seviya.UI.ClientDashboardRoute
 import com.example.seviya.UI.ClientHomeRoute
 import com.example.seviya.UI.ClientMapScreen
 import com.example.seviya.UI.ClientPaymentUploadScreen
-import com.example.seviya.UI.CurrentTimeSnapshot
 import com.example.seviya.UI.FavoriteWorkersRoute
 import com.example.seviya.UI.LandingScreen
 import com.example.seviya.UI.MonthlyCalendarScreen
 import com.example.seviya.UI.ProfessionalProfileRoute
-import com.example.seviya.UI.RequestAppointmentDraft
 import com.example.seviya.UI.RequestAppointmentRoute
 import com.example.seviya.UI.RoleAdmissionCatalogScreen
 import com.example.seviya.UI.RoleCatalogScreen
@@ -117,6 +115,8 @@ import com.example.seviya.navigation.WorkerServices
 import com.example.seviya.navigation.WorkerSettings
 import com.example.seviya.navigation.WorkerStartAppointmentOtp
 import com.example.seviya.navigation.WorkersList
+import com.example.shared.presentation.requestAppointment.CurrentTimeSnapshot
+import com.example.shared.presentation.requestAppointment.RequestAppointmentDraft
 import com.example.seviya.theme.AppTheme
 import com.example.seviya.ui.ClientRequestsScreen
 import com.example.seviya.ui.ServicesScreen

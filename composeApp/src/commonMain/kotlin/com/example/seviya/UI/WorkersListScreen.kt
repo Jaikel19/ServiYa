@@ -71,6 +71,7 @@ import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.WorkZone
 import com.example.shared.domain.entity.WorkerListItemData
 import com.example.shared.domain.entity.WorkerSchedule
+import com.example.shared.presentation.requestAppointment.CurrentTimeSnapshot
 import com.example.shared.presentation.workersList.WorkersListUiState
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import compose.icons.TablerIcons
