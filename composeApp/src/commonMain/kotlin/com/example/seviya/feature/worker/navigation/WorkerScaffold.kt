@@ -8,7 +8,13 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -65,6 +71,45 @@ fun NavDestination?.isWorkerScaffoldDestination(): Boolean {
         destination.hasRoute<TravelTimeConfig>() ||
         destination.hasRoute<WorkerAppointmentDetail>() ||
         destination.hasRoute<WorkerDailyAppointments>()
+}
+
+@Composable
+fun WorkerScaffold(
+    navController: NavHostController,
+    currentWorkerId: String,
+    currentTab: WorkerTab,
+    menuExpanded: Boolean,
+    onCurrentTabChange: (WorkerTab) -> Unit,
+    onClientMenuExpandedChange: (Boolean) -> Unit,
+    onWorkerMenuExpandedChange: (Boolean) -> Unit,
+    onLogout: () -> Unit,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            bottomBar = {
+                WorkerFeatureBottomBar(
+                    navController = navController,
+                    currentTab = currentTab,
+                    menuExpanded = menuExpanded,
+                    onCurrentTabChange = onCurrentTabChange,
+                    onClientMenuExpandedChange = onClientMenuExpandedChange,
+                    onWorkerMenuExpandedChange = onWorkerMenuExpandedChange
+                )
+            }
+        ) { innerPadding ->
+            content(innerPadding)
+        }
+
+        WorkerFeatureMenu(
+            navController = navController,
+            currentWorkerId = currentWorkerId,
+            menuExpanded = menuExpanded,
+            onWorkerMenuExpandedChange = onWorkerMenuExpandedChange,
+            onLogout = onLogout
+        )
+    }
 }
 
 @Composable

@@ -8,7 +8,11 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -18,6 +22,8 @@ import com.example.seviya.core.designsystem.components.ClientBottomBar
 import com.example.seviya.core.designsystem.components.ClientTab
 import com.example.seviya.core.designsystem.components.FullScreenMenu
 import com.example.seviya.core.designsystem.components.MenuOption
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import com.example.seviya.core.navigation.CategoriesCatalog
 import com.example.seviya.core.navigation.ClientAgenda
 import com.example.seviya.core.navigation.ClientAlerts
@@ -68,6 +74,43 @@ fun NavDestination?.isClientScaffoldDestination(): Boolean {
         destination.hasRoute<ClientRequests>() ||
         destination.hasRoute<ClientPaymentUpload>() ||
         destination.hasRoute<ClientLocationCatalog>()
+}
+
+@Composable
+fun ClientScaffold(
+    navController: NavHostController,
+    currentTab: ClientTab,
+    menuExpanded: Boolean,
+    onCurrentTabChange: (ClientTab) -> Unit,
+    onClientMenuExpandedChange: (Boolean) -> Unit,
+    onWorkerMenuExpandedChange: (Boolean) -> Unit,
+    onLogout: () -> Unit,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            bottomBar = {
+                ClientFeatureBottomBar(
+                    navController = navController,
+                    currentTab = currentTab,
+                    menuExpanded = menuExpanded,
+                    onCurrentTabChange = onCurrentTabChange,
+                    onClientMenuExpandedChange = onClientMenuExpandedChange,
+                    onWorkerMenuExpandedChange = onWorkerMenuExpandedChange
+                )
+            }
+        ) { innerPadding ->
+            content(innerPadding)
+        }
+
+        ClientFeatureMenu(
+            navController = navController,
+            menuExpanded = menuExpanded,
+            onClientMenuExpandedChange = onClientMenuExpandedChange,
+            onLogout = onLogout
+        )
+    }
 }
 
 @Composable

@@ -3,7 +3,6 @@ package com.example.seviya.app
 
 //esto se agrego para que sirva drante la migracion de booking
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -44,11 +43,9 @@ import com.example.shared.domain.entity.Booking
 import com.example.shared.domain.entity.Service
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.seviya.app.navigation.AppNavGraph
-import com.example.seviya.feature.client.navigation.ClientFeatureBottomBar
-import com.example.seviya.feature.client.navigation.ClientFeatureMenu
+import com.example.seviya.feature.client.navigation.ClientScaffold
 import com.example.seviya.feature.client.navigation.isClientScaffoldDestination
-import com.example.seviya.feature.worker.navigation.WorkerFeatureBottomBar
-import com.example.seviya.feature.worker.navigation.WorkerFeatureMenu
+import com.example.seviya.feature.worker.navigation.WorkerScaffold
 import com.example.seviya.feature.worker.navigation.isWorkerScaffoldDestination
 import com.example.shared.utils.DateTimeUtils
 import org.koin.compose.viewmodel.koinViewModel
@@ -108,57 +105,111 @@ fun App() {
         }
 
     AppTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            showClientBottomBar -> {
+                ClientScaffold(
+                    navController = navController,
+                    currentTab = currentClientTab,
+                    menuExpanded = clientMenuExpanded,
+                    onCurrentTabChange = { currentClientTab = it },
+                    onClientMenuExpandedChange = { clientMenuExpanded = it },
+                    onWorkerMenuExpandedChange = { workerMenuExpanded = it },
+                    onLogout = {
+                        clientMenuExpanded = false
+                        workerMenuExpanded = false
+                        sessionRole = SessionRole.GUEST
+                        currentClientTab = ClientTab.SERVICES
+                        requestAppointmentDraft = null
+                        navController.navigateToLandingClearingStack()
+                    }
+                ) { innerPadding ->
+                    AppNavGraph(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
+                        currentWorkerId = currentWorkerId,
+                        onCurrentWorkerIdChange = { currentWorkerId = it },
+                        currentClientId = currentClientId,
+                        onCurrentClientIdChange = { currentClientId = it },
+                        currentClientName = currentClientName,
+                        onCurrentClientNameChange = { currentClientName = it },
+                        requestAppointmentDraft = requestAppointmentDraft,
+                        onRequestAppointmentDraftChange = { requestAppointmentDraft = it },
+                        onSessionRoleChange = { sessionRole = it },
+                        onCurrentClientTabChange = { currentClientTab = it },
+                        onCurrentWorkerTabChange = { currentWorkerTab = it },
+                        onClientMenuExpandedChange = { clientMenuExpanded = it },
+                        onWorkerMenuExpandedChange = { workerMenuExpanded = it },
+                        monthlyCalendarViewModel = monthlyCalendarViewModel
+                    )
+                }
+            }
+
+            showWorkerBottomBar -> {
+                WorkerScaffold(
+                    navController = navController,
+                    currentWorkerId = currentWorkerId,
+                    currentTab = currentWorkerTab,
+                    menuExpanded = workerMenuExpanded,
+                    onCurrentTabChange = { currentWorkerTab = it },
+                    onClientMenuExpandedChange = { clientMenuExpanded = it },
+                    onWorkerMenuExpandedChange = { workerMenuExpanded = it },
+                    onLogout = {
+                        workerMenuExpanded = false
+                        clientMenuExpanded = false
+                        sessionRole = SessionRole.GUEST
+                        currentWorkerTab = WorkerTab.DASHBOARD
+                        requestAppointmentDraft = null
+                        navController.navigateToLandingClearingStack()
+                    }
+                ) { innerPadding ->
+                    AppNavGraph(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
+                        currentWorkerId = currentWorkerId,
+                        onCurrentWorkerIdChange = { currentWorkerId = it },
+                        currentClientId = currentClientId,
+                        onCurrentClientIdChange = { currentClientId = it },
+                        currentClientName = currentClientName,
+                        onCurrentClientNameChange = { currentClientName = it },
+                        requestAppointmentDraft = requestAppointmentDraft,
+                        onRequestAppointmentDraftChange = { requestAppointmentDraft = it },
+                        onSessionRoleChange = { sessionRole = it },
+                        onCurrentClientTabChange = { currentClientTab = it },
+                        onCurrentWorkerTabChange = { currentWorkerTab = it },
+                        onClientMenuExpandedChange = { clientMenuExpanded = it },
+                        onWorkerMenuExpandedChange = { workerMenuExpanded = it },
+                        monthlyCalendarViewModel = monthlyCalendarViewModel
+                    )
+                }
+            }
+
+            else -> {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.background,
                 bottomBar = {
-                    when {
-                        showGuestBottomBar -> {
-                            GuestBottomBar(
-                                currentTab = guestCurrentTab,
-                                onHome = {
-                                    sessionRole = SessionRole.GUEST
-                                    clientMenuExpanded = false
-                                    workerMenuExpanded = false
-                                    requestAppointmentDraft = null
-                                    navController.navigateSingleTop(Landing)
-                                },
-                                onLogin = {
-                                    sessionRole = SessionRole.GUEST
-                                    clientMenuExpanded = false
-                                    workerMenuExpanded = false
-                                    navController.navigateSingleTop(RoleAdmissionCatalog)
-                                },
-                                onRegister = {
-                                    sessionRole = SessionRole.GUEST
-                                    clientMenuExpanded = false
-                                    workerMenuExpanded = false
-                                    navController.navigateSingleTop(RoleCatalog)
-                                }
-                            )
-                        }
-
-                        showClientBottomBar -> {
-                            ClientFeatureBottomBar(
-                                navController = navController,
-                                currentTab = currentClientTab,
-                                menuExpanded = clientMenuExpanded,
-                                onCurrentTabChange = { currentClientTab = it },
-                                onClientMenuExpandedChange = { clientMenuExpanded = it },
-                                onWorkerMenuExpandedChange = { workerMenuExpanded = it }
-                            )
-                        }
-
-                        showWorkerBottomBar -> {
-                            WorkerFeatureBottomBar(
-                                navController = navController,
-                                currentTab = currentWorkerTab,
-                                menuExpanded = workerMenuExpanded,
-                                onCurrentTabChange = { currentWorkerTab = it },
-                                onClientMenuExpandedChange = { clientMenuExpanded = it },
-                                onWorkerMenuExpandedChange = { workerMenuExpanded = it }
-                            )
-                        }
+                    if (showGuestBottomBar) {
+                        GuestBottomBar(
+                            currentTab = guestCurrentTab,
+                            onHome = {
+                                sessionRole = SessionRole.GUEST
+                                clientMenuExpanded = false
+                                workerMenuExpanded = false
+                                requestAppointmentDraft = null
+                                navController.navigateSingleTop(Landing)
+                            },
+                            onLogin = {
+                                sessionRole = SessionRole.GUEST
+                                clientMenuExpanded = false
+                                workerMenuExpanded = false
+                                navController.navigateSingleTop(RoleAdmissionCatalog)
+                            },
+                            onRegister = {
+                                sessionRole = SessionRole.GUEST
+                                clientMenuExpanded = false
+                                workerMenuExpanded = false
+                                navController.navigateSingleTop(RoleCatalog)
+                            }
+                        )
                     }
                 }
             ) { innerPadding ->
@@ -181,38 +232,6 @@ fun App() {
                     monthlyCalendarViewModel = monthlyCalendarViewModel
                 )
             }
-
-            if (sessionRole == SessionRole.CLIENT) {
-                ClientFeatureMenu(
-                    navController = navController,
-                    menuExpanded = clientMenuExpanded,
-                    onClientMenuExpandedChange = { clientMenuExpanded = it },
-                    onLogout = {
-                        clientMenuExpanded = false
-                        workerMenuExpanded = false
-                        sessionRole = SessionRole.GUEST
-                        currentClientTab = ClientTab.SERVICES
-                        requestAppointmentDraft = null
-                        navController.navigateToLandingClearingStack()
-                    }
-                )
-            }
-
-            if (sessionRole == SessionRole.WORKER) {
-                WorkerFeatureMenu(
-                    navController = navController,
-                    currentWorkerId = currentWorkerId,
-                    menuExpanded = workerMenuExpanded,
-                    onWorkerMenuExpandedChange = { workerMenuExpanded = it },
-                    onLogout = {
-                        workerMenuExpanded = false
-                        clientMenuExpanded = false
-                        sessionRole = SessionRole.GUEST
-                        currentWorkerTab = WorkerTab.DASHBOARD
-                        requestAppointmentDraft = null
-                        navController.navigateToLandingClearingStack()
-                    }
-                )
             }
         }
     }
