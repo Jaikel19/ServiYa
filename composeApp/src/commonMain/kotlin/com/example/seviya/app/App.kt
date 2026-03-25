@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -20,7 +19,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -215,112 +213,6 @@ fun App() {
                         navController.navigateToLandingClearingStack()
                     }
                 )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ClientDashboardPlaceholder(
-    onGoToProfessionalProfile: () -> Unit,
-    onBackToLanding: () -> Unit,
-    onGoToCategories: () -> Unit,
-    onGoToServices: () -> Unit,
-    onGoToClientAppointmentDetail: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Dashboard Cliente",
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            Text(
-                text = "Pantalla temporal para pruebas del flujo de ingreso.",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
-            )
-
-            Button(
-                onClick = onGoToCategories,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Text("Ir a categorías")
-            }
-
-            Button(
-                onClick = onGoToProfessionalProfile,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Text("Ir al perfil profesional")
-            }
-
-            Button(
-                onClick = onGoToServices,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Text("Ir a servicios")
-            }
-
-            Button(
-                onClick = onGoToClientAppointmentDetail,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Text("Ir a detalle de cita cliente")
-            }
-
-            Button(onClick = onBackToLanding) {
-                Text("Volver al landing")
-            }
-        }
-    }
-}
-
-@Composable
-private fun WorkerDashboardPlaceholder(
-    onBackToLanding: () -> Unit,
-    onGoToMonthlyCalendar: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Dashboard Trabajador",
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            Text(
-                text = "Pantalla temporal para pruebas del flujo de ingreso.",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
-            )
-
-            Button(
-                onClick = onGoToMonthlyCalendar,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Text("Ir a la agenda")
-            }
-
-            Button(onClick = onBackToLanding) {
-                Text("Volver al landing")
             }
         }
     }
