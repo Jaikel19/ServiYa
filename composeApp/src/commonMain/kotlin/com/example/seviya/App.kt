@@ -159,6 +159,7 @@ import com.example.seviya.UI.ClientToWorkerReviewScreen
 import com.example.seviya.UI.WorkerToClientReviewScreen
 import com.example.seviya.navigation.ClientLocationCatalog
 import com.example.seviya.navigation.ClientToWorkerReview
+import com.example.seviya.navigation.WorkerDailyAgenda
 import com.example.seviya.navigation.WorkerToClientReview
 import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
 import compose.icons.TablerIcons
@@ -1025,9 +1026,25 @@ fun App() {
 
                     composable<WorkerDailyAppointments> { backStackEntry ->
                         val route = backStackEntry.toRoute<WorkerDailyAppointments>()
+                        val viewModel: WorkerDailyAppointmentsViewModel = koinViewModel()
+
+                        LaunchedEffect(route.workerId) {
+                            viewModel.loadAppointments(route.workerId)
+                        }
+
+                        WorkerDailyAppointmentsScreen(
+                            workerId = route.workerId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() },
+                            onOpenMaps = { _, _, _ -> }
+                        )
+                    }
+
+                    composable<WorkerWeeklyAppointments> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerWeeklyAppointments>()
                         val viewModel: DailyAgendaViewModel = koinViewModel()
 
-                        DailyAgendaScreen(
+                        WeeklyAgendaScreen(
                             viewModel = viewModel,
                             userId = route.workerId,
                             role = CalendarUserRole.WORKER,
@@ -1039,11 +1056,11 @@ fun App() {
                         )
                     }
 
-                    composable<WorkerWeeklyAppointments> { backStackEntry ->
-                        val route = backStackEntry.toRoute<WorkerWeeklyAppointments>()
+                    composable<WorkerDailyAgenda> { backStackEntry ->
+                        val route = backStackEntry.toRoute<WorkerDailyAgenda>()
                         val viewModel: DailyAgendaViewModel = koinViewModel()
 
-                        WeeklyAgendaScreen(
+                        DailyAgendaScreen(
                             viewModel = viewModel,
                             userId = route.workerId,
                             role = CalendarUserRole.WORKER,
@@ -1068,7 +1085,7 @@ fun App() {
                                 navController.navigate(WorkerWeeklyAppointments(workerId = currentWorkerId))
                             },
                             onOpenDayView = {
-                                navController.navigate(WorkerDailyAppointments(workerId = currentWorkerId))
+                                navController.navigate(WorkerDailyAgenda(workerId = currentWorkerId))
                             },
                             onOpenAppointmentDetail = { appointment ->
                                 monthlyCalendarViewModel.selectAppointment(appointment)
@@ -1273,17 +1290,9 @@ fun App() {
                     }
 
                     composable<WorkerMessages> {
-                        val viewModel: WorkerDailyAppointmentsViewModel = koinViewModel()
-
-                        LaunchedEffect(currentWorkerId) {
-                            viewModel.loadAppointments(currentWorkerId)
-                        }
-
-                        WorkerDailyAppointmentsScreen(
-                            workerId = currentWorkerId,
-                            viewModel = viewModel,
-                            onBack = { navController.popBackStack() },
-                            onOpenMaps = { _, _, _ -> }
+                        FeaturePlaceholder(
+                            title = "Mensajes",
+                            subtitle = "Aquí irán los chats y conversaciones con clientes."
                         )
                     }
 
@@ -1413,6 +1422,7 @@ fun App() {
                     title = "Menú trabajador",
                     options = workerMenuOptions(
                         navController = navController,
+                        currentWorkerId = currentWorkerId,
                         closeMenu = { workerMenuExpanded = false },
                         onLogout = {
                             workerMenuExpanded = false
@@ -1538,6 +1548,7 @@ private fun clientMenuOptions(
 
 private fun workerMenuOptions(
     navController: NavHostController,
+    currentWorkerId: String,
     closeMenu: () -> Unit,
     onLogout: () -> Unit
 ): List<MenuOption> {
@@ -1550,6 +1561,48 @@ private fun workerMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(WorkerProfile)
+            }
+        ),
+        MenuOption(
+            title = "Agenda Diaria",
+            subtitle = "Vista diaria en lista o mapa de las citas",
+            icon = TablerIcons.CalendarEvent,
+            iconColor = Color(0xFF4F8CFF),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(
+                    WorkerDailyAppointments(workerId = currentWorkerId)
+                )
+            }
+        ),
+        MenuOption(
+            title = "Servicios",
+            subtitle = "Registrar y modificar servicios ofrecidos",
+            icon = TablerIcons.Briefcase,
+            iconColor = Color(0xFF4CB5AE),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(WorkerServices)
+            }
+        ),
+        MenuOption(
+            title = "Mis Categorías",
+            subtitle = "Categorías de servicios que ofrezco",
+            icon = TablerIcons.Adjustments,
+            iconColor = Color(0xFF3B82F6),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(WorkerCategories)
+            }
+        ),
+        MenuOption(
+            title = "Tiempo de Traslado",
+            subtitle = "Tiempo de margen entre servicios",
+            icon = TablerIcons.Clock,
+            iconColor = Color(0xFFE2B100),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(TravelTimeConfig)
             }
         ),
         MenuOption(
@@ -1600,36 +1653,6 @@ private fun workerMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(WorkerPortfolio)
-            }
-        ),
-        MenuOption(
-            title = "Servicios",
-            subtitle = "Registrar y modificar servicios ofrecidos",
-            icon = TablerIcons.Briefcase,
-            iconColor = Color(0xFF4CB5AE),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(WorkerServices)
-            }
-        ),
-        MenuOption(
-            title = "Mis Categorías",
-            subtitle = "Categorías de servicios que ofrezco",
-            icon = TablerIcons.Adjustments,
-            iconColor = Color(0xFF3B82F6),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(WorkerCategories)
-            }
-        ),
-        MenuOption(
-            title = "Tiempo de Traslado",
-            subtitle = "Tiempo de margen entre servicios",
-            icon = TablerIcons.Clock,
-            iconColor = Color(0xFFE2B100),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(TravelTimeConfig)
             }
         ),
         MenuOption(

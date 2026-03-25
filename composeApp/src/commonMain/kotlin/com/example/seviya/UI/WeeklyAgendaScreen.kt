@@ -40,17 +40,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.seviya.theme.BrandBlue
-import com.example.seviya.theme.BrandRed
-import com.example.seviya.theme.White
+import com.example.seviya.theme.*
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
 import compose.icons.TablerIcons
-import compose.icons.tablericons.CalendarEvent
-import compose.icons.tablericons.ChevronLeft
-import compose.icons.tablericons.ChevronRight
-import compose.icons.tablericons.User
+import compose.icons.tablericons.*
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -60,6 +55,25 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.sp
+import compose.icons.tablericons.ArrowLeft
 
 @OptIn(ExperimentalTime::class)
 @Composable
@@ -206,75 +220,256 @@ fun WeeklyAgendaScreen(
 private fun WeeklyAgendaHeader(
     onBack: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(126.dp)
-            .background(BrandBlue)
+    val infiniteTransition = rememberInfiniteTransition(label = "weekly_agenda_header")
+
+    val leftBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.035f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "left_badge_scale"
+    )
+
+    val rightBadgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.03f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2100, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "right_badge_scale"
+    )
+
+    val bubbleOffsetLarge by infiniteTransition.animateFloat(
+        initialValue = -4f,
+        targetValue = 6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_large"
+    )
+
+    val bubbleOffsetSmall by infiniteTransition.animateFloat(
+        initialValue = 5f,
+        targetValue = -5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_offset_small"
+    )
+
+    val bubbleScaleLarge by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_large"
+    )
+
+    val bubbleScaleSmall by infiniteTransition.animateFloat(
+        initialValue = 0.96f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bubble_scale_small"
+    )
+
+    val shimmerOffset by infiniteTransition.animateFloat(
+        initialValue = -260f,
+        targetValue = 620f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer_offset"
+    )
+
+    val arrowFloat by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "arrow_float"
+    )
+
+    val entranceVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        entranceVisible.value = true
+    }
+
+    AnimatedVisibility(
+        visible = entranceVisible.value,
+        enter = fadeIn(
+            animationSpec = tween(500)
+        ) + slideInVertically(
+            initialOffsetY = { -it / 3 },
+            animationSpec = tween(600, easing = FastOutSlowInEasing)
+        )
     ) {
-        Surface(
+        Box(
             modifier = Modifier
-                .padding(start = 20.dp, top = 24.dp)
-                .clip(RoundedCornerShape(999.dp))
-                .clickable { onBack() },
-            shape = RoundedCornerShape(999.dp),
-            color = White.copy(alpha = 0.13f),
-            border = androidx.compose.foundation.BorderStroke(1.dp, White.copy(alpha = 0.18f))
+                .fillMaxWidth()
+                .height(140.dp)
+                .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
+                .background(BrandBlue)
         ) {
             Box(
-                modifier = Modifier.padding(horizontal = 28.dp, vertical = 18.dp),
-                contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(140.dp)
+                        .offset(x = shimmerOffset.dp)
+                        .graphicsLayer {
+                            rotationZ = -18f
+                            alpha = 0.16f
+                        }
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    White.copy(alpha = 0.45f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 20.dp, top = 42.dp)
+                    .graphicsLayer {
+                        scaleX = leftBadgeScale
+                        scaleY = leftBadgeScale
+                    }
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(White.copy(alpha = 0.14f))
+                    .border(
+                        width = 1.dp,
+                        color = White.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(999.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .graphicsLayer {
+                            translationY = arrowFloat
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.14f))
+                        .clickable { onBack() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.ArrowLeft,
+                        contentDescription = "Volver",
+                        tint = White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Servi",
                         color = White,
-                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
                     )
                     Text(
                         text = "Ya",
                         color = BrandRed,
-                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
                     )
                 }
             }
-        }
 
-        Surface(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = 20.dp, top = 28.dp),
-            shape = RoundedCornerShape(999.dp),
-            color = White.copy(alpha = 0.13f),
-            border = androidx.compose.foundation.BorderStroke(1.dp, White.copy(alpha = 0.18f))
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 22.dp, vertical = 14.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 20.dp, top = 42.dp)
+                    .graphicsLayer {
+                        scaleX = rightBadgeScale
+                        scaleY = rightBadgeScale
+                    },
+                shape = RoundedCornerShape(999.dp),
+                color = White.copy(alpha = 0.14f),
+                border = BorderStroke(1.dp, White.copy(alpha = 0.16f))
             ) {
-                Icon(
-                    imageVector = TablerIcons.CalendarEvent,
-                    contentDescription = null,
-                    tint = White,
-                    modifier = Modifier.size(18.dp)
+                Row(
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.CalendarEvent,
+                        contentDescription = null,
+                        tint = White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "AGENDA",
+                        color = White,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 24.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(82.dp)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetLarge
+                            scaleX = bubbleScaleLarge
+                            scaleY = bubbleScaleLarge
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.08f))
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "AGENDA",
-                    color = White,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold)
+
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .align(Alignment.BottomStart)
+                        .graphicsLayer {
+                            translationY = bubbleOffsetSmall
+                            scaleX = bubbleScaleSmall
+                            scaleY = bubbleScaleSmall
+                        }
+                        .clip(CircleShape)
+                        .background(White.copy(alpha = 0.10f))
                 )
             }
         }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(28.dp)
-                .clip(RoundedCornerShape(topStart = 100.dp, topEnd = 100.dp))
-                .background(Color(0xFFF4F6F8))
-        )
     }
 }
 
