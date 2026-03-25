@@ -40,7 +40,6 @@ import com.example.seviya.feature.shared.MonthlyCalendarScreen
 import com.example.seviya.feature.shared.WeeklyAgendaScreen
 import com.example.seviya.feature.worker.FavoriteWorkersScreen
 import com.example.seviya.feature.client.ClientRequestsScreen
-import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 
@@ -184,7 +183,6 @@ fun NavGraphBuilder.clientNavGraph(
         ClientAppointmentDetailScreen(
             bookingId = route.bookingId,
             onBack = { navController.popBackStack() },
-            onChatClick = { },
             onReviewClick = {
                 navController.navigate(
                     ClientToWorkerReview(appointmentId = route.bookingId)

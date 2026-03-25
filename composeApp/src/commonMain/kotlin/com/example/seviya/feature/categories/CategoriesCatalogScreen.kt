@@ -28,10 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.seviya.UI.CategoriesHeader
-import com.example.seviya.UI.CategoriesMenuOverlay
-import com.example.seviya.UI.CategoryCard
-import com.example.seviya.UI.ContinueButtonBar
+import com.example.seviya.feature.categories.components.CategoriesHeader
+import com.example.seviya.feature.categories.components.CategoriesMenuOverlay
+import com.example.seviya.feature.categories.components.CategoryCard
+import com.example.seviya.feature.categories.components.ContinueButtonBar
 import com.example.seviya.core.designsystem.theme.AppBackgroundAlt
 import com.example.seviya.core.designsystem.theme.BackgroundTopBlue
 import com.example.seviya.core.designsystem.theme.BorderSoftAlt

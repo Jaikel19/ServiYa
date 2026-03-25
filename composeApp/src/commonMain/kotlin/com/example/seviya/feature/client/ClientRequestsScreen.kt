@@ -1,4 +1,4 @@
-package com.example.seviya.ui
+package com.example.seviya.feature.client
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -40,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -662,9 +663,9 @@ private fun ClientApprovedRequestCard(
 private fun PremiumAppointmentCard(
     appointment: Appointment,
     statusText: String,
-    statusBackground: androidx.compose.ui.graphics.Color,
-    statusColor: androidx.compose.ui.graphics.Color,
-    accentColor: androidx.compose.ui.graphics.Color,
+    statusBackground: Color,
+    statusColor: Color,
+    accentColor: Color,
     helperText: String,
     onCardClick: (() -> Unit)?,
     footerButton: (@Composable () -> Unit)?
@@ -792,7 +793,7 @@ private fun AppointmentInfoPill(
     modifier: Modifier = Modifier,
     title: String,
     value: String,
-    accentColor: androidx.compose.ui.graphics.Color
+    accentColor: Color
 ) {
     Surface(
         modifier = modifier,
@@ -873,8 +874,8 @@ private fun AppointmentWideInfo(
 @Composable
 private fun StatusBadge(
     text: String,
-    backgroundColor: androidx.compose.ui.graphics.Color,
-    textColor: androidx.compose.ui.graphics.Color
+    backgroundColor: Color,
+    textColor: Color
 ) {
     Surface(
         shape = RoundedCornerShape(999.dp),
