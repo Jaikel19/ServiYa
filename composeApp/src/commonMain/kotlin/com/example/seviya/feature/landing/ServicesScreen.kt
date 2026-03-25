@@ -1,4 +1,4 @@
-package com.example.seviya.ui
+package com.example.seviya.feature.landing
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,9 +10,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.shared.domain.entity.Service
 import com.example.shared.presentation.services.ServicesViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ServicesScreen(viewModel: ServicesViewModel) {
+fun ServicesScreen() {
+    val viewModel: ServicesViewModel = koinViewModel()
+    ServicesContent(viewModel = viewModel)
+}
+
+@Composable
+private fun ServicesContent(viewModel: ServicesViewModel) {
 
     val state = viewModel.uiState.collectAsState().value
     val workerId = "worker_demo_001"

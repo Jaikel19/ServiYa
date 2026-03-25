@@ -39,7 +39,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 @Composable
-actual fun ClientPaymentUploadScreen(
+actual fun ClientPaymentUploadPlatformScreen(
     appointmentId: String,
     viewModel: ClientPaymentUploadViewModel,
     onBack: () -> Unit
@@ -47,10 +47,6 @@ actual fun ClientPaymentUploadScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(appointmentId) {
-        viewModel.loadData(appointmentId)
-    }
 
     LaunchedEffect(uiState.uploadSuccess) {
         if (uiState.uploadSuccess) {

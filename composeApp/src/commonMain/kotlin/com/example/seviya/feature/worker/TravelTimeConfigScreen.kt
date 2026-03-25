@@ -79,20 +79,21 @@ import com.example.seviya.core.designsystem.theme.SoftBlueSurface
 import com.example.seviya.core.designsystem.theme.TextBluePrimary
 import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun TravelTimeConfigRoute(
+fun TravelTimeConfigScreen(
     workerId: String,
-    viewModel: WorkerTravelTimeViewModel,
     onBack: () -> Unit
 ) {
+    val viewModel: WorkerTravelTimeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(workerId) {
         viewModel.loadData(workerId)
     }
 
-    TravelTimeConfigScreen(
+    TravelTimeConfigContent(
         uiState = uiState,
         onBack = onBack,
         onMinutesChange = { viewModel.updateMinutesText(it) },
@@ -102,7 +103,7 @@ fun TravelTimeConfigRoute(
 }
 
 @Composable
-fun TravelTimeConfigScreen(
+private fun TravelTimeConfigContent(
     uiState: WorkerTravelTimeUiState,
     onBack: () -> Unit,
     onMinutesChange: (String) -> Unit,

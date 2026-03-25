@@ -16,11 +16,23 @@ fun ClientToWorkerReviewScreen(
     onBack: () -> Unit
 ) {
     val viewModel: ClientToWorkerReviewViewModel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(appointmentId) {
         viewModel.loadAppointment(appointmentId)
     }
+
+    ClientToWorkerReviewContent(
+        viewModel = viewModel,
+        onBack = onBack
+    )
+}
+
+@Composable
+private fun ClientToWorkerReviewContent(
+    viewModel: ClientToWorkerReviewViewModel,
+    onBack: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier

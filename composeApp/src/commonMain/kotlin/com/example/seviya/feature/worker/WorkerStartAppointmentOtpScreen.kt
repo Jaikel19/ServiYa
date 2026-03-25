@@ -18,14 +18,46 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpUiState
+import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WorkerStartAppointmentOtpScreen(
+    appointmentId: String,
+    onBack: () -> Unit = {},
+    onStartSuccess: () -> Unit = {}
+) {
+    val viewModel: WorkerStartAppointmentOtpViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(appointmentId) {
+        viewModel.loadData(appointmentId)
+    }
+
+    LaunchedEffect(uiState.startSuccess) {
+        if (uiState.startSuccess) {
+            onStartSuccess()
+        }
+    }
+
+    WorkerStartAppointmentOtpContent(
+        uiState = uiState,
+        onBack = onBack,
+        onOtpChange = viewModel::onOtpChanged,
+        onStartAppointment = { viewModel.startAppointmentWithOtp() }
+    )
+}
+
+@Composable
+private fun WorkerStartAppointmentOtpContent(
     uiState: WorkerStartAppointmentOtpUiState,
     onBack: () -> Unit = {},
     onOtpChange: (String) -> Unit = {},

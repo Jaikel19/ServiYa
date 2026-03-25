@@ -54,16 +54,12 @@ import com.example.seviya.core.designsystem.theme.White
 
 
 @Composable
-actual fun ClientMapScreen(
+actual fun ClientMapPlatformScreen(
     clientId: String,
     viewModel: ClientMapViewModel,
     onWorkerClick: (workerId: String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(clientId) {
-        viewModel.loadMap(clientId)
-    }
 
     val defaultLatLng = LatLng(9.9281, -84.0907)
 

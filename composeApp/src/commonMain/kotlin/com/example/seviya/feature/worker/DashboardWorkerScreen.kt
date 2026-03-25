@@ -83,12 +83,12 @@ import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Tool
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun WorkerDashboardRoute(
+fun WorkerDashboardScreen(
     workerId: String,
-    viewModel: WorkerDashboardViewModel,
     onOpenMessages: () -> Unit = {},
     onOpenReports: () -> Unit = {},
     onOpenSchedule: () -> Unit = {},
@@ -99,13 +99,14 @@ fun WorkerDashboardRoute(
     onCompleteAppointment: (Booking) -> Unit = {},
     onOpenReview: (Booking) -> Unit = {}
 ) {
+    val viewModel: WorkerDashboardViewModel = koinViewModel()
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(workerId) {
         viewModel.load(workerId)
     }
 
-    DashboardWorkerScreen(
+    WorkerDashboardContent(
         state = state,
         onOpenMessages = onOpenMessages,
         onOpenReports = onOpenReports,
@@ -120,7 +121,7 @@ fun WorkerDashboardRoute(
 }
 
 @Composable
-fun DashboardWorkerScreen(
+private fun WorkerDashboardContent(
     state: WorkerDashboardUiState,
     onOpenMessages: () -> Unit = {},
     onOpenReports: () -> Unit = {},

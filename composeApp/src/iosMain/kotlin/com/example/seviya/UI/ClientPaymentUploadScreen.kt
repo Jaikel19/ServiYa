@@ -10,7 +10,7 @@ import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadVi
 
 
 @Composable
-actual fun ClientPaymentUploadScreen(
+actual fun ClientPaymentUploadPlatformScreen(
     appointmentId: String,
     viewModel: ClientPaymentUploadViewModel,
     onBack: () -> Unit

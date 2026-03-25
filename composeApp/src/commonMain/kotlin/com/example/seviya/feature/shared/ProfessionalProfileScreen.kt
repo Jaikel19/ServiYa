@@ -92,6 +92,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.*
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 
 private enum class ProfileTab {
@@ -103,10 +104,9 @@ private enum class ReviewFilterType {
 }
 
 @Composable
-fun ProfessionalProfileRoute(
+fun ProfessionalProfileScreen(
     clientId: String,
     workerId: String,
-    viewModel: ProfessionalProfileViewModel,
     avatarPainter: Painter? = null,
     onBack: () -> Unit = {},
     onProcessAppointment: (ProfessionalProfileData, List<Service>, List<Appointment>) -> Unit = { _, _, _ -> },
@@ -116,6 +116,7 @@ fun ProfessionalProfileRoute(
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {}
 ) {
+    val viewModel: ProfessionalProfileViewModel = koinViewModel()
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(workerId, clientId) {
@@ -123,7 +124,7 @@ fun ProfessionalProfileRoute(
         viewModel.loadFavoriteStatus(clientId, workerId)
     }
 
-    ProfessionalProfileScreen(
+    ProfessionalProfileContent(
         avatarPainter = avatarPainter,
         state = state,
         onBack = onBack,
@@ -140,7 +141,7 @@ fun ProfessionalProfileRoute(
 }
 
 @Composable
-fun ProfessionalProfileScreen(
+private fun ProfessionalProfileContent(
     modifier: Modifier = Modifier,
     avatarPainter: Painter? = null,
     state: ProfessionalProfileUiState,

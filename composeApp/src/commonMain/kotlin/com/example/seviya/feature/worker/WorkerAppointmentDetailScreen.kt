@@ -31,6 +31,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,11 +47,14 @@ import com.example.seviya.core.designsystem.theme.SoftBlueSurface
 import com.example.seviya.core.designsystem.theme.SoftSurface
 import com.example.seviya.core.designsystem.theme.TextSecondaryAlt
 import com.example.seviya.core.designsystem.theme.White
+import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.PaymentReceipt
 import com.example.shared.domain.entity.ReviewMeta
 import com.example.shared.presentation.cancellation.AppointmentCancellationPreview
+import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailViewModel
 import com.example.shared.presentation.workerAppointmentDetail.WorkerAppointmentDetailUiState
+import com.example.shared.utils.DateTimeUtils
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.CalendarEvent
@@ -57,9 +63,75 @@ import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Tool
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WorkerAppointmentDetailScreen(
+    appointment: Appointment,
+    monthlyCalendarViewModel: MonthlyCalendarViewModel,
+    onBack: () -> Unit,
+    onStartAppointment: (String) -> Unit,
+    onRateClient: (String) -> Unit,
+    onGoServices: () -> Unit = {},
+    onGoMap: () -> Unit = {},
+    onGoSearch: () -> Unit = {},
+    onGoAlerts: () -> Unit = {},
+    onGoMenu: () -> Unit = {}
+) {
+    val detailViewModel: WorkerAppointmentDetailViewModel = koinViewModel()
+    val detailUiState by detailViewModel.uiState.collectAsState()
+
+    LaunchedEffect(appointment.id) {
+        detailViewModel.loadPaymentReceipt(appointment.id)
+        detailViewModel.loadReviewMeta(appointment.id)
+    }
+
+    WorkerAppointmentDetailContent(
+        appointment = appointment,
+        paymentReceipt = detailUiState.paymentReceipt,
+        reviewMeta = detailUiState.reviewMeta,
+        uiState = detailUiState,
+        onBack = {
+            detailViewModel.clearState()
+            monthlyCalendarViewModel.clearSelectedAppointment()
+            onBack()
+        },
+        onOpenGoogleMaps = {},
+        onOpenWaze = {},
+        onVerifyPayment = {
+            monthlyCalendarViewModel.confirmPayment(appointment.id)
+        },
+        onStartAppointment = {
+            onStartAppointment(appointment.id)
+        },
+        onFinishAppointment = {
+            monthlyCalendarViewModel.completeAppointment(appointment.id)
+        },
+        onRateClient = {
+            onRateClient(appointment.id)
+        },
+        onRequestCancellationPreview = {
+            detailViewModel.prepareCancellationPreview(appointment)
+        },
+        onCancelAppointment = {
+            detailViewModel.cancelAppointmentByWorker(
+                appointment = appointment,
+                currentDateTime = DateTimeUtils.nowIsoMinute()
+            )
+        },
+        onDismissCancellationPreview = {
+            detailViewModel.dismissCancellationPreview()
+        },
+        onGoServices = onGoServices,
+        onGoMap = onGoMap,
+        onGoSearch = onGoSearch,
+        onGoAlerts = onGoAlerts,
+        onGoMenu = onGoMenu
+    )
+}
+
+@Composable
+private fun WorkerAppointmentDetailContent(
     appointment: Appointment,
     uiState: WorkerAppointmentDetailUiState = WorkerAppointmentDetailUiState(),
     paymentReceipt: PaymentReceipt? = null,

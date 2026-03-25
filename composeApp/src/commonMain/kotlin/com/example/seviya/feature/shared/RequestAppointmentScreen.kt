@@ -100,17 +100,18 @@ import compose.icons.tablericons.Menu2
 import compose.icons.tablericons.User
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 
 @Composable
-fun RequestAppointmentRoute(
+fun RequestAppointmentScreen(
     draft: RequestAppointmentDraft,
-    viewModel: RequestAppointmentViewModel,
     avatarPainter: Painter? = null,
     onBack: () -> Unit = {},
     onOpenRequests: () -> Unit = {},
     onOpenHome: () -> Unit = {}
 ) {
+    val viewModel: RequestAppointmentViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(draft.clientId) {
@@ -119,7 +120,7 @@ fun RequestAppointmentRoute(
         }
     }
 
-    RequestAppointmentScreen(
+    RequestAppointmentContent(
         draft = draft,
         uiState = uiState,
         avatarPainter = avatarPainter,
@@ -134,7 +135,7 @@ fun RequestAppointmentRoute(
 }
 
 @Composable
-fun RequestAppointmentScreen(
+private fun RequestAppointmentContent(
     draft: RequestAppointmentDraft,
     uiState: RequestAppointmentUiState,
     avatarPainter: Painter? = null,

@@ -1,4 +1,4 @@
-package com.example.seviya.ui
+package com.example.seviya.feature.client
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -40,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,8 +75,32 @@ import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.clientRequests.ClientRequestsUiState
+import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun ClientRequestsScreen(
+    clientId: String,
+    onBack: () -> Unit = {},
+    onOpenRequestDetail: (appointmentId: String) -> Unit = {},
+    onOpenPaymentUpload: (appointmentId: String) -> Unit = {}
+) {
+    val viewModel: ClientRequestsViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(clientId) {
+        viewModel.loadRequests(clientId)
+    }
+
+    ClientRequestsContent(
+        uiState = uiState,
+        onBack = onBack,
+        onOpenRequestDetail = onOpenRequestDetail,
+        onOpenPaymentUpload = onOpenPaymentUpload
+    )
+}
 
 enum class ClientRequestFilter {
     PENDING,
@@ -83,7 +108,7 @@ enum class ClientRequestFilter {
 }
 
 @Composable
-fun ClientRequestsScreen(
+private fun ClientRequestsContent(
     uiState: ClientRequestsUiState,
     onBack: () -> Unit = {},
     onOpenRequestDetail: (appointmentId: String) -> Unit = {},
@@ -638,9 +663,9 @@ private fun ClientApprovedRequestCard(
 private fun PremiumAppointmentCard(
     appointment: Appointment,
     statusText: String,
-    statusBackground: androidx.compose.ui.graphics.Color,
-    statusColor: androidx.compose.ui.graphics.Color,
-    accentColor: androidx.compose.ui.graphics.Color,
+    statusBackground: Color,
+    statusColor: Color,
+    accentColor: Color,
     helperText: String,
     onCardClick: (() -> Unit)?,
     footerButton: (@Composable () -> Unit)?
@@ -768,7 +793,7 @@ private fun AppointmentInfoPill(
     modifier: Modifier = Modifier,
     title: String,
     value: String,
-    accentColor: androidx.compose.ui.graphics.Color
+    accentColor: Color
 ) {
     Surface(
         modifier = modifier,
@@ -849,8 +874,8 @@ private fun AppointmentWideInfo(
 @Composable
 private fun StatusBadge(
     text: String,
-    backgroundColor: androidx.compose.ui.graphics.Color,
-    textColor: androidx.compose.ui.graphics.Color
+    backgroundColor: Color,
+    textColor: Color
 ) {
     Surface(
         shape = RoundedCornerShape(999.dp),

@@ -28,10 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.seviya.UI.CategoriesHeader
-import com.example.seviya.UI.CategoriesMenuOverlay
-import com.example.seviya.UI.CategoryCard
-import com.example.seviya.UI.ContinueButtonBar
+import com.example.seviya.feature.categories.components.CategoriesHeader
+import com.example.seviya.feature.categories.components.CategoriesMenuOverlay
+import com.example.seviya.feature.categories.components.CategoryCard
+import com.example.seviya.feature.categories.components.ContinueButtonBar
 import com.example.seviya.core.designsystem.theme.AppBackgroundAlt
 import com.example.seviya.core.designsystem.theme.BackgroundTopBlue
 import com.example.seviya.core.designsystem.theme.BorderSoftAlt
@@ -41,10 +41,10 @@ import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Category
 import com.example.shared.presentation.categories.CategoriesUiState
 import com.example.shared.presentation.categories.CategoriesViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CategoriesCatalogRoute(
-    viewModel: CategoriesViewModel,
+fun CategoriesCatalogScreen(
     selectedCategoryId: String?,
     onGoServices: () -> Unit,
     onGoMap: () -> Unit,
@@ -59,9 +59,10 @@ fun CategoriesCatalogRoute(
     onCategoryClick: (Category) -> Unit = {},
     onContinueWithSelectedCategory: () -> Unit
 ) {
+    val viewModel: CategoriesViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    CategoriesCatalogScreen(
+    CategoriesCatalogContent(
         uiState = uiState,
         selectedCategoryId = selectedCategoryId,
         onGoServices = onGoServices,
@@ -80,7 +81,7 @@ fun CategoriesCatalogRoute(
 }
 
 @Composable
-fun CategoriesCatalogScreen(
+private fun CategoriesCatalogContent(
     uiState: CategoriesUiState,
     selectedCategoryId: String?,
     onGoServices: () -> Unit,

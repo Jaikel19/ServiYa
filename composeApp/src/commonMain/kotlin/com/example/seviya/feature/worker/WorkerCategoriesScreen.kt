@@ -85,20 +85,21 @@ import com.example.shared.presentation.workerCategories.WorkerCategoriesUiState
 import com.example.shared.presentation.workerCategories.WorkerCategoriesViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.*
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerCategoriesRoute(
+fun WorkerCategoriesScreen(
     workerId: String,
-    viewModel: WorkerCategoriesViewModel,
     onBack: () -> Unit
 ) {
+    val viewModel: WorkerCategoriesViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(workerId) {
         viewModel.loadData(workerId)
     }
 
-    WorkerCategoriesScreen(
+    WorkerCategoriesContent(
         uiState = uiState,
         onBack = onBack,
         onToggleCategory = { viewModel.toggleCategory(it) },
@@ -110,7 +111,7 @@ fun WorkerCategoriesRoute(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun WorkerCategoriesScreen(
+private fun WorkerCategoriesContent(
     uiState: WorkerCategoriesUiState,
     onBack: () -> Unit,
     onToggleCategory: (String) -> Unit,

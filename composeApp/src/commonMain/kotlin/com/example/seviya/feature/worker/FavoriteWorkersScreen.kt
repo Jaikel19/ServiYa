@@ -65,12 +65,12 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.*
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 
 @Composable
-fun FavoriteWorkersRoute(
+fun FavoriteWorkersScreen(
     clientId: String,
-    viewModel: FavoriteWorkersViewModel,
     selectedCategoryId: String? = null,
     selectedCategoryName: String? = null,
     avatarPainter: Painter? = null,
@@ -82,13 +82,14 @@ fun FavoriteWorkersRoute(
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {}
 ) {
+    val viewModel: FavoriteWorkersViewModel = koinViewModel()
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(clientId) {
         viewModel.loadFavoriteWorkers(clientId)
     }
 
-    FavoriteWorkersScreen(
+    FavoriteWorkersContent(
         state = state,
         selectedCategoryId = selectedCategoryId,
         selectedCategoryName = selectedCategoryName,
@@ -110,7 +111,7 @@ fun FavoriteWorkersRoute(
 }
 
 @Composable
-fun FavoriteWorkersScreen(
+private fun FavoriteWorkersContent(
     state: FavoriteWorkersUiState,
     selectedCategoryId: String? = null,
     selectedCategoryName: String? = null,
