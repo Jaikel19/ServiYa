@@ -87,12 +87,12 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun ClientLocationCatalogRoute(
+fun ClientLocationCatalogScreen(
     clientId: String,
     onBack: () -> Unit
 ) {
     val viewModel: ClientLocationCatalogViewModel = koinViewModel()
-    ClientLocationCatalogScreen(
+    ClientLocationCatalogContent(
         clientId = clientId,
         viewModel = viewModel,
         onBack = onBack
@@ -101,7 +101,7 @@ fun ClientLocationCatalogRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClientLocationCatalogScreen(
+private fun ClientLocationCatalogContent(
     clientId: String,
     viewModel: ClientLocationCatalogViewModel,
     onBack: () -> Unit

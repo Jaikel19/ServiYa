@@ -17,15 +17,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.seviya.feature.shared.ProfessionalProfileRoute
-import com.example.seviya.feature.shared.RequestAppointmentRoute
-import com.example.seviya.feature.landing.ServicesRoute
+import com.example.seviya.feature.shared.ProfessionalProfileScreen
+import com.example.seviya.feature.shared.RequestAppointmentScreen
+import com.example.seviya.feature.landing.ServicesScreen
 import com.example.seviya.feature.landing.RoleAdmissionCatalogScreen
 import com.example.seviya.feature.landing.RoleCatalogScreen
 import com.example.seviya.feature.client.navigation.clientNavGraph
 import com.example.seviya.feature.worker.navigation.workerNavGraph
-import com.example.seviya.feature.worker.TravelTimeConfigRoute
-import com.example.seviya.feature.worker.WorkersListRoute
+import com.example.seviya.feature.worker.TravelTimeConfigScreen
+import com.example.seviya.feature.worker.WorkersListScreen
 import com.example.seviya.app.FeaturePlaceholder
 import com.example.seviya.app.SessionRole
 import com.example.seviya.app.buildCurrentTimeSnapshot
@@ -60,7 +60,7 @@ import com.example.seviya.core.navigation.Services
 import com.example.seviya.core.navigation.TravelTimeConfig
 import com.example.seviya.core.navigation.WorkerDashboard
 import com.example.seviya.core.navigation.WorkersList
-import com.example.seviya.feature.categories.CategoriesCatalogRoute
+import com.example.seviya.feature.categories.CategoriesCatalogScreen
 import com.example.seviya.feature.landing.LandingScreen
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
@@ -182,11 +182,11 @@ fun NavGraphBuilder.homeNavGraph(
     )
 
     composable<Services> {
-        ServicesRoute()
+        ServicesScreen()
     }
 
     composable<TravelTimeConfig> {
-        TravelTimeConfigRoute(
+        TravelTimeConfigScreen(
             workerId = currentWorkerId,
             onBack = { navController.popBackStack() }
         )
@@ -236,7 +236,7 @@ fun NavGraphBuilder.homeNavGraph(
         var selectedCategoryId by rememberSaveable { mutableStateOf<String?>(null) }
         var selectedCategoryName by rememberSaveable { mutableStateOf<String?>(null) }
 
-        CategoriesCatalogRoute(
+        CategoriesCatalogScreen(
             selectedCategoryId = selectedCategoryId,
             onGoServices = {
                 onCurrentClientTabChange(ClientTab.SERVICES)
@@ -284,7 +284,7 @@ fun NavGraphBuilder.homeNavGraph(
             buildCurrentTimeSnapshot()
         }
 
-        WorkersListRoute(
+        WorkersListScreen(
             clientId = currentClientId,
             currentTime = currentTimeSnapshot,
             selectedCategoryId = route.categoryId,
@@ -323,7 +323,7 @@ fun NavGraphBuilder.homeNavGraph(
     composable<ProfessionalProfile> { backStackEntry ->
         val route = backStackEntry.toRoute<ProfessionalProfile>()
 
-        ProfessionalProfileRoute(
+        ProfessionalProfileScreen(
             clientId = currentClientId,
             workerId = route.workerId,
             onBack = { navController.popBackStack() },
@@ -376,7 +376,7 @@ fun NavGraphBuilder.homeNavGraph(
                 subtitle = "No hay servicios seleccionados para procesar."
             )
         } else {
-            RequestAppointmentRoute(
+            RequestAppointmentScreen(
                 draft = requestAppointmentDraft,
                 onBack = { navController.popBackStack() },
                 onOpenRequests = {

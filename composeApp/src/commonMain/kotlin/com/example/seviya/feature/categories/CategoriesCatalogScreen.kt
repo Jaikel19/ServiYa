@@ -44,7 +44,7 @@ import com.example.shared.presentation.categories.CategoriesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun CategoriesCatalogRoute(
+fun CategoriesCatalogScreen(
     selectedCategoryId: String?,
     onGoServices: () -> Unit,
     onGoMap: () -> Unit,
@@ -62,7 +62,7 @@ fun CategoriesCatalogRoute(
     val viewModel: CategoriesViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    CategoriesCatalogScreen(
+    CategoriesCatalogContent(
         uiState = uiState,
         selectedCategoryId = selectedCategoryId,
         onGoServices = onGoServices,
@@ -81,7 +81,7 @@ fun CategoriesCatalogRoute(
 }
 
 @Composable
-fun CategoriesCatalogScreen(
+private fun CategoriesCatalogContent(
     uiState: CategoriesUiState,
     selectedCategoryId: String?,
     onGoServices: () -> Unit,

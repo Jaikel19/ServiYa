@@ -104,7 +104,7 @@ private enum class ReviewFilterType {
 }
 
 @Composable
-fun ProfessionalProfileRoute(
+fun ProfessionalProfileScreen(
     clientId: String,
     workerId: String,
     avatarPainter: Painter? = null,
@@ -124,7 +124,7 @@ fun ProfessionalProfileRoute(
         viewModel.loadFavoriteStatus(clientId, workerId)
     }
 
-    ProfessionalProfileScreen(
+    ProfessionalProfileContent(
         avatarPainter = avatarPainter,
         state = state,
         onBack = onBack,
@@ -141,7 +141,7 @@ fun ProfessionalProfileRoute(
 }
 
 @Composable
-fun ProfessionalProfileScreen(
+private fun ProfessionalProfileContent(
     modifier: Modifier = Modifier,
     avatarPainter: Painter? = null,
     state: ProfessionalProfileUiState,

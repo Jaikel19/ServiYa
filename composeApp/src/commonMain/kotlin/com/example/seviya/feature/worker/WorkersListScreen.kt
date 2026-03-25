@@ -92,7 +92,7 @@ private data class CalendarDayCell(
 )
 
 @Composable
-fun WorkersListRoute(
+fun WorkersListScreen(
     clientId: String,
     currentTime: CurrentTimeSnapshot,
     selectedCategoryId: String? = null,
@@ -115,7 +115,7 @@ fun WorkersListRoute(
         viewModel.loadClientAddresses(clientId)
     }
 
-    WorkersListScreen(
+    WorkersListContent(
         state = state,
         currentTime = currentTime,
         selectedCategoryId = selectedCategoryId,
@@ -138,7 +138,7 @@ fun WorkersListRoute(
 }
 
 @Composable
-fun WorkersListScreen(
+private fun WorkersListContent(
     state: WorkersListUiState,
     currentTime: CurrentTimeSnapshot,
     selectedCategoryId: String? = null,

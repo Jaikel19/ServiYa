@@ -77,14 +77,14 @@ import compose.icons.tablericons.ArrowLeft
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun DailyAgendaRoute(
+fun DailyAgendaScreen(
     userId: String,
     role: CalendarUserRole,
     onBack: () -> Unit,
     onOpenDetail: (Appointment) -> Unit
 ) {
     val viewModel: DailyAgendaViewModel = koinViewModel()
-    DailyAgendaScreen(
+    DailyAgendaContent(
         viewModel = viewModel,
         userId = userId,
         role = role,
@@ -95,7 +95,7 @@ fun DailyAgendaRoute(
 
 @OptIn(ExperimentalTime::class)
 @Composable
-fun DailyAgendaScreen(
+private fun DailyAgendaContent(
     viewModel: DailyAgendaViewModel,
     userId: String,
     role: CalendarUserRole,

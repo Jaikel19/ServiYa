@@ -82,7 +82,7 @@ import compose.icons.tablericons.ArrowLeft
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerRequestsRoute(
+fun WorkerRequestsScreen(
     workerId: String,
     onOpenRequestDetail: (appointmentId: String) -> Unit = {},
     onOpenPaymentDetail: (appointmentId: String) -> Unit = {},
@@ -95,7 +95,7 @@ fun WorkerRequestsRoute(
         viewModel.loadRequests(workerId)
     }
 
-    WorkerRequestsScreen(
+    WorkerRequestsContent(
         uiState = uiState,
         onAccept = { appointment -> viewModel.acceptRequest(appointment) },
         onReject = { appointment -> viewModel.rejectRequest(appointment) },
@@ -114,7 +114,7 @@ enum class RequestFilter {
 }
 
 @Composable
-fun WorkerRequestsScreen(
+private fun WorkerRequestsContent(
     uiState: WorkerRequestsUiState,
     onAccept: (Appointment) -> Unit,
     onReject: (Appointment) -> Unit,

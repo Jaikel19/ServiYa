@@ -88,7 +88,7 @@ import compose.icons.tablericons.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerCategoriesRoute(
+fun WorkerCategoriesScreen(
     workerId: String,
     onBack: () -> Unit
 ) {
@@ -99,7 +99,7 @@ fun WorkerCategoriesRoute(
         viewModel.loadData(workerId)
     }
 
-    WorkerCategoriesScreen(
+    WorkerCategoriesContent(
         uiState = uiState,
         onBack = onBack,
         onToggleCategory = { viewModel.toggleCategory(it) },
@@ -111,7 +111,7 @@ fun WorkerCategoriesRoute(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun WorkerCategoriesScreen(
+private fun WorkerCategoriesContent(
     uiState: WorkerCategoriesUiState,
     onBack: () -> Unit,
     onToggleCategory: (String) -> Unit,

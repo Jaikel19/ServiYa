@@ -98,7 +98,7 @@ import kotlin.math.round
 import kotlin.time.Clock
 
 @Composable
-fun ClientDashboardRoute(
+fun ClientDashboardScreen(
     clientId: String,
     avatarPainter: Painter? = null,
     onOpenAppointmentDetail: (String) -> Unit = {},
@@ -118,7 +118,7 @@ fun ClientDashboardRoute(
         viewModel.loadBookings(clientId)
     }
 
-    ClientDashboardScreen(
+    ClientDashboardContent(
         state = state,
         avatarPainter = avatarPainter,
         onOpenAppointmentDetail = onOpenAppointmentDetail,
@@ -134,7 +134,7 @@ fun ClientDashboardRoute(
 }
 
 @Composable
-fun ClientDashboardScreen(
+private fun ClientDashboardContent(
     state: ClientDashboardUiState,
     avatarPainter: Painter? = null,
     clientPhotoUrl: String? = null,

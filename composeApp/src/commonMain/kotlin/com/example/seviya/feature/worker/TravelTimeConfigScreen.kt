@@ -82,7 +82,7 @@ import com.example.seviya.core.designsystem.theme.White
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun TravelTimeConfigRoute(
+fun TravelTimeConfigScreen(
     workerId: String,
     onBack: () -> Unit
 ) {
@@ -93,7 +93,7 @@ fun TravelTimeConfigRoute(
         viewModel.loadData(workerId)
     }
 
-    TravelTimeConfigScreen(
+    TravelTimeConfigContent(
         uiState = uiState,
         onBack = onBack,
         onMinutesChange = { viewModel.updateMinutesText(it) },
@@ -103,7 +103,7 @@ fun TravelTimeConfigRoute(
 }
 
 @Composable
-fun TravelTimeConfigScreen(
+private fun TravelTimeConfigContent(
     uiState: WorkerTravelTimeUiState,
     onBack: () -> Unit,
     onMinutesChange: (String) -> Unit,

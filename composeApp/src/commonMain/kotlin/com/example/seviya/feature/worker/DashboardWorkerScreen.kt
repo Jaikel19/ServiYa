@@ -87,7 +87,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun WorkerDashboardRoute(
+fun WorkerDashboardScreen(
     workerId: String,
     onOpenMessages: () -> Unit = {},
     onOpenReports: () -> Unit = {},
@@ -106,7 +106,7 @@ fun WorkerDashboardRoute(
         viewModel.load(workerId)
     }
 
-    DashboardWorkerScreen(
+    WorkerDashboardContent(
         state = state,
         onOpenMessages = onOpenMessages,
         onOpenReports = onOpenReports,
@@ -121,7 +121,7 @@ fun WorkerDashboardRoute(
 }
 
 @Composable
-fun DashboardWorkerScreen(
+private fun WorkerDashboardContent(
     state: WorkerDashboardUiState,
     onOpenMessages: () -> Unit = {},
     onOpenReports: () -> Unit = {},

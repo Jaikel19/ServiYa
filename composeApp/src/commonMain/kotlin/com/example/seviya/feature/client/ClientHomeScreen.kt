@@ -107,7 +107,7 @@ private data class HomeCategoryVisuals(
 )
 
 @Composable
-fun ClientHomeRoute(
+fun ClientHomeScreen(
     clientId: String,
     avatarPainter: Painter? = null,
     onWorkerClick: (String) -> Unit = {},
@@ -128,7 +128,7 @@ fun ClientHomeRoute(
         workersListViewModel.loadFavoriteWorkerIds(clientId)
     }
 
-    ClientHomeScreen(
+    ClientHomeContent(
         categoriesState = categoriesState,
         favoritesState = favoritesState,
         workersState = workersState,
@@ -144,7 +144,7 @@ fun ClientHomeRoute(
 }
 
 @Composable
-fun ClientHomeScreen(
+private fun ClientHomeContent(
     categoriesState: CategoriesUiState,
     favoritesState: FavoriteWorkersUiState,
     workersState: WorkersListUiState,

@@ -69,7 +69,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 
 @Composable
-fun FavoriteWorkersRoute(
+fun FavoriteWorkersScreen(
     clientId: String,
     selectedCategoryId: String? = null,
     selectedCategoryName: String? = null,
@@ -89,7 +89,7 @@ fun FavoriteWorkersRoute(
         viewModel.loadFavoriteWorkers(clientId)
     }
 
-    FavoriteWorkersScreen(
+    FavoriteWorkersContent(
         state = state,
         selectedCategoryId = selectedCategoryId,
         selectedCategoryName = selectedCategoryName,
@@ -111,7 +111,7 @@ fun FavoriteWorkersRoute(
 }
 
 @Composable
-fun FavoriteWorkersScreen(
+private fun FavoriteWorkersContent(
     state: FavoriteWorkersUiState,
     selectedCategoryId: String? = null,
     selectedCategoryName: String? = null,

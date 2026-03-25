@@ -80,7 +80,7 @@ import compose.icons.tablericons.ArrowLeft
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ClientRequestsRoute(
+fun ClientRequestsScreen(
     clientId: String,
     onBack: () -> Unit = {},
     onOpenRequestDetail: (appointmentId: String) -> Unit = {},
@@ -93,7 +93,7 @@ fun ClientRequestsRoute(
         viewModel.loadRequests(clientId)
     }
 
-    ClientRequestsScreen(
+    ClientRequestsContent(
         uiState = uiState,
         onBack = onBack,
         onOpenRequestDetail = onOpenRequestDetail,
@@ -107,7 +107,7 @@ enum class ClientRequestFilter {
 }
 
 @Composable
-fun ClientRequestsScreen(
+private fun ClientRequestsContent(
     uiState: ClientRequestsUiState,
     onBack: () -> Unit = {},
     onOpenRequestDetail: (appointmentId: String) -> Unit = {},

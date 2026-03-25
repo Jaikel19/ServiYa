@@ -29,17 +29,17 @@ import com.example.seviya.core.navigation.ClientWeeklyAppointments
 import com.example.seviya.core.navigation.ProfessionalProfile
 import com.example.seviya.core.navigation.WorkersList
 import com.example.seviya.feature.client.ClientAppointmentDetailRoute
-import com.example.seviya.feature.client.ClientDashboardRoute
-import com.example.seviya.feature.client.ClientHomeRoute
-import com.example.seviya.feature.client.ClientLocationCatalogRoute
+import com.example.seviya.feature.client.ClientDashboardScreen
+import com.example.seviya.feature.client.ClientHomeScreen
+import com.example.seviya.feature.client.ClientLocationCatalogScreen
 import com.example.seviya.feature.client.ClientMapRoute
 import com.example.seviya.feature.client.ClientPaymentUploadRoute
 import com.example.seviya.feature.client.ClientToWorkerReviewRoute
-import com.example.seviya.feature.shared.DailyAgendaRoute
+import com.example.seviya.feature.shared.DailyAgendaScreen
 import com.example.seviya.feature.shared.MonthlyCalendarScreen
-import com.example.seviya.feature.shared.WeeklyAgendaRoute
-import com.example.seviya.feature.worker.FavoriteWorkersRoute
-import com.example.seviya.ui.ClientRequestsRoute
+import com.example.seviya.feature.shared.WeeklyAgendaScreen
+import com.example.seviya.feature.worker.FavoriteWorkersScreen
+import com.example.seviya.feature.client.ClientRequestsScreen
 import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
@@ -53,7 +53,7 @@ fun NavGraphBuilder.clientNavGraph(
     monthlyCalendarViewModel: MonthlyCalendarViewModel
 ) {
     composable<ClientHome> {
-        ClientHomeRoute(
+        ClientHomeScreen(
             clientId = currentClientId,
             onWorkerClick = { workerId ->
                 navController.navigate(ProfessionalProfile(workerId))
@@ -76,7 +76,7 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientDashboard> {
-        ClientDashboardRoute(
+        ClientDashboardScreen(
             clientId = currentClientId,
             onOpenAppointmentDetail = { bookingId ->
                 navController.navigate(
@@ -114,7 +114,7 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientFavorites> {
-        FavoriteWorkersRoute(
+        FavoriteWorkersScreen(
             clientId = currentClientId,
             onWorkerClick = { workerId ->
                 navController.navigate(
@@ -149,7 +149,7 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientRequests> {
-        ClientRequestsRoute(
+        ClientRequestsScreen(
             clientId = currentClientId,
             onOpenRequestDetail = { appointmentId ->
                 navController.navigate(
@@ -173,7 +173,7 @@ fun NavGraphBuilder.clientNavGraph(
     }
 
     composable<ClientLocationCatalog> {
-        ClientLocationCatalogRoute(
+        ClientLocationCatalogScreen(
             clientId = currentClientId,
             onBack = { navController.popBackStack() }
         )
@@ -239,7 +239,7 @@ fun NavGraphBuilder.clientNavGraph(
     composable<ClientDailyAppointments> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientDailyAppointments>()
 
-        DailyAgendaRoute(
+        DailyAgendaScreen(
             userId = route.clientId,
             role = CalendarUserRole.CLIENT,
             onBack = { navController.popBackStack() },
@@ -254,7 +254,7 @@ fun NavGraphBuilder.clientNavGraph(
     composable<ClientWeeklyAppointments> { backStackEntry ->
         val route = backStackEntry.toRoute<ClientWeeklyAppointments>()
 
-        WeeklyAgendaRoute(
+        WeeklyAgendaScreen(
             userId = route.clientId,
             role = CalendarUserRole.CLIENT,
             onBack = { navController.popBackStack() },

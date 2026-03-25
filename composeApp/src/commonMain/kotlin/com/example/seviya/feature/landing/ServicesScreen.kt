@@ -13,13 +13,13 @@ import com.example.shared.presentation.services.ServicesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ServicesRoute() {
+fun ServicesScreen() {
     val viewModel: ServicesViewModel = koinViewModel()
-    ServicesScreen(viewModel = viewModel)
+    ServicesContent(viewModel = viewModel)
 }
 
 @Composable
-fun ServicesScreen(viewModel: ServicesViewModel) {
+private fun ServicesContent(viewModel: ServicesViewModel) {
 
     val state = viewModel.uiState.collectAsState().value
     val workerId = "worker_demo_001"

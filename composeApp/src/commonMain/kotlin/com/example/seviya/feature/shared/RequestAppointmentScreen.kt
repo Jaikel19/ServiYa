@@ -104,7 +104,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.round
 
 @Composable
-fun RequestAppointmentRoute(
+fun RequestAppointmentScreen(
     draft: RequestAppointmentDraft,
     avatarPainter: Painter? = null,
     onBack: () -> Unit = {},
@@ -120,7 +120,7 @@ fun RequestAppointmentRoute(
         }
     }
 
-    RequestAppointmentScreen(
+    RequestAppointmentContent(
         draft = draft,
         uiState = uiState,
         avatarPainter = avatarPainter,
@@ -135,7 +135,7 @@ fun RequestAppointmentRoute(
 }
 
 @Composable
-fun RequestAppointmentScreen(
+private fun RequestAppointmentContent(
     draft: RequestAppointmentDraft,
     uiState: RequestAppointmentUiState,
     avatarPainter: Painter? = null,
