@@ -1,5 +1,6 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +33,10 @@ import io.kamel.image.asyncPainterResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 
 @Composable
 actual fun ClientPaymentUploadScreen(
@@ -245,9 +251,9 @@ actual fun ClientPaymentUploadScreen(
 
                 if (uiState.selectedImageBytes != null) {
                     val uri = remember(uiState.selectedImageBytes) {
-                        val tempFile = java.io.File.createTempFile("receipt", ".jpg", context.cacheDir)
+                        val tempFile = File.createTempFile("receipt", ".jpg", context.cacheDir)
                         tempFile.writeBytes(uiState.selectedImageBytes!!)
-                        android.net.Uri.fromFile(tempFile)
+                        Uri.fromFile(tempFile)
                     }
 
                     Box(
@@ -347,7 +353,7 @@ actual fun ClientPaymentUploadScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .background(
-                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                    Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
                             MaterialTheme.colorScheme.background.copy(alpha = 0.95f),
@@ -363,10 +369,10 @@ actual fun ClientPaymentUploadScreen(
                     coroutineScope.launch {
                         try {
                             val imageUrl = withContext(Dispatchers.IO) {
-                                val url = java.net.URL("https://api.cloudinary.com/v1_1/dfk5xx88f/image/upload")
+                                val url = URL("https://api.cloudinary.com/v1_1/dfk5xx88f/image/upload")
                                 val boundary = "Boundary${System.currentTimeMillis()}"
 
-                                val connection = url.openConnection() as java.net.HttpURLConnection
+                                val connection = url.openConnection() as HttpURLConnection
                                 connection.requestMethod = "POST"
                                 connection.doOutput = true
                                 connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
@@ -385,7 +391,7 @@ actual fun ClientPaymentUploadScreen(
                                 val response = connection.inputStream.bufferedReader().readText()
                                 println("DEBUG Cloudinary response: $response")
 
-                                val json = org.json.JSONObject(response)
+                                val json = JSONObject(response)
                                 json.optString("secure_url", "")
                             }
 

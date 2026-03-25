@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
 import androidx.compose.runtime.Composable
 import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadViewModel

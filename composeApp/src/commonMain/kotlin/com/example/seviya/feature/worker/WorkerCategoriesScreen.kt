@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.worker
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -10,6 +10,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -575,7 +576,7 @@ private fun SearchBar(
             shape = RoundedCornerShape(24.dp),
             color = White,
             shadowElevation = 6.dp,
-            border = androidx.compose.foundation.BorderStroke(
+            border = BorderStroke(
                 width = 1.dp,
                 color = if (query.isNotBlank()) BrandBlue.copy(alpha = 0.18f) else BorderSoft
             )

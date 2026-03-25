@@ -18,31 +18,31 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.seviya.UI.ClientAppointmentDetailScreen
-import com.example.seviya.UI.ClientDashboardRoute
-import com.example.seviya.UI.ClientHomeRoute
-import com.example.seviya.UI.ClientLocationCatalogScreen
-import com.example.seviya.UI.ClientMapScreen
-import com.example.seviya.UI.ClientPaymentUploadScreen
-import com.example.seviya.UI.ClientToWorkerReviewScreen
+import com.example.seviya.feature.client.ClientAppointmentDetailScreen
+import com.example.seviya.feature.client.ClientDashboardRoute
+import com.example.seviya.feature.client.ClientHomeRoute
+import com.example.seviya.feature.client.ClientLocationCatalogScreen
+import com.example.seviya.feature.client.ClientMapScreen
+import com.example.seviya.feature.client.ClientPaymentUploadScreen
+import com.example.seviya.feature.client.ClientToWorkerReviewScreen
 import com.example.seviya.UI.DailyAgendaScreen
 import com.example.seviya.UI.FavoriteWorkersRoute
 import com.example.seviya.UI.MonthlyCalendarScreen
 import com.example.seviya.UI.ProfessionalProfileRoute
 import com.example.seviya.UI.RequestAppointmentRoute
-import com.example.seviya.UI.RoleAdmissionCatalogScreen
-import com.example.seviya.UI.RoleCatalogScreen
+import com.example.seviya.feature.landing.RoleAdmissionCatalogScreen
+import com.example.seviya.feature.landing.RoleCatalogScreen
 import com.example.seviya.UI.TravelTimeConfigRoute
 import com.example.seviya.UI.WeeklyAgendaScreen
-import com.example.seviya.UI.WorkerAppointmentDetailScreen
-import com.example.seviya.UI.WorkerCategoriesRoute
-import com.example.seviya.UI.WorkerDailyAppointmentsScreen
+import com.example.seviya.feature.worker.WorkerAppointmentDetailScreen
+import com.example.seviya.feature.worker.WorkerCategoriesRoute
+import com.example.seviya.feature.worker.WorkerDailyAppointmentsScreen
 import com.example.seviya.UI.WorkerDashboardRoute
-import com.example.seviya.UI.WorkerPaymentDetailScreen
-import com.example.seviya.UI.WorkerRequestDetailScreen
-import com.example.seviya.UI.WorkerStartAppointmentOtpScreen
-import com.example.seviya.UI.WorkerToClientReviewScreen
-import com.example.seviya.UI.WorkersListRoute
+import com.example.seviya.feature.worker.WorkerPaymentDetailScreen
+import com.example.seviya.feature.worker.WorkerRequestDetailScreen
+import com.example.seviya.feature.worker.WorkerStartAppointmentOtpScreen
+import com.example.seviya.feature.worker.WorkerToClientReviewScreen
+import com.example.seviya.feature.worker.WorkersListRoute
 import com.example.seviya.app.FeaturePlaceholder
 import com.example.seviya.app.SessionRole
 import com.example.seviya.app.buildCurrentTimeSnapshot
@@ -282,16 +282,6 @@ fun NavGraphBuilder.homeNavGraph(
 
     composable<RoleCatalog> {
         RoleCatalogScreen(
-            onGoHome = {
-                onSessionRoleChange(SessionRole.GUEST)
-                onRequestAppointmentDraftChange(null)
-                navController.navigateSingleTop(Landing)
-            },
-            onGoLogin = {
-                onSessionRoleChange(SessionRole.GUEST)
-                navController.navigateSingleTop(RoleAdmissionCatalog)
-            },
-            onGoRegister = { },
             onPickClient = {
                 onSessionRoleChange(SessionRole.CLIENT)
                 onCurrentClientIdChange("client_demo_001")
@@ -312,16 +302,6 @@ fun NavGraphBuilder.homeNavGraph(
 
     composable<RoleAdmissionCatalog> {
         RoleAdmissionCatalogScreen(
-            onGoHome = {
-                onSessionRoleChange(SessionRole.GUEST)
-                onRequestAppointmentDraftChange(null)
-                navController.navigateSingleTop(Landing)
-            },
-            onGoLogin = { },
-            onGoRegister = {
-                onSessionRoleChange(SessionRole.GUEST)
-                navController.navigateSingleTop(RoleCatalog)
-            },
             onPickClient = {
                 onSessionRoleChange(SessionRole.CLIENT)
                 onCurrentClientIdChange("client_demo_001")

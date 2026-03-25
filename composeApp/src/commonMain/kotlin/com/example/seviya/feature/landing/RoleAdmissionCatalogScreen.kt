@@ -1,30 +1,56 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.landing
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -41,8 +67,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.layout.offset
 import com.example.seviya.core.designsystem.theme.AvatarBlueSoft
 import com.example.seviya.core.designsystem.theme.BorderUltraSoft
 import com.example.seviya.core.designsystem.theme.BrandBlue
@@ -54,31 +78,35 @@ import com.example.seviya.core.designsystem.theme.SubtitleOnBlue
 import com.example.seviya.core.designsystem.theme.TextPrimary
 import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
-
-// ✅ Tabler Icons (Compose Icons)
 import compose.icons.TablerIcons
-import compose.icons.tablericons.*
+import compose.icons.tablericons.Briefcase
+import compose.icons.tablericons.Coin
+import compose.icons.tablericons.MapPin
+import compose.icons.tablericons.Search
+import compose.icons.tablericons.ShieldCheck
+import compose.icons.tablericons.User
+import kotlinx.coroutines.delay
 
-private enum class RolesTab { HOME, LOGIN, REGISTER }
-private enum class SelectedRole { CLIENT, WORKER }
+private enum class RolesAdmissionTab { HOME, LOGIN, REGISTER }
+private enum class SelectedRoleAdmission { CLIENT, WORKER }
 
 /* ----------------------------- HELPERS ANIM ----------------------------- */
 
-private data class RoleEnterAnim(
+private data class RoleAdmissionEnterAnim(
     val alpha: Float,
     val offsetY: Dp,
     val scale: Float
 )
 
 @Composable
-private fun rememberRoleEnterAnim(
+private fun rememberRoleAdmissionEnterAnim(
     delayMs: Int,
     distance: Dp = 18.dp
-): RoleEnterAnim {
+): RoleAdmissionEnterAnim {
     var show by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(delayMs.toLong())
+        delay(delayMs.toLong())
         show = true
     }
 
@@ -100,27 +128,34 @@ private fun rememberRoleEnterAnim(
         label = "enter_scale"
     )
 
-    return RoleEnterAnim(alpha = alpha, offsetY = offsetY, scale = scale)
+    return RoleAdmissionEnterAnim(alpha = alpha, offsetY = offsetY, scale = scale)
 }
 
 @Composable
-private fun RoleAnimatedSection(
+private fun RoleAdmissionAnimatedSection(
     delayMs: Int,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val a = rememberRoleEnterAnim(delayMs)
+    val a = rememberRoleAdmissionEnterAnim(delayMs)
+
     Box(
         modifier = modifier
             .offset(y = a.offsetY)
             .alpha(a.alpha)
-            .graphicsLayer { scaleX = a.scale; scaleY = a.scale }
+            .graphicsLayer {
+                scaleX = a.scale
+                scaleY = a.scale
+            }
     ) {
         content()
     }
 }
 
-private fun Modifier.shimmerOverlay(alpha: Float = 0.16f, durationMs: Int = 1600): Modifier = composed {
+private fun Modifier.shimmerOverlay(
+    alpha: Float = 0.16f,
+    durationMs: Int = 1600
+): Modifier = composed {
     val inf = rememberInfiniteTransition(label = "shimmer")
     val x by inf.animateFloat(
         initialValue = -1f,
@@ -140,7 +175,11 @@ private fun Modifier.shimmerOverlay(alpha: Float = 0.16f, durationMs: Int = 1600
         val startX = x * w
 
         val brush = Brush.linearGradient(
-            colors = listOf(Color.Transparent, White.copy(alpha = alpha), Color.Transparent),
+            colors = listOf(
+                Color.Transparent,
+                White.copy(alpha = alpha),
+                Color.Transparent
+            ),
             start = Offset(startX, 0f),
             end = Offset(startX + shimmerW, h)
         )
@@ -159,7 +198,10 @@ private fun Modifier.bouncyClick(onClick: () -> Unit): Modifier = composed {
     )
 
     this
-        .graphicsLayer { scaleX = s; scaleY = s }
+        .graphicsLayer {
+            scaleX = s
+            scaleY = s
+        }
         .clickable(
             interactionSource = interaction,
             indication = LocalIndication.current,
@@ -170,14 +212,11 @@ private fun Modifier.bouncyClick(onClick: () -> Unit): Modifier = composed {
 /* ----------------------------- SCREEN ----------------------------- */
 
 @Composable
-fun RoleCatalogScreen(
-    onGoHome: () -> Unit,
-    onGoLogin: () -> Unit,
-    onGoRegister: () -> Unit,
+fun RoleAdmissionCatalogScreen(
     onPickClient: () -> Unit,
     onPickWorker: () -> Unit
 ) {
-    var selected by rememberSaveable { mutableStateOf<SelectedRole?>(null) }
+    var selected by rememberSaveable { mutableStateOf<SelectedRoleAdmission?>(null) }
 
     Scaffold(
         containerColor = White,
@@ -192,7 +231,7 @@ fun RoleCatalogScreen(
             val bottomH = maxHeight - topH
 
             Column(Modifier.fillMaxSize()) {
-                RoleHeaderAnimated(height = topH)
+                RoleAdmissionHeaderAnimated(height = topH)
 
                 Column(
                     modifier = Modifier
@@ -203,10 +242,12 @@ fun RoleCatalogScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    RoleAnimatedSection(240) {
+                    RoleAdmissionAnimatedSection(240) {
                         Text(
-                            text = "Elige tu rol",
-                            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.ExtraBold),
+                            text = "¿Cómo deseas ingresar?",
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.ExtraBold
+                            ),
                             color = TextPrimary,
                             textAlign = TextAlign.Center
                         )
@@ -214,9 +255,9 @@ fun RoleCatalogScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    RoleAnimatedSection(300) {
+                    RoleAdmissionAnimatedSection(300) {
                         Text(
-                            text = "Selecciona cómo usarás la plataforma para\ncontinuar",
+                            text = "Selecciona el tipo de cuenta con el que\nquieres continuar",
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 color = TextSecondary,
                                 lineHeight = 22.sp
@@ -227,32 +268,32 @@ fun RoleCatalogScreen(
 
                     Spacer(Modifier.height(18.dp))
 
-                    RoleAnimatedSection(360) {
+                    RoleAdmissionAnimatedSection(360) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .widthIn(max = 420.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            RolePickCardAnimated(
+                            RoleAdmissionPickCardAnimated(
                                 title = "Cliente",
-                                subtitle = "Busco servicios",
+                                subtitle = "Ingresar al dashboard cliente",
                                 icon = TablerIcons.User,
-                                selected = selected == SelectedRole.CLIENT,
+                                selected = selected == SelectedRoleAdmission.CLIENT,
                                 modifier = Modifier.weight(1f)
                             ) {
-                                selected = SelectedRole.CLIENT
+                                selected = SelectedRoleAdmission.CLIENT
                                 onPickClient()
                             }
 
-                            RolePickCardAnimated(
+                            RoleAdmissionPickCardAnimated(
                                 title = "Trabajador",
-                                subtitle = "Ofrezco servicios",
+                                subtitle = "Ingresar al dashboard trabajador",
                                 icon = TablerIcons.Briefcase,
-                                selected = selected == SelectedRole.WORKER,
+                                selected = selected == SelectedRoleAdmission.WORKER,
                                 modifier = Modifier.weight(1f)
                             ) {
-                                selected = SelectedRole.WORKER
+                                selected = SelectedRoleAdmission.WORKER
                                 onPickWorker()
                             }
                         }
@@ -263,10 +304,10 @@ fun RoleCatalogScreen(
     }
 }
 
-/* ----------------------------- HEADER CON MUCHAS ANIMACIONES ----------------------------- */
+/* ----------------------------- HEADER ----------------------------- */
 
 @Composable
-private fun RoleHeaderAnimated(height: Dp) {
+private fun RoleAdmissionHeaderAnimated(height: Dp) {
     val inf = rememberInfiniteTransition(label = "header_inf")
 
     val gradT by inf.animateFloat(
@@ -324,7 +365,7 @@ private fun RoleHeaderAnimated(height: Dp) {
         Box(
             modifier = Modifier
                 .size(260.dp)
-                .offset((-110).dp, (-110).dp)
+                .offset(x = (-110).dp, y = (-110).dp)
                 .background(BrandRed.copy(alpha = glowA), CircleShape)
         )
 
@@ -342,11 +383,11 @@ private fun RoleHeaderAnimated(height: Dp) {
                 .padding(horizontal = 22.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RoleAnimatedSection(0) { LogoPillCompact() }
+            RoleAdmissionLogoPillCompact()
 
             Spacer(Modifier.height(14.dp))
 
-            RoleAnimatedSection(80) {
+            RoleAdmissionAnimatedSection(80) {
                 Text(
                     text = "Conectamos soluciones con\nnecesidades de forma segura",
                     color = White,
@@ -364,15 +405,15 @@ private fun RoleHeaderAnimated(height: Dp) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.widthIn(max = 320.dp)
             ) {
-                RoleAnimatedSection(140) {
+                RoleAdmissionAnimatedSection(140) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        FeatureGlassTileSmall(
+                        RoleAdmissionFeatureGlassTileSmall(
                             icon = TablerIcons.Search,
                             label = "BUSCA",
                             modifier = Modifier.weight(1f),
                             float = floatY * 0.30f
                         )
-                        FeatureGlassTileSmall(
+                        RoleAdmissionFeatureGlassTileSmall(
                             icon = TablerIcons.Briefcase,
                             label = "OFRECE",
                             modifier = Modifier.weight(1f),
@@ -381,15 +422,15 @@ private fun RoleHeaderAnimated(height: Dp) {
                     }
                 }
 
-                RoleAnimatedSection(200) {
+                RoleAdmissionAnimatedSection(200) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        FeatureGlassTileSmall(
+                        RoleAdmissionFeatureGlassTileSmall(
                             icon = TablerIcons.ShieldCheck,
                             label = "CONFÍA",
                             modifier = Modifier.weight(1f),
                             float = floatY * 0.24f
                         )
-                        FeatureGlassTileSmall(
+                        RoleAdmissionFeatureGlassTileSmall(
                             icon = TablerIcons.Coin,
                             label = "GANA",
                             modifier = Modifier.weight(1f),
@@ -406,7 +447,10 @@ private fun RoleHeaderAnimated(height: Dp) {
                 .fillMaxWidth()
                 .height(92.dp)
         ) {
-            PrettyWaveAnimated(modifier = Modifier.fillMaxSize(), baseColor = White)
+            RoleAdmissionPrettyWaveAnimated(
+                modifier = Modifier.fillMaxSize(),
+                baseColor = White
+            )
         }
     }
 }
@@ -414,7 +458,7 @@ private fun RoleHeaderAnimated(height: Dp) {
 /* ---------------- PIEZAS UI ---------------- */
 
 @Composable
-private fun LogoPillCompact() {
+private fun RoleAdmissionLogoPillCompact() {
     Card(
         shape = RoundedCornerShape(999.dp),
         colors = CardDefaults.cardColors(containerColor = White),
@@ -446,17 +490,30 @@ private fun LogoPillCompact() {
 
             Text(
                 text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = BrandBlue, fontWeight = FontWeight.ExtraBold)) { append("Servi") }
-                    withStyle(SpanStyle(color = BrandRed, fontWeight = FontWeight.ExtraBold)) { append("Ya") }
+                    withStyle(
+                        SpanStyle(
+                            color = BrandBlue,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    ) { append("Servi") }
+
+                    withStyle(
+                        SpanStyle(
+                            color = BrandRed,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    ) { append("Ya") }
                 },
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.ExtraBold
+                )
             )
         }
     }
 }
 
 @Composable
-private fun FeatureGlassTileSmall(
+private fun RoleAdmissionFeatureGlassTileSmall(
     icon: ImageVector,
     label: String,
     modifier: Modifier = Modifier,
@@ -466,7 +523,10 @@ private fun FeatureGlassTileSmall(
     val pulse by inf.animateFloat(
         initialValue = 1f,
         targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(tween(1800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
         label = "pulse_$label"
     )
 
@@ -474,22 +534,34 @@ private fun FeatureGlassTileSmall(
         modifier = modifier
             .height(78.dp)
             .offset(y = (-float).dp)
-            .graphicsLayer { scaleX = pulse; scaleY = pulse }
+            .graphicsLayer {
+                scaleX = pulse
+                scaleY = pulse
+            }
             .clip(RoundedCornerShape(20.dp))
             .shimmerOverlay(alpha = 0.12f, durationMs = 2000),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.12f)),
+        colors = CardDefaults.cardColors(
+            containerColor = White.copy(alpha = 0.12f)
+        ),
         border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
     ) {
         Column(
-            Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, null, tint = White, modifier = Modifier.size(20.dp))
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = White,
+                modifier = Modifier.size(20.dp)
+            )
+
             Spacer(Modifier.height(6.dp))
+
             Text(
-                label,
+                text = label,
                 color = White.copy(alpha = 0.78f),
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Black,
@@ -501,7 +573,7 @@ private fun FeatureGlassTileSmall(
 }
 
 @Composable
-private fun RolePickCardAnimated(
+private fun RoleAdmissionPickCardAnimated(
     title: String,
     subtitle: String,
     icon: ImageVector,
@@ -527,7 +599,7 @@ private fun RolePickCardAnimated(
         label = "icon_bg"
     )
 
-    val inf = rememberInfiniteTransition(label = "role_float_$title")
+    val inf = rememberInfiniteTransition(label = "roleAdmission_float_$title")
     val floatY by inf.animateFloat(
         initialValue = 0f,
         targetValue = if (selected) 8f else 0f,
@@ -546,7 +618,9 @@ private fun RolePickCardAnimated(
             .bouncyClick(onClick),
         shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(containerColor = bgColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (selected) 10.dp else 6.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (selected) 10.dp else 6.dp
+        ),
         border = BorderStroke(2.dp, borderColor)
     ) {
         Column(
@@ -579,7 +653,9 @@ private fun RolePickCardAnimated(
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.ExtraBold
+                ),
                 color = TextPrimary
             )
 
@@ -587,17 +663,19 @@ private fun RolePickCardAnimated(
 
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = TextSecondary
+                ),
                 textAlign = TextAlign.Center
             )
         }
     }
 }
 
-/* ---------------- WAVE ANIMADA ---------------- */
+/* ---------------- WAVE ---------------- */
 
 @Composable
-private fun PrettyWaveAnimated(
+private fun RoleAdmissionPrettyWaveAnimated(
     modifier: Modifier,
     baseColor: Color
 ) {
@@ -605,11 +683,14 @@ private fun PrettyWaveAnimated(
     val a by inf.animateFloat(
         initialValue = 0.22f,
         targetValue = 0.38f,
-        animationSpec = infiniteRepeatable(tween(2200, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
         label = "wave_hi"
     )
 
-    androidx.compose.foundation.Canvas(modifier = modifier) {
+    Canvas(modifier = modifier) {
         val w = size.width
         val h = size.height
 

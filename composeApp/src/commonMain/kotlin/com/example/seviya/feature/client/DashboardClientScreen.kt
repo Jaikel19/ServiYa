@@ -1,6 +1,7 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,10 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -602,7 +605,7 @@ private fun ProgressZeroRing(
                 sweepAngle = 0f,
                 useCenter = false,
                 topLeft = Offset(stroke / 2f, stroke / 2f),
-                size = androidx.compose.ui.geometry.Size(
+                size = Size(
                     width = this.size.width - stroke,
                     height = this.size.height - stroke
                 ),
@@ -698,7 +701,7 @@ private fun QuickActionsRow(
 @Composable
 private fun QuickActionItem(
     label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Column(
@@ -788,7 +791,7 @@ private fun SummaryCard(
         modifier = modifier,
         shape = RoundedCornerShape(22.dp),
         color = White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, ClientSectionCardBorder),
+        border = BorderStroke(1.dp, ClientSectionCardBorder),
         shadowElevation = 1.dp
     ) {
         Column(
@@ -840,7 +843,7 @@ private fun SectionCard(
             .animateContentSize(),
         shape = RoundedCornerShape(24.dp),
         color = White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, ClientSectionCardBorder),
+        border = BorderStroke(1.dp, ClientSectionCardBorder),
         shadowElevation = 1.dp
     ) {
         Column(
@@ -916,7 +919,7 @@ private fun UpcomingBookingRow(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = ClientSoftBlueRow,
-        border = androidx.compose.foundation.BorderStroke(1.dp, ClientSoftBlueRowBorder),
+        border = BorderStroke(1.dp, ClientSoftBlueRowBorder),
         onClick = onClick
     ) {
         Row(
@@ -1037,7 +1040,7 @@ private fun SecondaryActionsRow(
             onClick = onOpenCategories,
             shape = RoundedCornerShape(18.dp),
             color = White,
-            border = androidx.compose.foundation.BorderStroke(1.dp, DividerSoft)
+            border = BorderStroke(1.dp, DividerSoft)
         ) {
             Text(
                 text = "Ir a categorías",
@@ -1137,7 +1140,7 @@ private fun statusAccentColor(status: String): Color {
     }
 }
 
-private fun statusEndIcon(status: String): androidx.compose.ui.graphics.vector.ImageVector {
+private fun statusEndIcon(status: String): ImageVector {
     return when (status.clientStatusKey()) {
         "payment_pending" -> TablerIcons.Clock
         "confirmed" -> TablerIcons.CalendarEvent

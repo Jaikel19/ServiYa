@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -737,7 +737,7 @@ private fun AddEditLocationForm(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            CurrentLocationButton(
+            _root_ide_package_.com.example.seviya.UI.CurrentLocationButton(
                 onLocationObtained = { lat, lng, prov, cant, dist ->
                     latitude = lat
                     longitude = lng

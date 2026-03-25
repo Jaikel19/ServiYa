@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -502,7 +503,7 @@ private fun ClientHeader(
 
 @Composable
 private fun HeaderCircleButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Box(
@@ -525,7 +526,7 @@ private fun HeaderCircleButton(
 
 @Composable
 private fun ClientInfoBlock(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     label: String,
     value: String
 ) {
@@ -580,7 +581,7 @@ private fun ClientInfoBlock(
 @Composable
 private fun ClientActionButton(
     text: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     backgroundColor: Color,
     contentColor: Color,
     borderColor: Color,

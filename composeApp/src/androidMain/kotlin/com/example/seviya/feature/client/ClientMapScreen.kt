@@ -1,4 +1,4 @@
-package com.example.seviya.UI
+package com.example.seviya.feature.client
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -39,6 +39,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.seviya.core.designsystem.theme.AppBackground
 import com.example.seviya.core.designsystem.theme.BlueGrayText
 import com.example.seviya.core.designsystem.theme.BorderSoft
@@ -477,7 +478,7 @@ private fun PremiumMapSearchField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    leadingIcon: androidx.compose.ui.graphics.vector.ImageVector,
+    leadingIcon: ImageVector,
     modifier: Modifier = Modifier
 ) {
     Surface(
