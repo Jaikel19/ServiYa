@@ -95,8 +95,6 @@ import com.example.seviya.core.navigation.ClientLocationCatalog
 import compose.icons.TablerIcons
 import compose.icons.tablericons.*
 import com.example.shared.utils.DateTimeUtils
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.TimeZone
 import org.koin.compose.viewmodel.koinViewModel
 
 enum class SessionRole {
@@ -872,8 +870,6 @@ private fun extractMinutesFromDuration(duration: String): Int {
         .toIntOrNull() ?: 0
 }
 
-private val APP_TIME_ZONE = TimeZone.of("America/Costa_Rica")
-
 
 internal fun buildCurrentTimeSnapshot(): CurrentTimeSnapshot {
     val isoNow = DateTimeUtils.nowIsoMinute()
@@ -954,14 +950,3 @@ private fun dayOfWeekIndex(year: Int, month: Int, day: Int): Int {
     return (y + y / 4 - y / 100 + y / 400 + monthOffsets[month - 1] + day) % 7
 }
 
-private fun appDayKeyFromWeekday(dayOfWeek: DayOfWeek): String {
-    return when (dayOfWeek) {
-        DayOfWeek.MONDAY -> "monday"
-        DayOfWeek.TUESDAY -> "tuesday"
-        DayOfWeek.WEDNESDAY -> "wednesday"
-        DayOfWeek.THURSDAY -> "thursday"
-        DayOfWeek.FRIDAY -> "friday"
-        DayOfWeek.SATURDAY -> "saturday"
-        DayOfWeek.SUNDAY -> "sunday"
-    }
-}
