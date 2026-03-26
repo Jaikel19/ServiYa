@@ -2,12 +2,15 @@ package com.example.shared.data.repository.Appointment
 
 import com.example.shared.data.remote.appointment.IRemoteAppointmentDataSource
 import com.example.shared.data.repository.OtpAppointment.IOtpAppointmentRepository
+import com.example.shared.data.repository.catchEmpty
+import com.example.shared.data.repository.catchNull
+import com.example.shared.data.repository.safeStringCall
+import com.example.shared.data.repository.safeUnitCall
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.OtpAppointment
 import com.example.shared.utils.DateTimeUtils
 import com.example.shared.utils.OtpUtils
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 
 class AppointmentRepository(
     private val remote: IRemoteAppointmentDataSource,
@@ -15,47 +18,22 @@ class AppointmentRepository(
 ) : IAppointmentRepository {
 
     override suspend fun getAppointmentsByClient(clientId: String): Flow<List<Appointment>> =
-        remote.getAppointmentsByClient(clientId)
-            .catch { e ->
-                println("ERROR fetching appointments by client: ${e.message}")
-                emit(emptyList())
-            }
+        remote.getAppointmentsByClient(clientId).catchEmpty("fetching appointments by client")
 
     override suspend fun getAppointmentsByWorker(workerId: String): Flow<List<Appointment>> =
-        remote.getAppointmentsByWorker(workerId)
-            .catch { e ->
-                println("ERROR fetching appointments by worker: ${e.message}")
-                emit(emptyList())
-            }
+        remote.getAppointmentsByWorker(workerId).catchEmpty("fetching appointments by worker")
 
     override suspend fun getAppointmentById(appointmentId: String): Flow<Appointment?> =
-        remote.getAppointmentById(appointmentId)
-            .catch { e ->
-                println("ERROR fetching appointment: ${e.message}")
-                emit(null)
-            }
+        remote.getAppointmentById(appointmentId).catchNull("fetching appointment")
 
     override suspend fun createAppointment(appointment: Appointment): String =
-        try {
-            remote.createAppointment(appointment)
-        } catch (e: Exception) {
-            println("ERROR createAppointment: ${e.message}")
-            ""
-        }
+        safeStringCall("createAppointment") { remote.createAppointment(appointment) }
 
     override suspend fun updateAppointment(appointment: Appointment) =
-        try {
-            remote.updateAppointment(appointment)
-        } catch (e: Exception) {
-            println("ERROR updateAppointment: ${e.message}")
-        }
+        safeUnitCall("updateAppointment") { remote.updateAppointment(appointment) }
 
     override suspend fun deleteAppointment(appointmentId: String) =
-        try {
-            remote.deleteAppointment(appointmentId)
-        } catch (e: Exception) {
-            println("ERROR deleteAppointment: ${e.message}")
-        }
+        safeUnitCall("deleteAppointment") { remote.deleteAppointment(appointmentId) }
 
     override suspend fun approveAppointment(appointmentId: String) {
         remote.approveAppointment(appointmentId)

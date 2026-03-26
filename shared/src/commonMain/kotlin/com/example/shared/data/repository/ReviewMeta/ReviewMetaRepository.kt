@@ -1,6 +1,8 @@
 package com.example.shared.data.repository.ReviewMeta
 
 import com.example.shared.data.remote.ReviewMeta.IRemoteReviewMetaDataSource
+import com.example.shared.data.repository.safeStringCall
+import com.example.shared.data.repository.safeUnitCall
 import com.example.shared.domain.entity.ReviewMeta
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -20,30 +22,19 @@ class ReviewMetaRepository(
         appointmentId: String,
         reviewMeta: ReviewMeta
     ): String =
-        try {
-            remote.createReviewMeta(appointmentId, reviewMeta)
-        } catch (e: Exception) {
-            println("ERROR createReviewMeta: ${e.message}")
-            ""
-        }
+        safeStringCall("createReviewMeta") { remote.createReviewMeta(appointmentId, reviewMeta) }
 
     override suspend fun updateClientToWorkerReview(
         appointmentId: String,
         reviewId: String
-    ) =
-        try {
-            remote.updateClientToWorkerReview(appointmentId, reviewId)
-        } catch (e: Exception) {
-            println("ERROR updateClientToWorkerReview: ${e.message}")
-        }
+    ) = safeUnitCall("updateClientToWorkerReview") {
+        remote.updateClientToWorkerReview(appointmentId, reviewId)
+    }
 
     override suspend fun updateWorkerToClientReview(
         appointmentId: String,
         reviewId: String
-    ) =
-        try {
-            remote.updateWorkerToClientReview(appointmentId, reviewId)
-        } catch (e: Exception) {
-            println("ERROR updateWorkerToClientReview: ${e.message}")
-        }
+    ) = safeUnitCall("updateWorkerToClientReview") {
+        remote.updateWorkerToClientReview(appointmentId, reviewId)
+    }
 }
