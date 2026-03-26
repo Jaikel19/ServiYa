@@ -6,7 +6,7 @@ import com.example.shared.domain.entity.Favorite
 import com.example.shared.domain.entity.WorkerListItemData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapLatest
 
 class FavoriteWorkersRepository(
     private val remote: IRemoteFavoriteWorkersDataSource,
@@ -20,21 +20,22 @@ class FavoriteWorkersRepository(
             }
 
     override suspend fun getFavoriteWorkersByClient(clientId: String): Flow<List<WorkerListItemData>> =
-        combine(
-            remote.getFavoritesByClient(clientId),
-            workersListRepository.getWorkers()
-        ) { favorites, workers ->
+        remote.getFavoritesByClient(clientId)
+            .mapLatest { favorites ->
+                val favoriteIds = favorites
+                    .map { it.workerId.trim() }
+                    .filter { it.isNotBlank() }
+                    .toSet()
 
-            val favoriteIds = favorites
-                .map { it.workerId.trim() }
-                .filter { it.isNotBlank() }
-
-            workers.filter { worker ->
-                favoriteIds.contains(worker.workerId.trim())
+                if (favoriteIds.isEmpty()) {
+                    emptyList()
+                } else {
+                    workersListRepository.getWorkersByIds(favoriteIds)
+                }
             }
-        }.catch {
-            emit(emptyList())
-        }
+            .catch {
+                emit(emptyList())
+            }
 
     override suspend fun getFavoriteById(clientId: String, favoriteId: String): Favorite? =
         try {

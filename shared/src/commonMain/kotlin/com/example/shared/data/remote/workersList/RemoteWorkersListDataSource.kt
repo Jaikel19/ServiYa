@@ -15,6 +15,17 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
 
     private val db = Firebase.firestore
 
+    private fun toWorkerRemoteItemOrNull(workerId: String, profile: WorkerProfile): WorkerRemoteItem? {
+        return if (profile.role == "worker") {
+            WorkerRemoteItem(
+                workerId = workerId,
+                profile = profile
+            )
+        } else {
+            null
+        }
+    }
+
     override suspend fun getWorkers(): Flow<List<WorkerRemoteItem>> {
         return db.collection("users")
             .snapshots
@@ -22,19 +33,29 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
                 querySnapshot.documents.mapNotNull { document ->
                     try {
                         val profile = document.data<WorkerProfile>()
-                        if (profile.role == "worker") {
-                            WorkerRemoteItem(
-                                workerId = document.id,
-                                profile = profile
-                            )
-                        } else {
-                            null
-                        }
+                        toWorkerRemoteItemOrNull(document.id, profile)
                     } catch (e: Exception) {
                         null
                     }
                 }
             }
+    }
+
+    override suspend fun getWorkersByIds(workerIds: Set<String>): List<WorkerRemoteItem> {
+        if (workerIds.isEmpty()) return emptyList()
+
+        return workerIds.mapNotNull { workerId ->
+            try {
+                val snapshot = db.collection("users")
+                    .document(workerId)
+                    .get()
+
+                val profile = snapshot.data<WorkerProfile>()
+                toWorkerRemoteItemOrNull(snapshot.id, profile)
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 
     override suspend fun getCategoryNames(categoryIds: List<String>): List<String> {

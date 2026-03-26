@@ -95,15 +95,22 @@ class WorkersListViewModel(
         favoritesJob?.cancel()
 
         favoritesJob = viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoadingFavorites = true,
+                errorMessage = null
+            )
+
             try {
                 repository.getFavoriteWorkerIds(clientId).collect { favoriteIds ->
                     _uiState.value = _uiState.value.copy(
+                        isLoadingFavorites = false,
                         favoriteWorkerIds = favoriteIds,
                         errorMessage = null
                     )
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
+                    isLoadingFavorites = false,
                     errorMessage = e.message ?: "Error cargando favoritos"
                 )
             }

@@ -14,6 +14,7 @@ data class WorkerRemoteItem(
 
 interface IRemoteWorkersListDataSource {
     suspend fun getWorkers(): Flow<List<WorkerRemoteItem>>
+    suspend fun getWorkersByIds(workerIds: Set<String>): List<WorkerRemoteItem>
     suspend fun getCategoryNames(categoryIds: List<String>): List<String>
     suspend fun getWorkerAddress(workerId: String): Address?
     suspend fun getWorkerSchedule(workerId: String): List<WorkerSchedule>

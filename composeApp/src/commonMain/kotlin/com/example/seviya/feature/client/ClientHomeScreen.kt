@@ -200,7 +200,7 @@ private fun ClientHomeContent(
                 .padding(padding)
         ) {
             ClientHomeHeader(
-                favoritesCount = favoritesState.workers.size,
+                favoritesCount = workersState.favoriteWorkerIds.size,
                 onFavoritesClick = onFavoritesClick
             )
 
@@ -278,7 +278,7 @@ private fun ClientHomeContent(
                                 )
 
                                 when {
-                                    favoritesState.isLoading && favoritesState.workers.isEmpty() -> {
+                                    favoritesState.isLoading && visibleFavorites.isEmpty() -> {
                                         HomeMessageCard(text = "Cargando favoritos...")
                                     }
 
