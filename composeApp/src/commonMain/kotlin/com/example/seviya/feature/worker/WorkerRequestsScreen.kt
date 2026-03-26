@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,9 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.seviya.core.designsystem.theme.BlueGrayText
 import com.example.seviya.core.designsystem.theme.BorderBlueLight
+import com.example.seviya.core.designsystem.theme.BorderUltraSoft
 import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.BrandBlueDark
 import com.example.seviya.core.designsystem.theme.BrandRed
+import com.example.seviya.core.designsystem.theme.CardSurface
 import com.example.seviya.core.designsystem.theme.ClientQuickActionSurface
 import com.example.seviya.core.designsystem.theme.ClientSectionCardBorder
 import com.example.seviya.core.designsystem.theme.DividerSoft
@@ -161,50 +165,50 @@ private fun WorkerRequestsContent(
 
             selectedFilter == RequestFilter.PENDING -> {
                 if (uiState.requests.isEmpty()) {
-                        scaleY = rightBadgeScale
+                    item {
+                        PremiumMessageCard(
+                            title = "No tienes solicitudes pendientes",
+                            subtitle = "Cuando un cliente solicite una cita aparecerá aquí para que la revises."
+                        )
                     }
-                    .clip(RoundedCornerShape(999.dp))
-                    .background(White.copy(alpha = 0.14f))
-                    .border(
-                        width = 1.dp,
-                        color = White.copy(alpha = 0.16f),
-                        shape = RoundedCornerShape(999.dp)
-                    )
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                color = White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 24.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(82.dp)
-                        .graphicsLayer {
-                            translationY = bubbleOffsetLarge
-                            scaleX = bubbleScaleLarge
-                            scaleY = bubbleScaleLarge
+                } else {
+                    items(uiState.requests) { appointment ->
+                        Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
+                            WorkerPendingRequestCard(
+                                appointment = appointment,
+                                onAccept = { onAccept(appointment) },
+                                onReject = { onReject(appointment) },
+                                onOpenDetail = { onOpenRequestDetail(appointment.id) }
+                            )
                         }
-                        .clip(CircleShape)
-                        .background(White.copy(alpha = 0.08f))
-                )
+                    }
+                }
+            }
 
-                Box(
-                    modifier = Modifier
-                        .size(46.dp)
-                        .align(Alignment.BottomStart)
-                        .graphicsLayer {
-                            translationY = bubbleOffsetSmall
-                            scaleX = bubbleScaleSmall
-                            scaleY = bubbleScaleSmall
+            selectedFilter == RequestFilter.PAYMENT_PENDING -> {
+                if (uiState.isLoadingPayments) {
+                    item {
+                        RequestLoadingCard()
+                    }
+                } else if (uiState.paymentPendingAppointments.isEmpty()) {
+                    item {
+                        PremiumMessageCard(
+                            title = "No tienes pagos pendientes",
+                            subtitle = "Los comprobantes enviados por tus clientes aparecerán aquí para revisión."
+                        )
+                    }
+                } else {
+                    items(uiState.paymentPendingAppointments) { (appointment, _) ->
+                        Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
+                            WorkerPaymentPendingCard(
+                                appointment = appointment,
+                                onConfirm = { onConfirm(appointment) },
+                                onCancel = { onCancel(appointment) },
+                                onOpenPaymentDetail = { onOpenPaymentDetail(appointment.id) }
+                            )
                         }
-                        .clip(CircleShape)
-                        .background(White.copy(alpha = 0.10f))
-                )
+                    }
+                }
             }
         }
     }
