@@ -1,17 +1,6 @@
 package com.example.seviya.feature.worker
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,21 +8,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -48,20 +30,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.seviya.core.designsystem.theme.AppBackground
 import com.example.seviya.core.designsystem.theme.BlueGrayText
 import com.example.seviya.core.designsystem.theme.BorderBlueLight
-import com.example.seviya.core.designsystem.theme.BorderUltraSoft
 import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.BrandBlueDark
 import com.example.seviya.core.designsystem.theme.BrandRed
-import com.example.seviya.core.designsystem.theme.CardSurface
 import com.example.seviya.core.designsystem.theme.ClientQuickActionSurface
 import com.example.seviya.core.designsystem.theme.ClientSectionCardBorder
 import com.example.seviya.core.designsystem.theme.DividerSoft
@@ -75,11 +52,13 @@ import com.example.seviya.core.designsystem.theme.Success
 import com.example.seviya.core.designsystem.theme.TextPrimary
 import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
+import com.example.seviya.feature.requests.RequestLoadingCard
+import com.example.seviya.feature.requests.RequestsScreenScaffold
+import com.example.seviya.feature.requests.RequestsSectionHeader
+import com.example.seviya.feature.requests.RequestsTopHeader
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsUiState
 import com.example.shared.presentation.WorkerRequest.WorkerRequestsViewModel
-import compose.icons.TablerIcons
-import compose.icons.tablericons.ArrowLeft
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -128,82 +107,46 @@ private fun WorkerRequestsContent(
 ) {
     var selectedFilter by remember { mutableStateOf(RequestFilter.PENDING) }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-    ) {
-        item {
-            WorkerRequestsTopHeader(
+    RequestsScreenScaffold(
+        headerContent = {
+            RequestsTopHeader(
                 onBack = onBack
             )
+        },
+        filtersContent = {
+            RequestsSectionHeader(
+                title = if (selectedFilter == RequestFilter.PENDING) {
+                    "Solicitudes pendientes"
+                } else {
+                    "Pendientes de pago"
+                },
+                subtitle = if (selectedFilter == RequestFilter.PENDING) {
+                    "Gestiona las solicitudes enviadas por tus clientes"
+                } else {
+                    "Verifica los comprobantes enviados para continuar"
+                }
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            RequestSegmentedControl(
+                selectedFilter = selectedFilter,
+                pendingCount = uiState.requests.size,
+                paymentPendingCount = uiState.paymentPendingAppointments.size,
+                onPendingClick = {
+                    selectedFilter = RequestFilter.PENDING
+                },
+                onPaymentPendingClick = {
+                    selectedFilter = RequestFilter.PAYMENT_PENDING
+                    onLoadPaymentPending()
+                }
+            )
         }
-
-        item {
-            Spacer(modifier = Modifier.height(22.dp))
-        }
-
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            ) {
-                SectionHeader(
-                    title = if (selectedFilter == RequestFilter.PENDING) {
-                        "Solicitudes pendientes"
-                    } else {
-                        "Pendientes de pago"
-                    },
-                    subtitle = if (selectedFilter == RequestFilter.PENDING) {
-                        "Gestiona las solicitudes enviadas por tus clientes"
-                    } else {
-                        "Verifica los comprobantes enviados para continuar"
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                RequestSegmentedControl(
-                    selectedFilter = selectedFilter,
-                    pendingCount = uiState.requests.size,
-                    paymentPendingCount = uiState.paymentPendingAppointments.size,
-                    onPendingClick = {
-                        selectedFilter = RequestFilter.PENDING
-                    },
-                    onPaymentPendingClick = {
-                        selectedFilter = RequestFilter.PAYMENT_PENDING
-                        onLoadPaymentPending()
-                    }
-                )
-            }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
+    ) {
         when {
             uiState.isLoading -> {
                 item {
-                    Surface(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 8.dp)
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(28.dp),
-                        color = CardSurface,
-                        border = BorderStroke(1.dp, BorderUltraSoft),
-                        shadowElevation = 2.dp
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 34.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = BrandBlue)
-                        }
-                    }
+                    RequestLoadingCard()
                 }
             }
 
@@ -218,271 +161,6 @@ private fun WorkerRequestsContent(
 
             selectedFilter == RequestFilter.PENDING -> {
                 if (uiState.requests.isEmpty()) {
-                    item {
-                        PremiumMessageCard(
-                            title = "No tienes solicitudes pendientes",
-                            subtitle = "Cuando un cliente solicite una cita aparecerá aquí para que la revises."
-                        )
-                    }
-                } else {
-                    items(uiState.requests) { appointment ->
-                        Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                            WorkerPendingRequestCard(
-                                appointment = appointment,
-                                onAccept = { onAccept(appointment) },
-                                onReject = { onReject(appointment) },
-                                onOpenDetail = { onOpenRequestDetail(appointment.id) }
-                            )
-                        }
-                    }
-                }
-            }
-
-            selectedFilter == RequestFilter.PAYMENT_PENDING -> {
-                if (uiState.isLoadingPayments) {
-                    item {
-                        Surface(
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp, vertical = 8.dp)
-                                .fillMaxWidth(),
-                            shape = RoundedCornerShape(28.dp),
-                            color = CardSurface,
-                            border = BorderStroke(1.dp, BorderUltraSoft),
-                            shadowElevation = 2.dp
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 34.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(color = BrandBlue)
-                            }
-                        }
-                    }
-                } else if (uiState.paymentPendingAppointments.isEmpty()) {
-                    item {
-                        PremiumMessageCard(
-                            title = "No tienes pagos pendientes",
-                            subtitle = "Los comprobantes enviados por tus clientes aparecerán aquí para revisión."
-                        )
-                    }
-                } else {
-                    items(uiState.paymentPendingAppointments) { (appointment, _) ->
-                        Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                            WorkerPaymentPendingCard(
-                                appointment = appointment,
-                                onConfirm = { onConfirm(appointment) },
-                                onCancel = { onCancel(appointment) },
-                                onOpenPaymentDetail = { onOpenPaymentDetail(appointment.id) }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(22.dp))
-        }
-    }
-}
-
-@Composable
-private fun WorkerRequestsTopHeader(
-    onBack: () -> Unit
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "worker_requests_header")
-
-    val leftBadgeScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.035f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "left_badge_scale"
-    )
-
-    val rightBadgeScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.03f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2100, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "right_badge_scale"
-    )
-
-    val bubbleOffsetLarge by infiniteTransition.animateFloat(
-        initialValue = -4f,
-        targetValue = 6f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2600, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bubble_offset_large"
-    )
-
-    val bubbleOffsetSmall by infiniteTransition.animateFloat(
-        initialValue = 5f,
-        targetValue = -5f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bubble_offset_small"
-    )
-
-    val bubbleScaleLarge by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.08f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2400, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bubble_scale_large"
-    )
-
-    val bubbleScaleSmall by infiniteTransition.animateFloat(
-        initialValue = 0.96f,
-        targetValue = 1.06f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bubble_scale_small"
-    )
-
-    val shimmerOffset by infiniteTransition.animateFloat(
-        initialValue = -260f,
-        targetValue = 620f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(3200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmer_offset"
-    )
-
-    val arrowFloat by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = -2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "arrow_float"
-    )
-
-    val entranceVisible = remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        entranceVisible.value = true
-    }
-
-    AnimatedVisibility(
-        visible = entranceVisible.value,
-        enter = fadeIn(
-            animationSpec = tween(500)
-        ) + slideInVertically(
-            initialOffsetY = { -it / 3 },
-            animationSpec = tween(600, easing = FastOutSlowInEasing)
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(140.dp)
-                .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
-                .background(BrandBlue)
-        ) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(140.dp)
-                        .offset(x = shimmerOffset.dp)
-                        .graphicsLayer {
-                            rotationZ = -18f
-                            alpha = 0.16f
-                        }
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    White.copy(alpha = 0.45f),
-                                    Color.Transparent
-                                )
-                            )
-                        )
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(start = 20.dp, top = 42.dp)
-                    .graphicsLayer {
-                        scaleX = leftBadgeScale
-                        scaleY = leftBadgeScale
-                    }
-                    .clip(RoundedCornerShape(999.dp))
-                    .background(White.copy(alpha = 0.14f))
-                    .border(
-                        width = 1.dp,
-                        color = White.copy(alpha = 0.16f),
-                        shape = RoundedCornerShape(999.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 9.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .graphicsLayer {
-                            translationY = arrowFloat
-                        }
-                        .clip(CircleShape)
-                        .background(White.copy(alpha = 0.14f))
-                        .clickable { onBack() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = TablerIcons.ArrowLeft,
-                        contentDescription = "Volver",
-                        tint = White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Servi",
-                        color = White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Text(
-                        text = "Ya",
-                        color = BrandRed,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                }
-            }
-
-            Text(
-                text = "SOLICITUDES",
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 20.dp, top = 42.dp)
-                    .graphicsLayer {
-                        scaleX = rightBadgeScale
                         scaleY = rightBadgeScale
                     }
                     .clip(RoundedCornerShape(999.dp))
@@ -620,31 +298,6 @@ private fun RequestSegmentItem(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun SectionHeader(
-    title: String,
-    subtitle: String
-) {
-    Column {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = TextSecondary
-            )
-        )
     }
 }
 
