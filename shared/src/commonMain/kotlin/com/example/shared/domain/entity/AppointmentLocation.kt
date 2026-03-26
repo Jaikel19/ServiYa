@@ -11,5 +11,5 @@ data class AppointmentLocation(
     val canton: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val reference: String = ""
+    val reference: String = "",
 )

@@ -24,123 +24,109 @@ import kotlinx.coroutines.flow.map
 class FirestoreSubcollectionCrud(
     private val db: FirebaseFirestore,
     private val parentCollection: String,
-    private val subcollection: String
+    private val subcollection: String,
 ) {
-    fun subcollectionRef(parentId: String): CollectionReference =
-        db.collection(parentCollection).document(parentId).collection(subcollection)
+  fun subcollectionRef(parentId: String): CollectionReference =
+      db.collection(parentCollection).document(parentId).collection(subcollection)
 
-    /**
-     * Observes all documents in the subcollection as a Flow<List<T>>.
-     * [transform] maps each document snapshot to the domain type.
-     */
-    fun <T> observeList(
-        parentId: String,
-        transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?
-    ): Flow<List<T>> =
-        subcollectionRef(parentId).snapshots.map { snapshot ->
-            snapshot.documents.mapNotNull { doc ->
-                try {
-                    transform(doc)
-                } catch (e: Exception) {
-                    println("ERROR parsing $subcollection ${doc.id}: ${e.message}")
-                    null
-                }
-            }
-        }
-
-    /**
-     * Observes the first document in the subcollection as a Flow<T?>.
-     */
-    fun <T> observeFirst(
-        parentId: String,
-        transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?
-    ): Flow<T?> =
-        subcollectionRef(parentId).snapshots.map { snapshot ->
-            snapshot.documents.firstOrNull()?.let { doc ->
-                try {
-                    transform(doc)
-                } catch (e: Exception) {
-                    println("ERROR parsing $subcollection: ${e.message}")
-                    null
-                }
-            }
-        }
-
-    /**
-     * Observes a single document by ID as a Flow<T?>.
-     */
-    fun <T> observeDocument(
-        parentId: String,
-        docId: String,
-        transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?
-    ): Flow<T?> =
-        subcollectionRef(parentId).document(docId).snapshots.map { doc ->
-            try {
-                if (doc.exists) transform(doc) else null
-            } catch (e: Exception) {
-                println("ERROR parsing $subcollection/$docId: ${e.message}")
-                null
-            }
-        }
-
-    /**
-     * Gets a single document by ID (one-shot).
-     */
-    suspend fun <T> getDocument(
-        parentId: String,
-        docId: String,
-        transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?
-    ): T? =
-        try {
-            val doc = subcollectionRef(parentId).document(docId).get()
-            if (doc.exists) transform(doc) else null
-        } catch (e: Exception) {
-            println("ERROR get $subcollection/$docId: ${e.message}")
+  /**
+   * Observes all documents in the subcollection as a Flow<List<T>>. [transform] maps each document
+   * snapshot to the domain type.
+   */
+  fun <T> observeList(
+      parentId: String,
+      transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?,
+  ): Flow<List<T>> =
+      subcollectionRef(parentId).snapshots.map { snapshot ->
+        snapshot.documents.mapNotNull { doc ->
+          try {
+            transform(doc)
+          } catch (e: Exception) {
+            println("ERROR parsing $subcollection ${doc.id}: ${e.message}")
             null
+          }
         }
+      }
 
-    /**
-     * Adds a new document to the subcollection and returns its generated ID.
-     */
-    suspend fun addDocument(parentId: String, data: Any): String =
-        try {
-            val ref = subcollectionRef(parentId).add(data)
-            ref.id
-        } catch (e: Exception) {
-            println("ERROR add to $subcollection: ${e.message}")
-            ""
+  /** Observes the first document in the subcollection as a Flow<T?>. */
+  fun <T> observeFirst(
+      parentId: String,
+      transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?,
+  ): Flow<T?> =
+      subcollectionRef(parentId).snapshots.map { snapshot ->
+        snapshot.documents.firstOrNull()?.let { doc ->
+          try {
+            transform(doc)
+          } catch (e: Exception) {
+            println("ERROR parsing $subcollection: ${e.message}")
+            null
+          }
         }
+      }
 
-    /**
-     * Sets (creates or overwrites) a document with a specific ID.
-     */
-    suspend fun setDocument(parentId: String, docId: String, data: Any) {
+  /** Observes a single document by ID as a Flow<T?>. */
+  fun <T> observeDocument(
+      parentId: String,
+      docId: String,
+      transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?,
+  ): Flow<T?> =
+      subcollectionRef(parentId).document(docId).snapshots.map { doc ->
         try {
-            subcollectionRef(parentId).document(docId).set(data)
+          if (doc.exists) transform(doc) else null
         } catch (e: Exception) {
-            println("ERROR set $subcollection/$docId: ${e.message}")
+          println("ERROR parsing $subcollection/$docId: ${e.message}")
+          null
         }
+      }
+
+  /** Gets a single document by ID (one-shot). */
+  suspend fun <T> getDocument(
+      parentId: String,
+      docId: String,
+      transform: (dev.gitlive.firebase.firestore.DocumentSnapshot) -> T?,
+  ): T? =
+      try {
+        val doc = subcollectionRef(parentId).document(docId).get()
+        if (doc.exists) transform(doc) else null
+      } catch (e: Exception) {
+        println("ERROR get $subcollection/$docId: ${e.message}")
+        null
+      }
+
+  /** Adds a new document to the subcollection and returns its generated ID. */
+  suspend fun addDocument(parentId: String, data: Any): String =
+      try {
+        val ref = subcollectionRef(parentId).add(data)
+        ref.id
+      } catch (e: Exception) {
+        println("ERROR add to $subcollection: ${e.message}")
+        ""
+      }
+
+  /** Sets (creates or overwrites) a document with a specific ID. */
+  suspend fun setDocument(parentId: String, docId: String, data: Any) {
+    try {
+      subcollectionRef(parentId).document(docId).set(data)
+    } catch (e: Exception) {
+      println("ERROR set $subcollection/$docId: ${e.message}")
     }
+  }
 
-    /**
-     * Updates specific fields on a document.
-     */
-    suspend fun updateFields(parentId: String, docId: String, vararg fields: Pair<String, Any?>) {
-        try {
-            subcollectionRef(parentId).document(docId).update(*fields)
-        } catch (e: Exception) {
-            println("ERROR update $subcollection/$docId: ${e.message}")
-        }
+  /** Updates specific fields on a document. */
+  suspend fun updateFields(parentId: String, docId: String, vararg fields: Pair<String, Any?>) {
+    try {
+      subcollectionRef(parentId).document(docId).update(*fields)
+    } catch (e: Exception) {
+      println("ERROR update $subcollection/$docId: ${e.message}")
     }
+  }
 
-    /**
-     * Deletes a document by ID.
-     */
-    suspend fun deleteDocument(parentId: String, docId: String) {
-        try {
-            subcollectionRef(parentId).document(docId).delete()
-        } catch (e: Exception) {
-            println("ERROR delete $subcollection/$docId: ${e.message}")
-        }
+  /** Deletes a document by ID. */
+  suspend fun deleteDocument(parentId: String, docId: String) {
+    try {
+      subcollectionRef(parentId).document(docId).delete()
+    } catch (e: Exception) {
+      println("ERROR delete $subcollection/$docId: ${e.message}")
     }
+  }
 }

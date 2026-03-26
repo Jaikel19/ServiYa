@@ -26,75 +26,72 @@ import java.util.Locale
 
 @Composable
 actual fun CurrentLocationButton(
-    onLocationObtained: (latitude: Double, longitude: Double, province: String, canton: String, district: String) -> Unit,
-    onError: () -> Unit
+    onLocationObtained:
+        (
+            latitude: Double,
+            longitude: Double,
+            province: String,
+            canton: String,
+            district: String,
+        ) -> Unit,
+    onError: () -> Unit,
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
+  val launcher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) {
+          isGranted ->
         if (isGranted) {
-            val fusedClient = LocationServices.getFusedLocationProviderClient(context)
-            try {
-                @SuppressLint("MissingPermission")
-                val task = fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-                task.addOnSuccessListener { location ->
-                    if (location != null) {
-                        val geocoder = Geocoder(context, Locale("es", "CR"))
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            geocoder.getFromLocation(location.latitude, location.longitude, 1) { addresses ->
-                                val address = addresses.firstOrNull()
-                                onLocationObtained(
-                                    location.latitude,
-                                    location.longitude,
-                                    address?.adminArea ?: "",
-                                    address?.subAdminArea ?: "",
-                                    address?.locality ?: ""
-                                )
-                            }
-                        } else {
-                            @Suppress("DEPRECATION")
-                            val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                            val address = addresses?.firstOrNull()
-                            onLocationObtained(
-                                location.latitude,
-                                location.longitude,
-                                address?.adminArea ?: "",
-                                address?.subAdminArea ?: "",
-                                address?.locality ?: ""
-                            )
-                        }
-                    } else {
-                        onError()
-                    }
+          val fusedClient = LocationServices.getFusedLocationProviderClient(context)
+          try {
+            @SuppressLint("MissingPermission")
+            val task = fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            task.addOnSuccessListener { location ->
+              if (location != null) {
+                val geocoder = Geocoder(context, Locale("es", "CR"))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                  geocoder.getFromLocation(location.latitude, location.longitude, 1) { addresses ->
+                    val address = addresses.firstOrNull()
+                    onLocationObtained(
+                        location.latitude,
+                        location.longitude,
+                        address?.adminArea ?: "",
+                        address?.subAdminArea ?: "",
+                        address?.locality ?: "",
+                    )
+                  }
+                } else {
+                  @Suppress("DEPRECATION")
+                  val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                  val address = addresses?.firstOrNull()
+                  onLocationObtained(
+                      location.latitude,
+                      location.longitude,
+                      address?.adminArea ?: "",
+                      address?.subAdminArea ?: "",
+                      address?.locality ?: "",
+                  )
                 }
-                task.addOnFailureListener {
-                    onError()
-                }
-            } catch (e: SecurityException) {
+              } else {
                 onError()
+              }
             }
-        } else {
+            task.addOnFailureListener { onError() }
+          } catch (e: SecurityException) {
             onError()
+          }
+        } else {
+          onError()
         }
-    }
+      }
 
-    Button(
-        onClick = { launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = AvatarBlueSoft,
-            contentColor = BrandBlue
-        ),
-        shape = RoundedCornerShape(14.dp)
-    ) {
-        Text(
-            text = "Usar mi ubicación actual",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
+  Button(
+      onClick = { launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION) },
+      modifier = Modifier.fillMaxWidth().height(48.dp),
+      colors =
+          ButtonDefaults.buttonColors(containerColor = AvatarBlueSoft, contentColor = BrandBlue),
+      shape = RoundedCornerShape(14.dp),
+  ) {
+    Text(text = "Usar mi ubicación actual", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+  }
 }

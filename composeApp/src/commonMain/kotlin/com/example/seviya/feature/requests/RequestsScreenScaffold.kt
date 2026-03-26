@@ -27,61 +27,39 @@ import com.example.seviya.core.designsystem.theme.CardSurface
 fun RequestsScreenScaffold(
     headerContent: @Composable () -> Unit,
     filtersContent: @Composable () -> Unit,
-    bodyContent: LazyListScope.() -> Unit
+    bodyContent: LazyListScope.() -> Unit,
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-    ) {
-        item {
-            headerContent()
-        }
+  LazyColumn(modifier = Modifier.fillMaxSize().background(AppBackground)) {
+    item { headerContent() }
 
-        item {
-            Spacer(modifier = Modifier.height(22.dp))
-        }
+    item { Spacer(modifier = Modifier.height(22.dp)) }
 
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            ) {
-                filtersContent()
-            }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        bodyContent()
-
-        item {
-            Spacer(modifier = Modifier.height(22.dp))
-        }
+    item {
+      Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { filtersContent() }
     }
+
+    item { Spacer(modifier = Modifier.height(12.dp)) }
+
+    bodyContent()
+
+    item { Spacer(modifier = Modifier.height(22.dp)) }
+  }
 }
 
 @Composable
 fun RequestLoadingCard() {
-    Surface(
-        modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
-        color = CardSurface,
-        border = BorderStroke(1.dp, BorderUltraSoft),
-        shadowElevation = 2.dp
+  Surface(
+      modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp).fillMaxWidth(),
+      shape = RoundedCornerShape(28.dp),
+      color = CardSurface,
+      border = BorderStroke(1.dp, BorderUltraSoft),
+      shadowElevation = 2.dp,
+  ) {
+    Box(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 34.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 34.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = BrandBlue)
-        }
+      CircularProgressIndicator(color = BrandBlue)
     }
+  }
 }

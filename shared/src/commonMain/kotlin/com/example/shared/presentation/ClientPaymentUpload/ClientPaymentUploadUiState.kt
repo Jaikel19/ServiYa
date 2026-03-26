@@ -10,5 +10,5 @@ data class ClientPaymentUploadUiState(
     val paymentReceipt: PaymentReceipt? = null,
     val selectedImageBytes: ByteArray? = null,
     val uploadSuccess: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

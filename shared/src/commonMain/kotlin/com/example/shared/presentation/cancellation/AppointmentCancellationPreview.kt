@@ -7,5 +7,5 @@ data class AppointmentCancellationPreview(
     val refundAmount: Int = 0,
     val nonRefundableAmount: Int = 0,
     val appointmentTotal: Int = 0,
-    val warningMessage: String = ""
+    val warningMessage: String = "",
 )

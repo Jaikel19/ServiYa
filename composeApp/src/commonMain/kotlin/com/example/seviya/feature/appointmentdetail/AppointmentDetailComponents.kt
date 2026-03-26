@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,11 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.Dp
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.ui.unit.dp
 import com.example.seviya.core.designsystem.theme.White
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
@@ -40,7 +39,7 @@ import compose.icons.tablericons.DotsVertical
 data class AppointmentStatusVisuals(
     val text: String,
     val backgroundColor: Color,
-    val textColor: Color
+    val textColor: Color,
 )
 
 @Composable
@@ -58,53 +57,46 @@ fun AppointmentDetailTopHeader(
     sideButtonBackgroundColor: Color,
     contentHorizontalPadding: Dp,
     contentVerticalPadding: Dp,
-    titleTopPadding: Dp
+    titleTopPadding: Dp,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height)
-            .background(backgroundColor)
-            .windowInsetsPadding(WindowInsets.statusBars)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
+  Box(
+      modifier =
+          modifier
+              .fillMaxWidth()
+              .height(height)
+              .background(backgroundColor)
+              .windowInsetsPadding(WindowInsets.statusBars)
+  ) {
+    Row(
+        modifier =
+            Modifier.fillMaxWidth()
                 .padding(horizontal = contentHorizontalPadding, vertical = contentVerticalPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            AppointmentDetailIconButton(
-                icon = TablerIcons.ArrowLeft,
-                onClick = onBack,
-                size = sideButtonSize,
-                backgroundColor = sideButtonBackgroundColor
-            )
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top,
+    ) {
+      AppointmentDetailIconButton(
+          icon = TablerIcons.ArrowLeft,
+          onClick = onBack,
+          size = sideButtonSize,
+          backgroundColor = sideButtonBackgroundColor,
+      )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = titleTopPadding)
-            ) {
-                Text(
-                    text = title,
-                    color = White,
-                    style = titleTextStyle
-                )
-                Text(
-                    text = subtitle,
-                    color = subtitleColor,
-                    style = subtitleTextStyle
-                )
-            }
+      Column(
+          horizontalAlignment = Alignment.CenterHorizontally,
+          modifier = Modifier.padding(top = titleTopPadding),
+      ) {
+        Text(text = title, color = White, style = titleTextStyle)
+        Text(text = subtitle, color = subtitleColor, style = subtitleTextStyle)
+      }
 
-            AppointmentDetailIconButton(
-                icon = TablerIcons.DotsVertical,
-                onClick = {},
-                size = sideButtonSize,
-                backgroundColor = sideButtonBackgroundColor
-            )
-        }
+      AppointmentDetailIconButton(
+          icon = TablerIcons.DotsVertical,
+          onClick = {},
+          size = sideButtonSize,
+          backgroundColor = sideButtonBackgroundColor,
+      )
     }
+  }
 }
 
 @Composable
@@ -112,24 +104,17 @@ fun AppointmentDetailIconButton(
     icon: ImageVector,
     onClick: () -> Unit,
     size: Dp,
-    backgroundColor: Color
+    backgroundColor: Color,
 ) {
-    Box(
-        modifier = Modifier
-            .size(size)
-            .background(
-                color = backgroundColor,
-                shape = CircleShape
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = White
-        )
-    }
+  Box(
+      modifier =
+          Modifier.size(size).background(color = backgroundColor, shape = CircleShape).clickable {
+            onClick()
+          },
+      contentAlignment = Alignment.Center,
+  ) {
+    Icon(imageVector = icon, contentDescription = null, tint = White)
+  }
 }
 
 @Composable
@@ -141,21 +126,21 @@ fun AppointmentMessageBanner(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     shapeRadius: Dp = 22.dp,
-    paddingValue: Dp = 16.dp
+    paddingValue: Dp = 16.dp,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(shapeRadius),
-        color = backgroundColor,
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = textStyle,
-            modifier = Modifier.padding(paddingValue)
-        )
-    }
+  Surface(
+      modifier = modifier.fillMaxWidth(),
+      shape = RoundedCornerShape(shapeRadius),
+      color = backgroundColor,
+      border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
+  ) {
+    Text(
+        text = text,
+        color = textColor,
+        style = textStyle,
+        modifier = Modifier.padding(paddingValue),
+    )
+  }
 }
 
 @Composable
@@ -165,20 +150,20 @@ fun AppointmentStatusChip(
     cornerRadius: Dp,
     textStyle: TextStyle,
     horizontalPadding: Dp,
-    verticalPadding: Dp
+    verticalPadding: Dp,
 ) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(cornerRadius),
-        color = visuals.backgroundColor
-    ) {
-        Text(
-            text = visuals.text,
-            color = visuals.textColor,
-            style = textStyle,
-            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = verticalPadding)
-        )
-    }
+  Surface(
+      modifier = modifier,
+      shape = RoundedCornerShape(cornerRadius),
+      color = visuals.backgroundColor,
+  ) {
+    Text(
+        text = visuals.text,
+        color = visuals.textColor,
+        style = textStyle,
+        modifier = Modifier.padding(horizontal = horizontalPadding, vertical = verticalPadding),
+    )
+  }
 }
 
 @Composable
@@ -193,65 +178,52 @@ fun AppointmentCancellationDialogShell(
     confirmEnabled: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = White,
-        shape = RoundedCornerShape(30.dp),
-        title = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = titleColor
-                    )
-                )
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      containerColor = White,
+      shape = RoundedCornerShape(30.dp),
+      title = {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text(
+              text = title,
+              style =
+                  MaterialTheme.typography.headlineSmall.copy(
+                      fontWeight = FontWeight.ExtraBold,
+                      color = titleColor,
+                  ),
+          )
 
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = badgeBackgroundColor
-                ) {
-                    Text(
-                        text = badgeText,
-                        color = badgeTextColor,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        ),
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                    )
-                }
-            }
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp), content = content)
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-                enabled = confirmEnabled
-            ) {
-                Text(
-                    text = confirmText,
-                    color = if (confirmEnabled) badgeTextColor else Color(0xFFE3A5A5),
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = dismissText,
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
+          Surface(shape = RoundedCornerShape(16.dp), color = badgeBackgroundColor) {
+            Text(
+                text = badgeText,
+                color = badgeTextColor,
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.ExtraBold),
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            )
+          }
         }
-    )
+      },
+      text = { Column(verticalArrangement = Arrangement.spacedBy(14.dp), content = content) },
+      confirmButton = {
+        TextButton(onClick = onConfirm, enabled = confirmEnabled) {
+          Text(
+              text = confirmText,
+              color = if (confirmEnabled) badgeTextColor else Color(0xFFE3A5A5),
+              style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.ExtraBold),
+          )
+        }
+      },
+      dismissButton = {
+        TextButton(onClick = onDismiss) {
+          Text(
+              text = dismissText,
+              style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+          )
+        }
+      },
+  )
 }
 
 @Composable
@@ -260,28 +232,27 @@ fun AppointmentCancellationDetailRow(
     value: String,
     labelColor: Color,
     valueColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge.copy(
+  Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Text(
+        text = label,
+        style =
+            MaterialTheme.typography.labelLarge.copy(
                 color = labelColor,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
+                fontWeight = FontWeight.ExtraBold,
+            ),
+    )
 
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge.copy(
+    Text(
+        text = value,
+        style =
+            MaterialTheme.typography.bodyLarge.copy(
                 color = valueColor,
-                fontWeight = FontWeight.SemiBold
-            )
-        )
-    }
+                fontWeight = FontWeight.SemiBold,
+            ),
+    )
+  }
 }
 
 @Composable
@@ -291,35 +262,35 @@ fun AppointmentCancellationWarningCard(
     backgroundColor: Color,
     borderColor: Color,
     titleColor: Color,
-    textColor: Color
+    textColor: Color,
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        color = backgroundColor,
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+  Surface(
+      modifier = Modifier.fillMaxWidth(),
+      shape = RoundedCornerShape(20.dp),
+      color = backgroundColor,
+      border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
+  ) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    color = titleColor,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            )
+      Text(
+          text = title,
+          style =
+              MaterialTheme.typography.labelLarge.copy(
+                  color = titleColor,
+                  fontWeight = FontWeight.ExtraBold,
+              ),
+      )
 
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = textColor,
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
-        }
+      Text(
+          text = message,
+          style =
+              MaterialTheme.typography.bodyMedium.copy(
+                  color = textColor,
+                  fontWeight = FontWeight.SemiBold,
+              ),
+      )
     }
+  }
 }

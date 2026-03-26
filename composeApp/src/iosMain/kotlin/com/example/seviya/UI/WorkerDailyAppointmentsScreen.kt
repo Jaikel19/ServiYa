@@ -13,12 +13,9 @@ actual fun WorkerDailyAppointmentsPlatformScreen(
     workerId: String,
     viewModel: WorkerDailyAppointmentsViewModel,
     onBack: () -> Unit,
-    onOpenMaps: (latitude: Double, longitude: Double, clientName: String) -> Unit
+    onOpenMaps: (latitude: Double, longitude: Double, clientName: String) -> Unit,
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Mapa de citas no disponible en iOS por ahora")
-    }
+  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Text("Mapa de citas no disponible en iOS por ahora")
+  }
 }

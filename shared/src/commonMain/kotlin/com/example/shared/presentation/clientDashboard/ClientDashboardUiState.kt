@@ -8,5 +8,5 @@ data class ClientDashboardUiState(
     val clientPhotoUrl: String = "",
     val bookings: List<Booking> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

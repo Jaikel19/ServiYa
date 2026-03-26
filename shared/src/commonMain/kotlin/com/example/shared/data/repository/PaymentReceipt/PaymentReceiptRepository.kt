@@ -7,25 +7,25 @@ import com.example.shared.data.repository.safeUnitCall
 import com.example.shared.domain.entity.PaymentReceipt
 import kotlinx.coroutines.flow.Flow
 
-class PaymentReceiptRepository(
-    private val remote: IRemotePaymentReceiptDataSource
-) : IPaymentReceiptRepository {
+class PaymentReceiptRepository(private val remote: IRemotePaymentReceiptDataSource) :
+    IPaymentReceiptRepository {
 
-    override suspend fun getReceiptByAppointment(appointmentId: String): Flow<PaymentReceipt?> =
-        remote.getReceiptByAppointment(appointmentId).catchNull("fetching receipt")
+  override suspend fun getReceiptByAppointment(appointmentId: String): Flow<PaymentReceipt?> =
+      remote.getReceiptByAppointment(appointmentId).catchNull("fetching receipt")
 
-    override suspend fun createReceipt(appointmentId: String, receipt: PaymentReceipt): String =
-        safeStringCall("createReceipt") { remote.createReceipt(appointmentId, receipt) }
+  override suspend fun createReceipt(appointmentId: String, receipt: PaymentReceipt): String =
+      safeStringCall("createReceipt") { remote.createReceipt(appointmentId, receipt) }
 
-    override suspend fun updateReceiptStatus(
-        appointmentId: String,
-        receiptId: String,
-        status: String,
-        note: String?,
-        reviewedAt: String?,
-        reviewedBy: String?,
-        rejectionReason: String?
-    ) = safeUnitCall("updateReceiptStatus") {
+  override suspend fun updateReceiptStatus(
+      appointmentId: String,
+      receiptId: String,
+      status: String,
+      note: String?,
+      reviewedAt: String?,
+      reviewedBy: String?,
+      rejectionReason: String?,
+  ) =
+      safeUnitCall("updateReceiptStatus") {
         remote.updateReceiptStatus(
             appointmentId = appointmentId,
             receiptId = receiptId,
@@ -33,18 +33,19 @@ class PaymentReceiptRepository(
             note = note,
             reviewedAt = reviewedAt,
             reviewedBy = reviewedBy,
-            rejectionReason = rejectionReason
+            rejectionReason = rejectionReason,
         )
-    }
+      }
 
-    override suspend fun updateReceiptImageUrl(
-        appointmentId: String,
-        receiptId: String,
-        imageUrl: String
-    ) = safeUnitCall("updateReceiptImageUrl") {
+  override suspend fun updateReceiptImageUrl(
+      appointmentId: String,
+      receiptId: String,
+      imageUrl: String,
+  ) =
+      safeUnitCall("updateReceiptImageUrl") {
         remote.updateReceiptImageUrl(appointmentId, receiptId, imageUrl)
-    }
+      }
 
-    override suspend fun deleteReceipt(appointmentId: String, receiptId: String) =
-        safeUnitCall("deleteReceipt") { remote.deleteReceipt(appointmentId, receiptId) }
+  override suspend fun deleteReceipt(appointmentId: String, receiptId: String) =
+      safeUnitCall("deleteReceipt") { remote.deleteReceipt(appointmentId, receiptId) }
 }

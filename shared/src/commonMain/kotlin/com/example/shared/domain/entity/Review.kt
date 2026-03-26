@@ -18,5 +18,5 @@ data class Review(
     val direction: String = "",
     val status: String = "published",
     val serviceSummary: String = "",
-    val createdAt: String = ""
+    val createdAt: String = "",
 )

@@ -17,5 +17,5 @@ data class WorkerReviewItem(
     val status: String = "",
     val targetId: String = "",
     val targetRole: String = "",
-    val workerName: String = ""
+    val workerName: String = "",
 )

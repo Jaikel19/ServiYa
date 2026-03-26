@@ -7,20 +7,26 @@ import com.example.shared.domain.entity.WorkerProfile
 import com.example.shared.domain.entity.WorkerSchedule
 import kotlinx.coroutines.flow.Flow
 
-data class WorkerRemoteItem(
-    val workerId: String,
-    val profile: WorkerProfile
-)
+data class WorkerRemoteItem(val workerId: String, val profile: WorkerProfile)
 
 interface IRemoteWorkersListDataSource {
-    suspend fun getWorkers(): Flow<List<WorkerRemoteItem>>
-    suspend fun getWorkersByIds(workerIds: Set<String>): List<WorkerRemoteItem>
-    suspend fun getCategoryNames(categoryIds: List<String>): List<String>
-    suspend fun getWorkerAddress(workerId: String): Address?
-    suspend fun getWorkerSchedule(workerId: String): List<WorkerSchedule>
-    suspend fun getWorkerAppointments(workerId: String): List<Appointment>
-    suspend fun getWorkerWorkZones(workerId: String): List<WorkZone>
-    suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>>
-    suspend fun addFavorite(clientId: String, workerId: String)
-    suspend fun removeFavorite(clientId: String, workerId: String)
+  suspend fun getWorkers(): Flow<List<WorkerRemoteItem>>
+
+  suspend fun getWorkersByIds(workerIds: Set<String>): List<WorkerRemoteItem>
+
+  suspend fun getCategoryNames(categoryIds: List<String>): List<String>
+
+  suspend fun getWorkerAddress(workerId: String): Address?
+
+  suspend fun getWorkerSchedule(workerId: String): List<WorkerSchedule>
+
+  suspend fun getWorkerAppointments(workerId: String): List<Appointment>
+
+  suspend fun getWorkerWorkZones(workerId: String): List<WorkZone>
+
+  suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>>
+
+  suspend fun addFavorite(clientId: String, workerId: String)
+
+  suspend fun removeFavorite(clientId: String, workerId: String)
 }

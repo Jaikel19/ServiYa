@@ -13,34 +13,35 @@ import kotlinx.coroutines.flow.mapLatest
 
 class FavoriteWorkersRepository(
     private val remote: IRemoteFavoriteWorkersDataSource,
-    private val workersListRepository: IWorkersListRepository
+    private val workersListRepository: IWorkersListRepository,
 ) : IFavoriteWorkersRepository {
 
-    override suspend fun getFavoritesByClient(clientId: String): Flow<List<Favorite>> =
-        remote.getFavoritesByClient(clientId).catchEmpty("fetching favorites")
+  override suspend fun getFavoritesByClient(clientId: String): Flow<List<Favorite>> =
+      remote.getFavoritesByClient(clientId).catchEmpty("fetching favorites")
 
-    override suspend fun getFavoriteWorkersByClient(clientId: String): Flow<List<WorkerListItemData>> =
-        remote.getFavoritesByClient(clientId)
-            .mapLatest { favorites ->
-                val favoriteIds = favorites
-                    .map { it.workerId.trim() }
-                    .filter { it.isNotBlank() }
-                    .toSet()
+  override suspend fun getFavoriteWorkersByClient(
+      clientId: String
+  ): Flow<List<WorkerListItemData>> =
+      remote
+          .getFavoritesByClient(clientId)
+          .mapLatest { favorites ->
+            val favoriteIds =
+                favorites.map { it.workerId.trim() }.filter { it.isNotBlank() }.toSet()
 
-                if (favoriteIds.isEmpty()) {
-                    emptyList()
-                } else {
-                    workersListRepository.getWorkersByIds(favoriteIds)
-                }
+            if (favoriteIds.isEmpty()) {
+              emptyList()
+            } else {
+              workersListRepository.getWorkersByIds(favoriteIds)
             }
-            .catchEmpty("fetching favorite workers")
+          }
+          .catchEmpty("fetching favorite workers")
 
-    override suspend fun getFavoriteById(clientId: String, favoriteId: String): Favorite? =
-        safeNullableCall("getFavoriteById") { remote.getFavoriteById(clientId, favoriteId) }
+  override suspend fun getFavoriteById(clientId: String, favoriteId: String): Favorite? =
+      safeNullableCall("getFavoriteById") { remote.getFavoriteById(clientId, favoriteId) }
 
-    override suspend fun addFavorite(clientId: String, favorite: Favorite): String =
-        safeStringCall("addFavorite") { remote.addFavorite(clientId, favorite) }
+  override suspend fun addFavorite(clientId: String, favorite: Favorite): String =
+      safeStringCall("addFavorite") { remote.addFavorite(clientId, favorite) }
 
-    override suspend fun removeFavorite(clientId: String, favoriteId: String) =
-        safeUnitCall("removeFavorite") { remote.removeFavorite(clientId, favoriteId) }
+  override suspend fun removeFavorite(clientId: String, favoriteId: String) =
+      safeUnitCall("removeFavorite") { remote.removeFavorite(clientId, favoriteId) }
 }

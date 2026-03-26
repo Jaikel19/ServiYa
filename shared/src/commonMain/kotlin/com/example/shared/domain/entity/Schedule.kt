@@ -8,5 +8,5 @@ data class Schedule(
     val dayNumber: Int = 0,
     val enabled: Boolean = false,
     val timeBlocks: List<String> = emptyList(),
-    val updatedAt: Long = 0L
+    val updatedAt: Long = 0L,
 )

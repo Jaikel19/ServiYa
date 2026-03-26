@@ -7,5 +7,5 @@ data class ClientLocationCatalogUiState(
     val addresses: List<Address> = emptyList(),
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

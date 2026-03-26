@@ -8,5 +8,5 @@ data class WorkerRequestsUiState(
     val isLoadingPayments: Boolean = false,
     val requests: List<Appointment> = emptyList(),
     val paymentPendingAppointments: List<Pair<Appointment, PaymentReceipt>> = emptyList(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

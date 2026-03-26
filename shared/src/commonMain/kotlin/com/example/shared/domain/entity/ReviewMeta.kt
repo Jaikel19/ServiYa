@@ -8,5 +8,5 @@ data class ReviewMeta(
     val clientToWorkerCreated: Boolean = false,
     val clientToWorkerReviewId: String? = null,
     val workerToClientCreated: Boolean = false,
-    val workerToClientReviewId: String? = null
+    val workerToClientReviewId: String? = null,
 )

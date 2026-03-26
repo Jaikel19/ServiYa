@@ -26,34 +26,26 @@ import com.example.shared.presentation.WorkerRequestDetailViewModel.WorkerReques
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WorkerRequestDetailScreen(
-    bookingId: String,
-    onBack: () -> Unit
-) {
-    val viewModel: WorkerRequestDetailViewModel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsState()
+fun WorkerRequestDetailScreen(bookingId: String, onBack: () -> Unit) {
+  val viewModel: WorkerRequestDetailViewModel = koinViewModel()
+  val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(bookingId) {
-        viewModel.loadBooking(bookingId)
-    }
+  LaunchedEffect(bookingId) { viewModel.loadBooking(bookingId) }
 
-    uiState.appointment?.let { appointment ->
-        WorkerRequestDetailContent(
-            booking = appointment,
-            onBack = onBack,
-            onAccept = {
-                viewModel.acceptRequest()
-                onBack()
-            },
-            onReject = {
-                viewModel.rejectRequest()
-                onBack()
-            }
-        )
-    } ?: FeaturePlaceholder(
-        title = "Solicitud",
-        subtitle = "No se encontró la solicitud."
+  uiState.appointment?.let { appointment ->
+    WorkerRequestDetailContent(
+        booking = appointment,
+        onBack = onBack,
+        onAccept = {
+          viewModel.acceptRequest()
+          onBack()
+        },
+        onReject = {
+          viewModel.rejectRequest()
+          onBack()
+        },
     )
+  } ?: FeaturePlaceholder(title = "Solicitud", subtitle = "No se encontró la solicitud.")
 }
 
 @Composable
@@ -66,225 +58,170 @@ private fun WorkerRequestDetailContent(
     onGoAgenda: () -> Unit = {},
     onGoRequests: () -> Unit = {},
     onGoAlerts: () -> Unit = {},
-    onGoMenu: () -> Unit = {}
+    onGoMenu: () -> Unit = {},
 ) {
-    val servicesText = booking.services.joinToString { it.name }
+  val servicesText = booking.services.joinToString { it.name }
+
+  Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Box(modifier = Modifier.fillMaxWidth().height(126.dp).background(BrandBlue)) {
+      Surface(
+          modifier =
+              Modifier.padding(start = 20.dp, top = 24.dp)
+                  .clip(RoundedCornerShape(999.dp))
+                  .clickable { onBack() },
+          shape = RoundedCornerShape(999.dp),
+          color = White.copy(alpha = 0.13f),
+          border = BorderStroke(1.dp, White.copy(alpha = 0.18f)),
+      ) {
+        Box(
+            modifier = Modifier.padding(horizontal = 28.dp, vertical = 18.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Servi",
+                color = White,
+                style =
+                    MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
+            )
+            Text(
+                text = "Ya",
+                color = BrandRed,
+                style =
+                    MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
+            )
+          }
+        }
+      }
+
+      Surface(
+          modifier = Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 28.dp),
+          shape = RoundedCornerShape(999.dp),
+          color = White.copy(alpha = 0.13f),
+          border = BorderStroke(1.dp, White.copy(alpha = 0.18f)),
+      ) {
+        Box(
+            modifier = Modifier.padding(horizontal = 22.dp, vertical = 14.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+          Text(
+              text = "SOLICITUD",
+              color = White,
+              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+          )
+        }
+      }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp)) {
+      Text(
+          text = "NUEVO REQUERIMIENTO",
+          style =
+              MaterialTheme.typography.labelSmall.copy(
+                  color = BrandBlue,
+                  fontWeight = FontWeight.ExtraBold,
+                  letterSpacing = 1.sp,
+              ),
+      )
+      Spacer(modifier = Modifier.height(4.dp))
+      Text(
+          text = servicesText,
+          style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+      )
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+      Column(
+          modifier = Modifier.padding(20.dp),
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        DetailRow(emoji = "👤", label = "CLIENTE", value = booking.clientName)
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+        DetailRow(emoji = "📅", label = "FECHA Y HORA", value = booking.serviceStartAt)
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+        DetailRow(emoji = "📍", label = "UBICACIÓN", value = booking.location.district)
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+        DetailRow(emoji = "💰", label = "COSTO TOTAL", value = "₡${booking.totalCost}")
+      }
+    }
+
+    Spacer(modifier = Modifier.height(24.dp))
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(126.dp)
-                .background(BrandBlue)
-        ) {
-            Surface(
-                modifier = Modifier
-                    .padding(start = 20.dp, top = 24.dp)
-                    .clip(RoundedCornerShape(999.dp))
-                    .clickable { onBack() },
-                shape = RoundedCornerShape(999.dp),
-                color = White.copy(alpha = 0.13f),
-                border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
-            ) {
-                Box(
-                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 18.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Servi",
-                            color = White,
-                            style = MaterialTheme.typography.headlineMedium.copy(
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        )
-                        Text(
-                            text = "Ya",
-                            color = BrandRed,
-                            style = MaterialTheme.typography.headlineMedium.copy(
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        )
-                    }
-                }
-            }
+      Button(
+          onClick = onAccept,
+          modifier = Modifier.fillMaxWidth().height(56.dp),
+          shape = RoundedCornerShape(16.dp),
+          colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+      ) {
+        Text(
+            text = "Aceptar Solicitud",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        )
+      }
 
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 20.dp, top = 28.dp),
-                shape = RoundedCornerShape(999.dp),
-                color = White.copy(alpha = 0.13f),
-                border = BorderStroke(1.dp, White.copy(alpha = 0.18f))
-            ) {
-                Box(
-                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 14.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "SOLICITUD",
-                        color = White,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    )
-                }
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 20.dp)
-        ) {
-            Text(
-                text = "NUEVO REQUERIMIENTO",
-                style = MaterialTheme.typography.labelSmall.copy(
-                    color = BrandBlue,
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 1.sp
-                )
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = servicesText,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                DetailRow(
-                    emoji = "👤",
-                    label = "CLIENTE",
-                    value = booking.clientName
-                )
-
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-                DetailRow(
-                    emoji = "📅",
-                    label = "FECHA Y HORA",
-                    value = booking.serviceStartAt
-                )
-
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-                DetailRow(
-                    emoji = "📍",
-                    label = "UBICACIÓN",
-                    value = booking.location.district
-                )
-
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-                DetailRow(
-                    emoji = "💰",
-                    label = "COSTO TOTAL",
-                    value = "₡${booking.totalCost}"
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Button(
-                onClick = onAccept,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue)
-            ) {
-                Text(
-                    text = "Aceptar Solicitud",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-
-            OutlinedButton(
-                onClick = onReject,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-            ) {
-                Text(
-                    text = "Rechazar Solicitud",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
+      OutlinedButton(
+          onClick = onReject,
+          modifier = Modifier.fillMaxWidth().height(56.dp),
+          shape = RoundedCornerShape(16.dp),
+          colors =
+              ButtonDefaults.outlinedButtonColors(
+                  contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+              ),
+          border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+      ) {
+        Text(
+            text = "Rechazar Solicitud",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        )
+      }
     }
+
+    Spacer(modifier = Modifier.height(32.dp))
+  }
 }
 
 @Composable
-private fun DetailRow(
-    emoji: String,
-    label: String,
-    value: String
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+private fun DetailRow(emoji: String, label: String, value: String) {
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
+  ) {
+    Box(
+        modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFFEEF4FF)),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFEEF4FF)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = emoji, fontSize = 18.sp)
-        }
-
-        Column {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
+      Text(text = emoji, fontSize = 18.sp)
     }
+
+    Column {
+      Text(
+          text = label,
+          style =
+              MaterialTheme.typography.labelSmall.copy(
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  fontWeight = FontWeight.Bold,
+                  letterSpacing = 1.sp,
+              ),
+      )
+      Text(
+          text = value,
+          style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+      )
+    }
+  }
 }

@@ -8,6 +8,7 @@ kotlinx-serialization = "1.7.3"
 kamel = "1.0.9"
 sqldelight = "2.2.1"
 google-services = "4.4.4"
+spotless = "8.4.0"
 
 agp = "9.1.0"
 android-compileSdk = "36"
@@ -124,3 +125,4 @@ androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library",
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

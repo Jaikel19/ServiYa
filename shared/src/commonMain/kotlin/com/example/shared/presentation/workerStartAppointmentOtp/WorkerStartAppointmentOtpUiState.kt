@@ -9,5 +9,5 @@ data class WorkerStartAppointmentOtpUiState(
     val otpInput: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val startSuccess: Boolean = false
+    val startSuccess: Boolean = false,
 )

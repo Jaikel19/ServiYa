@@ -8,12 +8,5 @@ data class Service(
     val name: String = "",
     val cost: Double = 0.0,
     val duration: String = "",
-    val description: String = ""
+    val description: String = "",
 )
-
-
-
-
-
-
-

@@ -11,5 +11,5 @@ data class WorkersListUiState(
     val savedAddresses: List<Address> = emptyList(),
     val selectedAddressId: String? = null,
     val favoriteWorkerIds: Set<String> = emptySet(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

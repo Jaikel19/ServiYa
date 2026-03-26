@@ -19,5 +19,5 @@ data class ProfessionalProfileData(
     val cancellationPolicy: CancellationPolicy? = null,
     val schedule: List<WorkerSchedule> = emptyList(),
     val portfolios: List<PortfolioItem> = emptyList(),
-    val reviews: List<WorkerReviewItem> = emptyList()
+    val reviews: List<WorkerReviewItem> = emptyList(),
 )

@@ -7,5 +7,5 @@ data class WorkerDashboardUiState(
     val isLoading: Boolean = false,
     val profile: ProfessionalProfileData? = null,
     val bookings: List<Booking> = emptyList(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

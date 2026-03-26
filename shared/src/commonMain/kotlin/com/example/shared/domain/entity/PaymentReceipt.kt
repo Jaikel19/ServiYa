@@ -8,9 +8,9 @@ data class PaymentReceipt(
     val attemptNumber: Long = 0L,
     val imageUrl: String = "",
     val note: String? = null,
-    val sentAt: String = "",            // YYYY-MM-DDTHH:mm
-    val reviewedAt: String? = null,     // YYYY-MM-DDTHH:mm
+    val sentAt: String = "", // YYYY-MM-DDTHH:mm
+    val reviewedAt: String? = null, // YYYY-MM-DDTHH:mm
     val reviewedBy: String? = null,
     val rejectionReason: String? = null,
-    val status: String = ""             // pending ||payment_pending | APPROVED | REJECTED
+    val status: String = "", // pending ||payment_pending | APPROVED | REJECTED
 )

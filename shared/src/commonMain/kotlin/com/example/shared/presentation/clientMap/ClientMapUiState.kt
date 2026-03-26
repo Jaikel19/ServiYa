@@ -5,10 +5,7 @@ import com.example.shared.domain.entity.Category
 import com.example.shared.domain.entity.User
 import com.example.shared.domain.entity.WorkZone
 
-data class WorkerMapMarker(
-    val user: User,
-    val workZone: WorkZone
-)
+data class WorkerMapMarker(val user: User, val workZone: WorkZone)
 
 data class ClientMapUiState(
     val isLoading: Boolean = false,
@@ -22,5 +19,5 @@ data class ClientMapUiState(
     val selectedCategoryId: String? = null,
     val availableCategories: List<Category> = emptyList(),
     val minStars: Double? = null,
-    val categoryQuery: String = ""
+    val categoryQuery: String = "",
 )

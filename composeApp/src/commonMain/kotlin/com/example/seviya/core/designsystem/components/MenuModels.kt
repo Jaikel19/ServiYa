@@ -8,5 +8,5 @@ data class MenuOption(
     val subtitle: String,
     val icon: ImageVector,
     val iconColor: Color,
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
 )

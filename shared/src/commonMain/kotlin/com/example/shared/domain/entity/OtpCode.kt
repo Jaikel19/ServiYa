@@ -9,5 +9,5 @@ data class OtpCode(
     val codeHash: String = "",
     val purpose: String = "",
     val expiresAt: Long = 0L,
-    val usedAt: Long? = null
+    val usedAt: Long? = null,
 )

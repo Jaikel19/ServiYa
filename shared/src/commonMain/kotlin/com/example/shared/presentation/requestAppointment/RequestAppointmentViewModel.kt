@@ -14,99 +14,102 @@ import kotlinx.coroutines.launch
 
 class RequestAppointmentViewModel(
     private val appointmentRepository: IAppointmentRepository,
-    private val addressRepository: IAddressRepository
+    private val addressRepository: IAddressRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(RequestAppointmentUiState())
-    val uiState: StateFlow<RequestAppointmentUiState> = _uiState.asStateFlow()
+  private val _uiState = MutableStateFlow(RequestAppointmentUiState())
+  val uiState: StateFlow<RequestAppointmentUiState> = _uiState.asStateFlow()
 
-    private var addressesJob: Job? = null
+  private var addressesJob: Job? = null
 
-    fun loadClientAddresses(clientId: String) {
-        addressesJob?.cancel()
+  fun loadClientAddresses(clientId: String) {
+    addressesJob?.cancel()
 
-        addressesJob = viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                isLoadingAddresses = true,
-                errorMessage = null
-            )
+    addressesJob =
+        viewModelScope.launch {
+          _uiState.value = _uiState.value.copy(isLoadingAddresses = true, errorMessage = null)
 
-            try {
-                addressRepository.getAddressesByUser(clientId).collect { addresses ->
-                    val orderedAddresses = addresses.sortedWith(
-                        compareByDescending<Address> { it.isDefault }
-                            .thenBy { it.alias.lowercase() }
-                    )
+          try {
+            addressRepository.getAddressesByUser(clientId).collect { addresses ->
+              val orderedAddresses =
+                  addresses.sortedWith(
+                      compareByDescending<Address> { it.isDefault }.thenBy { it.alias.lowercase() }
+                  )
 
-                    val currentSelected = _uiState.value.selectedAddressId
-                    val defaultAddressId = orderedAddresses.firstOrNull { it.isDefault }?.id.orEmpty()
+              val currentSelected = _uiState.value.selectedAddressId
+              val defaultAddressId = orderedAddresses.firstOrNull { it.isDefault }?.id.orEmpty()
 
-                    val selectedId = when {
-                        currentSelected.isNotBlank() && orderedAddresses.any { it.id == currentSelected } -> currentSelected
-                        defaultAddressId.isNotBlank() -> defaultAddressId
-                        orderedAddresses.isNotEmpty() -> orderedAddresses.first().id
-                        else -> ""
-                    }
+              val selectedId =
+                  when {
+                    currentSelected.isNotBlank() &&
+                        orderedAddresses.any { it.id == currentSelected } -> currentSelected
+                    defaultAddressId.isNotBlank() -> defaultAddressId
+                    orderedAddresses.isNotEmpty() -> orderedAddresses.first().id
+                    else -> ""
+                  }
 
-                    _uiState.value = _uiState.value.copy(
-                        isLoadingAddresses = false,
-                        savedAddresses = orderedAddresses,
-                        selectedAddressId = selectedId,
-                        errorMessage = null
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
+              _uiState.value =
+                  _uiState.value.copy(
+                      isLoadingAddresses = false,
+                      savedAddresses = orderedAddresses,
+                      selectedAddressId = selectedId,
+                      errorMessage = null,
+                  )
+            }
+          } catch (e: Exception) {
+            _uiState.value =
+                _uiState.value.copy(
                     isLoadingAddresses = false,
                     savedAddresses = emptyList(),
                     selectedAddressId = "",
-                    errorMessage = e.message ?: "No se pudieron cargar las ubicaciones."
+                    errorMessage = e.message ?: "No se pudieron cargar las ubicaciones.",
                 )
-            }
+          }
         }
-    }
+  }
 
-    fun selectAddress(addressId: String) {
-        _uiState.value = _uiState.value.copy(
-            selectedAddressId = addressId
-        )
-    }
+  fun selectAddress(addressId: String) {
+    _uiState.value = _uiState.value.copy(selectedAddressId = addressId)
+  }
 
-    fun createAppointment(appointment: Appointment) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                isCreating = true,
+  fun createAppointment(appointment: Appointment) {
+    viewModelScope.launch {
+      _uiState.value =
+          _uiState.value.copy(
+              isCreating = true,
+              isCreated = false,
+              createdAppointmentId = null,
+              errorMessage = null,
+          )
+
+      try {
+        val appointmentId =
+            appointmentRepository.createAppointment(appointment.copy(status = "pending"))
+
+        if (appointmentId.isBlank()) {
+          _uiState.value =
+              _uiState.value.copy(
+                  isCreating = false,
+                  isCreated = false,
+                  errorMessage = "No se pudo crear la solicitud.",
+              )
+        } else {
+          _uiState.value =
+              _uiState.value.copy(
+                  isCreating = false,
+                  isCreated = true,
+                  createdAppointmentId = appointmentId,
+                  errorMessage = null,
+              )
+        }
+      } catch (e: Exception) {
+        _uiState.value =
+            _uiState.value.copy(
+                isCreating = false,
                 isCreated = false,
-                createdAppointmentId = null,
-                errorMessage = null
+                errorMessage = e.message ?: "Ocurrió un error al crear la solicitud.",
             )
-
-            try {
-                val appointmentId = appointmentRepository.createAppointment(
-                    appointment.copy(status = "pending")
-                )
-
-                if (appointmentId.isBlank()) {
-                    _uiState.value = _uiState.value.copy(
-                        isCreating = false,
-                        isCreated = false,
-                        errorMessage = "No se pudo crear la solicitud."
-                    )
-                } else {
-                    _uiState.value = _uiState.value.copy(
-                        isCreating = false,
-                        isCreated = true,
-                        createdAppointmentId = appointmentId,
-                        errorMessage = null
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isCreating = false,
-                    isCreated = false,
-                    errorMessage = e.message ?: "Ocurrió un error al crear la solicitud."
-                )
-            }
-        }
+      }
     }
+  }
 }
