@@ -20,7 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +28,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,6 +41,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.seviya.feature.appointmentdetail.AppointmentCancellationDetailRow
+import com.example.seviya.feature.appointmentdetail.AppointmentCancellationDialogShell
+import com.example.seviya.feature.appointmentdetail.AppointmentCancellationWarningCard
 import com.example.seviya.feature.appointmentdetail.AppointmentDetailTopHeader
 import com.example.seviya.feature.appointmentdetail.AppointmentMessageBanner
 import com.example.seviya.feature.appointmentdetail.AppointmentStatusChip
@@ -721,37 +722,18 @@ private fun WorkerCancellationPreviewDialog(
 ) {
     val hasRefund = preview.refundAmount > 0
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = White,
-        shape = RoundedCornerShape(30.dp),
-        title = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "Confirmar cancelación",
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF18233A)
-                    )
-                )
-
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFFFFE9E9)
-                ) {
-                    Text(
-                        text = "Reembolso ${preview.refundPercentage}%",
-                        color = Color(0xFFE54848),
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        ),
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                    )
-                }
-            }
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    AppointmentCancellationDialogShell(
+        title = "Confirmar cancelación",
+        titleColor = Color(0xFF18233A),
+        badgeText = "Reembolso ${preview.refundPercentage}%",
+        badgeBackgroundColor = Color(0xFFFFE9E9),
+        badgeTextColor = Color(0xFFE54848),
+        confirmText = confirmText,
+        dismissText = "Volver",
+        confirmEnabled = confirmEnabled,
+        onDismiss = onDismiss,
+        onConfirm = onConfirm
+    ) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(24.dp),
@@ -776,111 +758,46 @@ private fun WorkerCancellationPreviewDialog(
                             text = if (hasRefund) {
                                 formatWorkerCurrency(preview.refundAmount)
                             } else {
-                                "No aplica reembolso"
+                            AppointmentCancellationDetailRow(
                             },
-                            style = MaterialTheme.typography.headlineMedium.copy(
+                                value = "Trabajador",
+                                labelColor = Color(0xFF8A97AB),
+                                valueColor = Color(0xFF18233A)
                                 color = Color(0xFFE54848),
                                 fontWeight = FontWeight.ExtraBold
-                            )
+                            AppointmentCancellationDetailRow(
                         )
-
+                                value = preview.policyLabel,
+                                labelColor = Color(0xFF8A97AB),
+                                valueColor = Color(0xFF18233A)
                         Text(
                             text = "El cliente recibirá el resultado según esta cancelación.",
-                            style = MaterialTheme.typography.bodyMedium.copy(
+                            AppointmentCancellationDetailRow(
                                 color = Color(0xFF8A97AB),
-                                fontWeight = FontWeight.SemiBold
+                                value = formatWorkerCurrency(preview.appointmentTotal),
+                                labelColor = Color(0xFF8A97AB),
+                                valueColor = Color(0xFF18233A)
                             )
                         )
-                    }
+                            AppointmentCancellationDetailRow(
                 }
 
-                Surface(
+                                labelColor = Color(0xFF8A97AB),
+                                valueColor = if (preview.nonRefundableAmount > 0) Color(0xFFE54848) else Color(0xFF18233A)
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(22.dp),
                     color = Color(0xFFF8FAFD),
                     border = BorderStroke(1.dp, Color(0xFFE4E8EF))
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        WorkerCancellationDetailRow(
-                            label = "Cancela",
-                            value = "Trabajador"
+                        AppointmentCancellationWarningCard(
+                            message = preview.warningMessage,
+                            title = "Importante",
+                            backgroundColor = Color(0xFFFFF8E8),
+                            borderColor = Color(0xFFF2D693),
+                            titleColor = Color(0xFF8C6500),
+                            textColor = Color(0xFF8C6500)
                         )
-
-                        WorkerCancellationDetailRow(
-                            label = "Motivo aplicado",
-                            value = preview.policyLabel
-                        )
-
-                        WorkerCancellationDetailRow(
-                            label = "Total de la cita",
-                            value = formatWorkerCurrency(preview.appointmentTotal)
-                        )
-
-                        WorkerCancellationDetailRow(
-                            label = "Monto no reembolsable",
-                            value = formatWorkerCurrency(preview.nonRefundableAmount),
-                            valueColor = if (preview.nonRefundableAmount > 0) Color(0xFFE54848) else Color(0xFF18233A)
-                        )
-                    }
-                }
-
                 if (hasRefund && preview.warningMessage.isNotBlank()) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFFFFF8E8),
-                        border = BorderStroke(1.dp, Color(0xFFF2D693))
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(
-                                text = "Importante",
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    color = Color(0xFF8C6500),
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                            )
-
-                            Text(
-                                text = preview.warningMessage,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = Color(0xFF8C6500),
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-                enabled = confirmEnabled
-            ) {
-                Text(
-                    text = confirmText,
-                    color = if (confirmEnabled) Color(0xFFE54848) else Color(0xFFE3A5A5),
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = "Volver",
-                    style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.Bold
                     )
                 )
