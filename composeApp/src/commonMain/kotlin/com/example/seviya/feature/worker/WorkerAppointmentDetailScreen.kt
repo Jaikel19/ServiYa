@@ -43,6 +43,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.seviya.feature.appointmentdetail.AppointmentDetailTopHeader
+import com.example.seviya.feature.appointmentdetail.AppointmentMessageBanner
+import com.example.seviya.feature.appointmentdetail.AppointmentStatusChip
+import com.example.seviya.feature.appointmentdetail.AppointmentStatusVisuals
 import com.example.seviya.core.designsystem.theme.SoftBlueSurface
 import com.example.seviya.core.designsystem.theme.SoftSurface
 import com.example.seviya.core.designsystem.theme.TextSecondaryAlt
@@ -179,39 +183,27 @@ private fun WorkerAppointmentDetailContent(
                 verticalArrangement = Arrangement.spacedBy(18.dp)
             ) {
                 if (errorMessageToShow != null) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(22.dp),
-                        color = Color(0xFFFFF3F3),
-                        border = BorderStroke(1.dp, Color(0xFFF4D0D0))
-                    ) {
-                        Text(
-                            text = errorMessageToShow,
-                            color = Color(0xFFE54848),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            modifier = Modifier.padding(16.dp)
+                    AppointmentMessageBanner(
+                        text = errorMessageToShow,
+                        backgroundColor = Color(0xFFFFF3F3),
+                        borderColor = Color(0xFFF4D0D0),
+                        textColor = Color(0xFFE54848),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.SemiBold
                         )
-                    }
+                    )
                 }
 
                 if (successMessageToShow != null) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(22.dp),
-                        color = Color(0xFFEAF7EE),
-                        border = BorderStroke(1.dp, Color(0xFFCFE8D6))
-                    ) {
-                        Text(
-                            text = successMessageToShow,
-                            color = Color(0xFF177245),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            modifier = Modifier.padding(16.dp)
+                    AppointmentMessageBanner(
+                        text = successMessageToShow,
+                        backgroundColor = Color(0xFFEAF7EE),
+                        borderColor = Color(0xFFCFE8D6),
+                        textColor = Color(0xFF177245),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.SemiBold
                         )
-                    }
+                    )
                 }
 
                 StepCard(
@@ -471,74 +463,25 @@ private fun WorkerAppointmentDetailContent(
 private fun DetailHeader(
     onBack: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(170.dp)
-            .background(Color(0xFF0A4DB3))
-            .windowInsetsPadding(WindowInsets.statusBars)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 18.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            CircleIconButton(
-                icon = TablerIcons.ArrowLeft,
-                onClick = onBack
-            )
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Text(
-                    text = "Guía Pre-Servicio",
-                    color = White,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                )
-                Text(
-                    text = "PREPARACIÓN DETALLADA",
-                    color = White.copy(alpha = 0.85f),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-
-            CircleIconButton(
-                icon = TablerIcons.DotsVertical,
-                onClick = {}
-            )
-        }
-    }
-}
-
-@Composable
-private fun CircleIconButton(
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(54.dp)
-            .background(
-                color = White.copy(alpha = 0.18f),
-                shape = CircleShape
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = White
-        )
-    }
+    AppointmentDetailTopHeader(
+        title = "Guía Pre-Servicio",
+        subtitle = "PREPARACIÓN DETALLADA",
+        onBack = onBack,
+        backgroundColor = Color(0xFF0A4DB3),
+        subtitleColor = White.copy(alpha = 0.85f),
+        height = 170.dp,
+        titleTextStyle = MaterialTheme.typography.headlineMedium.copy(
+            fontWeight = FontWeight.ExtraBold
+        ),
+        subtitleTextStyle = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.Bold
+        ),
+        sideButtonSize = 54.dp,
+        sideButtonBackgroundColor = White.copy(alpha = 0.18f),
+        contentHorizontalPadding = 20.dp,
+        contentVerticalPadding = 18.dp,
+        titleTopPadding = 8.dp
+    )
 }
 
 @Composable
@@ -600,73 +543,83 @@ private fun StepCard(
 
 @Composable
 private fun StatusChip(status: String) {
-    val text: String
-    val background: Color
-    val textColor: Color
+    val visuals: AppointmentStatusVisuals
 
     when (status.lowercase()) {
         "payment_pending" -> {
-            text = "PAGO PENDIENTE"
-            background = Color(0xFFFFF1E6)
-            textColor = Color(0xFFFF8C00)
+            visuals = AppointmentStatusVisuals(
+                text = "PAGO PENDIENTE",
+                backgroundColor = Color(0xFFFFF1E6),
+                textColor = Color(0xFFFF8C00)
+            )
         }
 
         "approved" -> {
-            text = "APROBADA"
-            background = Color(0xFFE8F0FF)
-            textColor = Color(0xFF0A4DB3)
+            visuals = AppointmentStatusVisuals(
+                text = "APROBADA",
+                backgroundColor = Color(0xFFE8F0FF),
+                textColor = Color(0xFF0A4DB3)
+            )
         }
 
         "confirmed" -> {
-            text = "CONFIRMADA"
-            background = Color(0xFFE6F7EC)
-            textColor = Color(0xFF1F9D55)
+            visuals = AppointmentStatusVisuals(
+                text = "CONFIRMADA",
+                backgroundColor = Color(0xFFE6F7EC),
+                textColor = Color(0xFF1F9D55)
+            )
         }
 
         "in_progress" -> {
-            text = "EN PROGRESO"
-            background = Color(0xFFFFF6D6)
-            textColor = Color(0xFFD97706)
+            visuals = AppointmentStatusVisuals(
+                text = "EN PROGRESO",
+                backgroundColor = Color(0xFFFFF6D6),
+                textColor = Color(0xFFD97706)
+            )
         }
 
         "completed" -> {
-            text = "FINALIZADA"
-            background = Color(0xFFEAF2FF)
-            textColor = Color(0xFF0A4DB3)
+            visuals = AppointmentStatusVisuals(
+                text = "FINALIZADA",
+                backgroundColor = Color(0xFFEAF2FF),
+                textColor = Color(0xFF0A4DB3)
+            )
         }
 
         "cancelled" -> {
-            text = "CANCELADA"
-            background = Color(0xFFFCE9E9)
-            textColor = Color(0xFFE54848)
+            visuals = AppointmentStatusVisuals(
+                text = "CANCELADA",
+                backgroundColor = Color(0xFFFCE9E9),
+                textColor = Color(0xFFE54848)
+            )
         }
 
         "rejected" -> {
-            text = "RECHAZADA"
-            background = Color(0xFFFCE9E9)
-            textColor = Color(0xFFE54848)
+            visuals = AppointmentStatusVisuals(
+                text = "RECHAZADA",
+                backgroundColor = Color(0xFFFCE9E9),
+                textColor = Color(0xFFE54848)
+            )
         }
 
         else -> {
-            text = status.uppercase()
-            background = Color(0xFFEDEFF3)
-            textColor = TextSecondaryAlt
+            visuals = AppointmentStatusVisuals(
+                text = status.uppercase(),
+                backgroundColor = Color(0xFFEDEFF3),
+                textColor = TextSecondaryAlt
+            )
         }
     }
 
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = background
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.ExtraBold
-            ),
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp)
-        )
-    }
+    AppointmentStatusChip(
+        visuals = visuals,
+        cornerRadius = 14.dp,
+        textStyle = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.ExtraBold
+        ),
+        horizontalPadding = 18.dp,
+        verticalPadding = 10.dp
+    )
 }
 
 @Composable
