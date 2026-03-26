@@ -6,5 +6,5 @@ data class ClientRequestsUiState(
     val isLoading: Boolean = false,
     val pendingAppointments: List<Appointment> = emptyList(),
     val approvedAppointments: List<Appointment> = emptyList(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

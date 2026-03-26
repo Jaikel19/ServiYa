@@ -8,5 +8,5 @@ data class PortfolioItem(
     val description: String = "",
     val image: String = "",
     val services: List<String> = emptyList(),
-    val workerId: String = ""
+    val workerId: String = "",
 )

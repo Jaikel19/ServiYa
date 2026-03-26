@@ -30,12 +30,13 @@ internal data class CategoryVisuals(
     val iconInner: Color,
     val iconTint: Color,
     val buttonBackground: Color,
-    val buttonText: Color
+    val buttonText: Color,
 )
 
 internal fun categoryVisual(categoryId: String): CategoryVisuals {
-    return when (categoryId.normalizedCategoryKey()) {
-        "automotriz" -> CategoryVisuals(
+  return when (categoryId.normalizedCategoryKey()) {
+    "automotriz" ->
+        CategoryVisuals(
             icon = TablerIcons.Car,
             accent = Color(0xFFE25578),
             accentSecondary = Color(0xFFF08CA1),
@@ -45,10 +46,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFD24166),
             buttonBackground = Color(0xFFFFEAF0),
-            buttonText = Color(0xFFD24166)
+            buttonText = Color(0xFFD24166),
         )
 
-        "barberia" -> CategoryVisuals(
+    "barberia" ->
+        CategoryVisuals(
             icon = TablerIcons.Scissors,
             accent = Color(0xFF6C63D9),
             accentSecondary = Color(0xFF9A92F2),
@@ -58,10 +60,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF5C54C7),
             buttonBackground = Color(0xFFEFEDFF),
-            buttonText = Color(0xFF5C54C7)
+            buttonText = Color(0xFF5C54C7),
         )
 
-        "belleza" -> CategoryVisuals(
+    "belleza" ->
+        CategoryVisuals(
             icon = TablerIcons.Scissors,
             accent = Color(0xFFD85D9E),
             accentSecondary = Color(0xFFF1A5C7),
@@ -71,10 +74,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFBF4B89),
             buttonBackground = Color(0xFFFDEAF3),
-            buttonText = Color(0xFFBF4B89)
+            buttonText = Color(0xFFBF4B89),
         )
 
-        "construccion-y-remodelacion" -> CategoryVisuals(
+    "construccion-y-remodelacion" ->
+        CategoryVisuals(
             icon = TablerIcons.Building,
             accent = Color(0xFFD66A4A),
             accentSecondary = Color(0xFFF0A07E),
@@ -84,10 +88,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC15739),
             buttonBackground = Color(0xFFFFEEE7),
-            buttonText = Color(0xFFC15739)
+            buttonText = Color(0xFFC15739),
         )
 
-        "cuidado-y-acompanamiento" -> CategoryVisuals(
+    "cuidado-y-acompanamiento" ->
+        CategoryVisuals(
             icon = TablerIcons.User,
             accent = Color(0xFF8C7AE6),
             accentSecondary = Color(0xFFB6A7F6),
@@ -97,10 +102,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF7564D6),
             buttonBackground = Color(0xFFF1EDFF),
-            buttonText = Color(0xFF7564D6)
+            buttonText = Color(0xFF7564D6),
         )
 
-        "deportes-y-entrenamiento" -> CategoryVisuals(
+    "deportes-y-entrenamiento" ->
+        CategoryVisuals(
             icon = TablerIcons.Apps,
             accent = Color(0xFF3FAE74),
             accentSecondary = Color(0xFF84D3A1),
@@ -110,10 +116,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF2F8E5A),
             buttonBackground = Color(0xFFEAF7EF),
-            buttonText = Color(0xFF2F8E5A)
+            buttonText = Color(0xFF2F8E5A),
         )
 
-        "diseno-y-creatividad" -> CategoryVisuals(
+    "diseno-y-creatividad" ->
+        CategoryVisuals(
             icon = TablerIcons.Paint,
             accent = Color(0xFF9B5DE5),
             accentSecondary = Color(0xFFC89AF4),
@@ -123,10 +130,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF8347C8),
             buttonBackground = Color(0xFFF4EBFF),
-            buttonText = Color(0xFF8347C8)
+            buttonText = Color(0xFF8347C8),
         )
 
-        "educacion" -> CategoryVisuals(
+    "educacion" ->
+        CategoryVisuals(
             icon = TablerIcons.Briefcase,
             accent = Color(0xFF4B8FD8),
             accentSecondary = Color(0xFF8EC0F5),
@@ -136,10 +144,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF3B78BC),
             buttonBackground = Color(0xFFEBF5FF),
-            buttonText = Color(0xFF3B78BC)
+            buttonText = Color(0xFF3B78BC),
         )
 
-        "electricidad" -> CategoryVisuals(
+    "electricidad" ->
+        CategoryVisuals(
             icon = TablerIcons.Plug,
             accent = Color(0xFFE2B100),
             accentSecondary = Color(0xFFF0C94D),
@@ -149,10 +158,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFB88900),
             buttonBackground = Color(0xFFFFF6D8),
-            buttonText = Color(0xFFB88900)
+            buttonText = Color(0xFFB88900),
         )
 
-        "eventos" -> CategoryVisuals(
+    "eventos" ->
+        CategoryVisuals(
             icon = TablerIcons.CalendarEvent,
             accent = Color(0xFFE06C5F),
             accentSecondary = Color(0xFFF3A297),
@@ -162,10 +172,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC85A4E),
             buttonBackground = Color(0xFFFFEEE9),
-            buttonText = Color(0xFFC85A4E)
+            buttonText = Color(0xFFC85A4E),
         )
 
-        "fotografia-y-video" -> CategoryVisuals(
+    "fotografia-y-video" ->
+        CategoryVisuals(
             icon = TablerIcons.Camera,
             accent = Color(0xFFC95C9A),
             accentSecondary = Color(0xFFE59BC1),
@@ -175,10 +186,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFB24A86),
             buttonBackground = Color(0xFFFBEAF3),
-            buttonText = Color(0xFFB24A86)
+            buttonText = Color(0xFFB24A86),
         )
 
-        "gastronomia" -> CategoryVisuals(
+    "gastronomia" ->
+        CategoryVisuals(
             icon = TablerIcons.Briefcase,
             accent = Color(0xFFE08A3A),
             accentSecondary = Color(0xFFF5B26B),
@@ -188,10 +200,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC97528),
             buttonBackground = Color(0xFFFFF1E3),
-            buttonText = Color(0xFFC97528)
+            buttonText = Color(0xFFC97528),
         )
 
-        "hogar" -> CategoryVisuals(
+    "hogar" ->
+        CategoryVisuals(
             icon = TablerIcons.Building,
             accent = Color(0xFF5D8AA8),
             accentSecondary = Color(0xFF9BBFD2),
@@ -201,10 +214,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF4E7691),
             buttonBackground = Color(0xFFEDF6FA),
-            buttonText = Color(0xFF4E7691)
+            buttonText = Color(0xFF4E7691),
         )
 
-        "idiomas" -> CategoryVisuals(
+    "idiomas" ->
+        CategoryVisuals(
             icon = TablerIcons.Globe,
             accent = Color(0xFF2FA7B7),
             accentSecondary = Color(0xFF79D1DB),
@@ -214,10 +228,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF248C99),
             buttonBackground = Color(0xFFE9F8FA),
-            buttonText = Color(0xFF248C99)
+            buttonText = Color(0xFF248C99),
         )
 
-        "jardineria" -> CategoryVisuals(
+    "jardineria" ->
+        CategoryVisuals(
             icon = TablerIcons.Tree,
             accent = Color(0xFF72A83B),
             accentSecondary = Color(0xFFA2C96A),
@@ -227,10 +242,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF5F8E2F),
             buttonBackground = Color(0xFFF0F7E2),
-            buttonText = Color(0xFF5F8E2F)
+            buttonText = Color(0xFF5F8E2F),
         )
 
-        "limpieza" -> CategoryVisuals(
+    "limpieza" ->
+        CategoryVisuals(
             icon = TablerIcons.Brush,
             accent = Color(0xFF38A169),
             accentSecondary = Color(0xFF68C08F),
@@ -240,10 +256,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF2F855A),
             buttonBackground = Color(0xFFEAF7EF),
-            buttonText = Color(0xFF2F855A)
+            buttonText = Color(0xFF2F855A),
         )
 
-        "mascotas" -> CategoryVisuals(
+    "mascotas" ->
+        CategoryVisuals(
             icon = TablerIcons.User,
             accent = Color(0xFF4CB5AE),
             accentSecondary = Color(0xFF8ADAD1),
@@ -253,10 +270,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF379A93),
             buttonBackground = Color(0xFFEAF8F6),
-            buttonText = Color(0xFF379A93)
+            buttonText = Color(0xFF379A93),
         )
 
-        "moda-y-confeccion" -> CategoryVisuals(
+    "moda-y-confeccion" ->
+        CategoryVisuals(
             icon = TablerIcons.Scissors,
             accent = Color(0xFFD86A9A),
             accentSecondary = Color(0xFFF0A9C7),
@@ -266,10 +284,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFBF5686),
             buttonBackground = Color(0xFFFDEBF3),
-            buttonText = Color(0xFFBF5686)
+            buttonText = Color(0xFFBF5686),
         )
 
-        "mudanzas-y-transporte" -> CategoryVisuals(
+    "mudanzas-y-transporte" ->
+        CategoryVisuals(
             icon = TablerIcons.Car,
             accent = Color(0xFFE07A3A),
             accentSecondary = Color(0xFFF4B178),
@@ -279,10 +298,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFFC9672C),
             buttonBackground = Color(0xFFFFF0E5),
-            buttonText = Color(0xFFC9672C)
+            buttonText = Color(0xFFC9672C),
         )
 
-        "musica-y-arte" -> CategoryVisuals(
+    "musica-y-arte" ->
+        CategoryVisuals(
             icon = TablerIcons.Paint,
             accent = Color(0xFF8F67D8),
             accentSecondary = Color(0xFFC0A2F0),
@@ -292,10 +312,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF7852C1),
             buttonBackground = Color(0xFFF1EDFF),
-            buttonText = Color(0xFF7852C1)
+            buttonText = Color(0xFF7852C1),
         )
 
-        "salud-y-bienestar" -> CategoryVisuals(
+    "salud-y-bienestar" ->
+        CategoryVisuals(
             icon = TablerIcons.User,
             accent = Color(0xFF49A99A),
             accentSecondary = Color(0xFF8AD5C8),
@@ -305,10 +326,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF358C7F),
             buttonBackground = Color(0xFFEAF8F4),
-            buttonText = Color(0xFF358C7F)
+            buttonText = Color(0xFF358C7F),
         )
 
-        "tecnologia" -> CategoryVisuals(
+    "tecnologia" ->
+        CategoryVisuals(
             icon = TablerIcons.Settings,
             accent = Color(0xFF5B7CFA),
             accentSecondary = Color(0xFF93A8FF),
@@ -318,10 +340,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF4968DE),
             buttonBackground = Color(0xFFEDF1FF),
-            buttonText = Color(0xFF4968DE)
+            buttonText = Color(0xFF4968DE),
         )
 
-        "tramites-y-gestiones" -> CategoryVisuals(
+    "tramites-y-gestiones" ->
+        CategoryVisuals(
             icon = TablerIcons.Briefcase,
             accent = Color(0xFF6B7A99),
             accentSecondary = Color(0xFFA1AEC8),
@@ -331,10 +354,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF596780),
             buttonBackground = Color(0xFFEEF2F7),
-            buttonText = Color(0xFF596780)
+            buttonText = Color(0xFF596780),
         )
 
-        "plomeria" -> CategoryVisuals(
+    "plomeria" ->
+        CategoryVisuals(
             icon = TablerIcons.Droplet,
             accent = Color(0xFF16A6B6),
             accentSecondary = Color(0xFF4FC3D9),
@@ -344,10 +368,11 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.92f),
             iconTint = Color(0xFF138A99),
             buttonBackground = Color(0xFFE8F8FA),
-            buttonText = Color(0xFF138A99)
+            buttonText = Color(0xFF138A99),
         )
 
-        else -> CategoryVisuals(
+    else ->
+        CategoryVisuals(
             icon = TablerIcons.Briefcase,
             accent = Color(0xFF6B7A99),
             accentSecondary = Color(0xFFA1AEC8),
@@ -357,19 +382,18 @@ internal fun categoryVisual(categoryId: String): CategoryVisuals {
             iconInner = White.copy(alpha = 0.94f),
             iconTint = Color(0xFF596780),
             buttonBackground = Color(0xFFEEF2F7),
-            buttonText = Color(0xFF596780)
+            buttonText = Color(0xFF596780),
         )
-    }
+  }
 }
 
 private fun String.normalizedCategoryKey(): String {
-    return this
-        .trim()
-        .lowercase()
-        .replace("á", "a")
-        .replace("é", "e")
-        .replace("í", "i")
-        .replace("ó", "o")
-        .replace("ú", "u")
-        .replace("ñ", "n")
+  return this.trim()
+      .lowercase()
+      .replace("á", "a")
+      .replace("é", "e")
+      .replace("í", "i")
+      .replace("ó", "o")
+      .replace("ú", "u")
+      .replace("ñ", "n")
 }

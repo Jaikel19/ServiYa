@@ -11,6 +11,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,8 +24,6 @@ import com.example.seviya.core.designsystem.components.ClientBottomBar
 import com.example.seviya.core.designsystem.components.ClientTab
 import com.example.seviya.core.designsystem.components.FullScreenMenu
 import com.example.seviya.core.designsystem.components.MenuOption
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import com.example.seviya.core.navigation.CategoriesCatalog
 import com.example.seviya.core.navigation.ClientAgenda
 import com.example.seviya.core.navigation.ClientAlerts
@@ -54,26 +54,26 @@ import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
 
 fun NavDestination?.isClientScaffoldDestination(): Boolean {
-    val destination = this ?: return false
+  val destination = this ?: return false
 
-    return destination.hasRoute<ClientHome>() ||
-        destination.hasRoute<CategoriesCatalog>() ||
-        destination.hasRoute<WorkersList>() ||
-        destination.hasRoute<ProfessionalProfile>() ||
-        destination.hasRoute<ClientMap>() ||
-        destination.hasRoute<ClientSearch>() ||
-        destination.hasRoute<ClientAlerts>() ||
-        destination.hasRoute<ClientDashboard>() ||
-        destination.hasRoute<ClientAgenda>() ||
-        destination.hasRoute<ClientProfile>() ||
-        destination.hasRoute<ClientMessages>() ||
-        destination.hasRoute<ClientConfiguration>() ||
-        destination.hasRoute<ClientSettings>() ||
-        destination.hasRoute<ClientFavorites>() ||
-        destination.hasRoute<RequestAppointment>() ||
-        destination.hasRoute<ClientRequests>() ||
-        destination.hasRoute<ClientPaymentUpload>() ||
-        destination.hasRoute<ClientLocationCatalog>()
+  return destination.hasRoute<ClientHome>() ||
+      destination.hasRoute<CategoriesCatalog>() ||
+      destination.hasRoute<WorkersList>() ||
+      destination.hasRoute<ProfessionalProfile>() ||
+      destination.hasRoute<ClientMap>() ||
+      destination.hasRoute<ClientSearch>() ||
+      destination.hasRoute<ClientAlerts>() ||
+      destination.hasRoute<ClientDashboard>() ||
+      destination.hasRoute<ClientAgenda>() ||
+      destination.hasRoute<ClientProfile>() ||
+      destination.hasRoute<ClientMessages>() ||
+      destination.hasRoute<ClientConfiguration>() ||
+      destination.hasRoute<ClientSettings>() ||
+      destination.hasRoute<ClientFavorites>() ||
+      destination.hasRoute<RequestAppointment>() ||
+      destination.hasRoute<ClientRequests>() ||
+      destination.hasRoute<ClientPaymentUpload>() ||
+      destination.hasRoute<ClientLocationCatalog>()
 }
 
 @Composable
@@ -85,32 +85,32 @@ fun ClientScaffold(
     onClientMenuExpandedChange: (Boolean) -> Unit,
     onWorkerMenuExpandedChange: (Boolean) -> Unit,
     onLogout: () -> Unit,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
-            bottomBar = {
-                ClientFeatureBottomBar(
-                    navController = navController,
-                    currentTab = currentTab,
-                    menuExpanded = menuExpanded,
-                    onCurrentTabChange = onCurrentTabChange,
-                    onClientMenuExpandedChange = onClientMenuExpandedChange,
-                    onWorkerMenuExpandedChange = onWorkerMenuExpandedChange
-                )
-            }
-        ) { innerPadding ->
-            content(innerPadding)
-        }
-
-        ClientFeatureMenu(
-            navController = navController,
-            menuExpanded = menuExpanded,
-            onClientMenuExpandedChange = onClientMenuExpandedChange,
-            onLogout = onLogout
-        )
+  Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+          ClientFeatureBottomBar(
+              navController = navController,
+              currentTab = currentTab,
+              menuExpanded = menuExpanded,
+              onCurrentTabChange = onCurrentTabChange,
+              onClientMenuExpandedChange = onClientMenuExpandedChange,
+              onWorkerMenuExpandedChange = onWorkerMenuExpandedChange,
+          )
+        },
+    ) { innerPadding ->
+      content(innerPadding)
     }
+
+    ClientFeatureMenu(
+        navController = navController,
+        menuExpanded = menuExpanded,
+        onClientMenuExpandedChange = onClientMenuExpandedChange,
+        onLogout = onLogout,
+    )
+  }
 }
 
 @Composable
@@ -120,40 +120,40 @@ fun ClientFeatureBottomBar(
     menuExpanded: Boolean,
     onCurrentTabChange: (ClientTab) -> Unit,
     onClientMenuExpandedChange: (Boolean) -> Unit,
-    onWorkerMenuExpandedChange: (Boolean) -> Unit
+    onWorkerMenuExpandedChange: (Boolean) -> Unit,
 ) {
-    ClientBottomBar(
-        currentTab = currentTab,
-        menuActive = menuExpanded,
-        onGoServices = {
-            onClientMenuExpandedChange(false)
-            onWorkerMenuExpandedChange(false)
-            onCurrentTabChange(ClientTab.SERVICES)
-            navController.navigateSingleTop(ClientHome)
-        },
-        onGoMap = {
-            onClientMenuExpandedChange(false)
-            onWorkerMenuExpandedChange(false)
-            onCurrentTabChange(ClientTab.MAP)
-            navController.navigateSingleTop(ClientMap)
-        },
-        onGoSearch = {
-            onClientMenuExpandedChange(false)
-            onWorkerMenuExpandedChange(false)
-            onCurrentTabChange(ClientTab.SEARCH)
-            navController.navigateSingleTop(ClientSearch)
-        },
-        onGoAlerts = {
-            onClientMenuExpandedChange(false)
-            onWorkerMenuExpandedChange(false)
-            onCurrentTabChange(ClientTab.ALERTS)
-            navController.navigateSingleTop(ClientAlerts)
-        },
-        onGoMenu = {
-            onWorkerMenuExpandedChange(false)
-            onClientMenuExpandedChange(!menuExpanded)
-        }
-    )
+  ClientBottomBar(
+      currentTab = currentTab,
+      menuActive = menuExpanded,
+      onGoServices = {
+        onClientMenuExpandedChange(false)
+        onWorkerMenuExpandedChange(false)
+        onCurrentTabChange(ClientTab.SERVICES)
+        navController.navigateSingleTop(ClientHome)
+      },
+      onGoMap = {
+        onClientMenuExpandedChange(false)
+        onWorkerMenuExpandedChange(false)
+        onCurrentTabChange(ClientTab.MAP)
+        navController.navigateSingleTop(ClientMap)
+      },
+      onGoSearch = {
+        onClientMenuExpandedChange(false)
+        onWorkerMenuExpandedChange(false)
+        onCurrentTabChange(ClientTab.SEARCH)
+        navController.navigateSingleTop(ClientSearch)
+      },
+      onGoAlerts = {
+        onClientMenuExpandedChange(false)
+        onWorkerMenuExpandedChange(false)
+        onCurrentTabChange(ClientTab.ALERTS)
+        navController.navigateSingleTop(ClientAlerts)
+      },
+      onGoMenu = {
+        onWorkerMenuExpandedChange(false)
+        onClientMenuExpandedChange(!menuExpanded)
+      },
+  )
 }
 
 @Composable
@@ -161,139 +161,134 @@ fun ClientFeatureMenu(
     navController: NavHostController,
     menuExpanded: Boolean,
     onClientMenuExpandedChange: (Boolean) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
 ) {
-    AnimatedVisibility(
-        visible = menuExpanded,
-        enter = slideInHorizontally(
-            initialOffsetX = { it },
-            animationSpec = tween(300)
-        ) + fadeIn(animationSpec = tween(220)) + scaleIn(
-            initialScale = 0.98f,
-            animationSpec = tween(300)
-        ),
-        exit = slideOutHorizontally(
-            targetOffsetX = { it },
-            animationSpec = tween(260)
-        ) + fadeOut(animationSpec = tween(180)) + scaleOut(
-            targetScale = 0.98f,
-            animationSpec = tween(260)
-        )
-    ) {
-        FullScreenMenu(
-            title = "Menú cliente",
-            options = clientMenuOptions(
+  AnimatedVisibility(
+      visible = menuExpanded,
+      enter =
+          slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) +
+              fadeIn(animationSpec = tween(220)) +
+              scaleIn(initialScale = 0.98f, animationSpec = tween(300)),
+      exit =
+          slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(260)) +
+              fadeOut(animationSpec = tween(180)) +
+              scaleOut(targetScale = 0.98f, animationSpec = tween(260)),
+  ) {
+    FullScreenMenu(
+        title = "Menú cliente",
+        options =
+            clientMenuOptions(
                 navController = navController,
                 closeMenu = { onClientMenuExpandedChange(false) },
-                onLogout = onLogout
+                onLogout = onLogout,
             ),
-            onDismiss = { onClientMenuExpandedChange(false) }
-        )
-    }
+        onDismiss = { onClientMenuExpandedChange(false) },
+    )
+  }
 }
 
 private fun clientMenuOptions(
     navController: NavHostController,
     closeMenu: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
 ): List<MenuOption> {
-    return listOf(
-        MenuOption(
-            title = "Agenda",
-            subtitle = "Citas, historial y seguimiento",
-            icon = TablerIcons.CalendarEvent,
-            iconColor = Color(0xFF5FA8D3),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientAgenda)
-            }
-        ),
-        MenuOption(
-            title = "Solicitudes",
-            subtitle = "Seguimiento de solicitudes y comprobantes",
-            icon = TablerIcons.Dashboard,
-            iconColor = Color(0xFF4F8CFF),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientRequests)
-            }
-        ),
-        MenuOption(
-            title = "Favoritos",
-            subtitle = "Trabajadores guardados por el cliente",
-            icon = TablerIcons.Briefcase,
-            iconColor = Color(0xFFE77E9B),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientFavorites)
-            }
-        ),
-        MenuOption(
-            title = "Mis Ubicaciones",
-            subtitle = "Gestiona tus direcciones frecuentes",
-            icon = TablerIcons.MapPin,
-            iconColor = Color(0xFF4A9EC7),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientLocationCatalog)
-            }
-        ),
-        MenuOption(
-            title = "Perfil",
-            subtitle = "Datos personales e información de la cuenta",
-            icon = TablerIcons.User,
-            iconColor = Color(0xFF8E7CC3),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientProfile)
-            }
-        ),
-        MenuOption(
-            title = "Mensajes",
-            subtitle = "Chats y conversaciones con trabajadores",
-            icon = TablerIcons.Message,
-            iconColor = Color(0xFF67B99A),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientMessages)
-            }
-        ),
-        MenuOption(
-            title = "Dashboard",
-            subtitle = "Resumen general y actividad reciente",
-            icon = TablerIcons.Dashboard,
-            iconColor = Color(0xFFE29C7A),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientDashboard)
-            }
-        ),
-        MenuOption(
-            title = "Configuración",
-            subtitle = "Opciones principales de la aplicación",
-            icon = TablerIcons.Settings,
-            iconColor = Color(0xFF9BB85D),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientConfiguration)
-            }
-        ),
-        MenuOption(
-            title = "Ajustes",
-            subtitle = "Preferencias y personalización",
-            icon = TablerIcons.Adjustments,
-            iconColor = Color(0xFFD7B85A),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(ClientSettings)
-            }
-        ),
-        MenuOption(
-            title = "Cerrar sesión",
-            subtitle = "Salir de la cuenta y volver al inicio",
-            icon = TablerIcons.Logout,
-            iconColor = Color(0xFFEF4444),
-            onClick = onLogout
-        )
-    )
+  return listOf(
+      MenuOption(
+          title = "Agenda",
+          subtitle = "Citas, historial y seguimiento",
+          icon = TablerIcons.CalendarEvent,
+          iconColor = Color(0xFF5FA8D3),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientAgenda)
+          },
+      ),
+      MenuOption(
+          title = "Solicitudes",
+          subtitle = "Seguimiento de solicitudes y comprobantes",
+          icon = TablerIcons.Dashboard,
+          iconColor = Color(0xFF4F8CFF),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientRequests)
+          },
+      ),
+      MenuOption(
+          title = "Favoritos",
+          subtitle = "Trabajadores guardados por el cliente",
+          icon = TablerIcons.Briefcase,
+          iconColor = Color(0xFFE77E9B),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientFavorites)
+          },
+      ),
+      MenuOption(
+          title = "Mis Ubicaciones",
+          subtitle = "Gestiona tus direcciones frecuentes",
+          icon = TablerIcons.MapPin,
+          iconColor = Color(0xFF4A9EC7),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientLocationCatalog)
+          },
+      ),
+      MenuOption(
+          title = "Perfil",
+          subtitle = "Datos personales e información de la cuenta",
+          icon = TablerIcons.User,
+          iconColor = Color(0xFF8E7CC3),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientProfile)
+          },
+      ),
+      MenuOption(
+          title = "Mensajes",
+          subtitle = "Chats y conversaciones con trabajadores",
+          icon = TablerIcons.Message,
+          iconColor = Color(0xFF67B99A),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientMessages)
+          },
+      ),
+      MenuOption(
+          title = "Dashboard",
+          subtitle = "Resumen general y actividad reciente",
+          icon = TablerIcons.Dashboard,
+          iconColor = Color(0xFFE29C7A),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientDashboard)
+          },
+      ),
+      MenuOption(
+          title = "Configuración",
+          subtitle = "Opciones principales de la aplicación",
+          icon = TablerIcons.Settings,
+          iconColor = Color(0xFF9BB85D),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientConfiguration)
+          },
+      ),
+      MenuOption(
+          title = "Ajustes",
+          subtitle = "Preferencias y personalización",
+          icon = TablerIcons.Adjustments,
+          iconColor = Color(0xFFD7B85A),
+          onClick = {
+            closeMenu()
+            navController.navigateSingleTop(ClientSettings)
+          },
+      ),
+      MenuOption(
+          title = "Cerrar sesión",
+          subtitle = "Salir de la cuenta y volver al inicio",
+          icon = TablerIcons.Logout,
+          iconColor = Color(0xFFEF4444),
+          onClick = onLogout,
+      ),
+  )
 }

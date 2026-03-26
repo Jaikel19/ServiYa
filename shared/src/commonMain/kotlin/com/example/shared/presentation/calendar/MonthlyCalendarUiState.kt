@@ -9,5 +9,5 @@ data class MonthlyCalendarUiState(
     val appointments: List<Appointment> = emptyList(),
     val selectedAppointment: Appointment? = null,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

@@ -11,18 +11,16 @@ import com.google.firebase.Firebase
 import com.google.firebase.initialize
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
-        Firebase.initialize(this)
-        setContent {
-            App()
-        }
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
+    super.onCreate(savedInstanceState)
+    Firebase.initialize(this)
+    setContent { App() }
+  }
 }
 
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+  App()
 }

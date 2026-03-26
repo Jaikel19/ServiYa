@@ -15,5 +15,5 @@ data class WorkerListItemData(
     val startingPrice: Double = 0.0,
     val schedule: List<WorkerSchedule> = emptyList(),
     val appointments: List<Appointment> = emptyList(),
-    val workZones: List<WorkZone> = emptyList()
+    val workZones: List<WorkZone> = emptyList(),
 )

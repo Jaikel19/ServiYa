@@ -52,220 +52,192 @@ import compose.icons.tablericons.ChevronRight
 import kotlinx.coroutines.delay
 
 @Composable
-internal fun CategoryCard(
-    category: Category,
-    index: Int,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    val visuals = categoryVisual(category.id)
-    val entered = remember { mutableStateOf(false) }
+internal fun CategoryCard(category: Category, index: Int, selected: Boolean, onClick: () -> Unit) {
+  val visuals = categoryVisual(category.id)
+  val entered = remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        delay(index * 55L)
-        entered.value = true
-    }
+  LaunchedEffect(Unit) {
+    delay(index * 55L)
+    entered.value = true
+  }
 
-    val cardAlpha by animateFloatAsState(
-        targetValue = if (entered.value) 1f else 0f,
-        animationSpec = tween(450),
-        label = "cardAlpha"
-    )
-    val cardTranslationY by animateFloatAsState(
-        targetValue = if (entered.value) 0f else 42f,
-        animationSpec = tween(500),
-        label = "cardTranslationY"
-    )
-    val cardScale by animateFloatAsState(
-        targetValue = if (entered.value) 1f else 0.95f,
-        animationSpec = tween(500),
-        label = "cardScale"
-    )
+  val cardAlpha by
+      animateFloatAsState(
+          targetValue = if (entered.value) 1f else 0f,
+          animationSpec = tween(450),
+          label = "cardAlpha",
+      )
+  val cardTranslationY by
+      animateFloatAsState(
+          targetValue = if (entered.value) 0f else 42f,
+          animationSpec = tween(500),
+          label = "cardTranslationY",
+      )
+  val cardScale by
+      animateFloatAsState(
+          targetValue = if (entered.value) 1f else 0.95f,
+          animationSpec = tween(500),
+          label = "cardScale",
+      )
 
-    val infinite = rememberInfiniteTransition(label = "categoryCard")
-    val bubbleScale by infinite.animateFloat(
-        initialValue = 0.96f,
-        targetValue = 1.08f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2200),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bubbleScale"
-    )
-    val iconFloat by infinite.animateFloat(
-        initialValue = 0f,
-        targetValue = -9f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "iconFloat"
-    )
+  val infinite = rememberInfiniteTransition(label = "categoryCard")
+  val bubbleScale by
+      infinite.animateFloat(
+          initialValue = 0.96f,
+          targetValue = 1.08f,
+          animationSpec =
+              infiniteRepeatable(animation = tween(2200), repeatMode = RepeatMode.Reverse),
+          label = "bubbleScale",
+      )
+  val iconFloat by
+      infinite.animateFloat(
+          initialValue = 0f,
+          targetValue = -9f,
+          animationSpec =
+              infiniteRepeatable(animation = tween(2000), repeatMode = RepeatMode.Reverse),
+          label = "iconFloat",
+      )
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(214.dp)
-            .graphicsLayer {
+  Card(
+      modifier =
+          Modifier.fillMaxWidth()
+              .height(214.dp)
+              .graphicsLayer {
                 alpha = cardAlpha
                 translationY = cardTranslationY
                 scaleX = cardScale
                 scaleY = cardScale
-            }
-            .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(30.dp),
-                clip = false
-            )
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(30.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) visuals.cardTint else White
-        ),
-        border = BorderStroke(
-            width = if (selected) 2.dp else 1.dp,
-            color = if (selected) visuals.accent else BorderSoftAlt
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+              }
+              .shadow(elevation = 10.dp, shape = RoundedCornerShape(30.dp), clip = false)
+              .clickable(onClick = onClick),
+      shape = RoundedCornerShape(30.dp),
+      colors = CardDefaults.cardColors(containerColor = if (selected) visuals.cardTint else White),
+      border =
+          BorderStroke(
+              width = if (selected) 2.dp else 1.dp,
+              color = if (selected) visuals.accent else BorderSoftAlt,
+          ),
+      elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+  ) {
+    Box(
+        modifier =
+            Modifier.fillMaxSize()
+                .background(Brush.verticalGradient(colors = listOf(visuals.cardTint, White)))
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            visuals.cardTint,
-                            White
-                        )
-                    )
-                )
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                visuals.accent,
-                                visuals.accentSecondary
-                            )
-                        )
-                    )
-            )
+      Box(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .height(6.dp)
+                  .background(
+                      Brush.horizontalGradient(
+                          colors = listOf(visuals.accent, visuals.accentSecondary)
+                      )
+                  )
+      )
 
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 16.dp, end = 16.dp)
-                    .size(42.dp)
-                    .graphicsLayer {
-                        scaleX = bubbleScale
-                        scaleY = bubbleScale
-                    }
-                    .clip(CircleShape)
-                    .background(visuals.accent.copy(alpha = 0.08f))
-            )
+      Box(
+          modifier =
+              Modifier.align(Alignment.TopEnd)
+                  .padding(top = 16.dp, end = 16.dp)
+                  .size(42.dp)
+                  .graphicsLayer {
+                    scaleX = bubbleScale
+                    scaleY = bubbleScale
+                  }
+                  .clip(CircleShape)
+                  .background(visuals.accent.copy(alpha = 0.08f))
+      )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 18.dp, vertical = 18.dp),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.SpaceBetween
+      Column(
+          modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp, vertical = 18.dp),
+          horizontalAlignment = Alignment.Start,
+          verticalArrangement = Arrangement.SpaceBetween,
+      ) {
+        Column {
+          Box(
+              modifier =
+                  Modifier.graphicsLayer { translationY = iconFloat }
+                      .size(66.dp)
+                      .clip(RoundedCornerShape(30.dp))
+                      .background(
+                          Brush.linearGradient(
+                              colors = listOf(visuals.iconPlateStart, visuals.iconPlateEnd)
+                          )
+                      )
+                      .border(
+                          width = 1.dp,
+                          color = visuals.accent.copy(alpha = 0.10f),
+                          shape = RoundedCornerShape(28.dp),
+                      ),
+              contentAlignment = Alignment.Center,
+          ) {
+            Box(
+                modifier = Modifier.size(40.dp).clip(CircleShape).background(visuals.iconInner),
+                contentAlignment = Alignment.Center,
             ) {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .graphicsLayer {
-                                translationY = iconFloat
-                            }
-                            .size(66.dp)
-                            .clip(RoundedCornerShape(30.dp))
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        visuals.iconPlateStart,
-                                        visuals.iconPlateEnd
-                                    )
-                                )
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = visuals.accent.copy(alpha = 0.10f),
-                                shape = RoundedCornerShape(28.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(visuals.iconInner),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = visuals.icon,
-                                contentDescription = null,
-                                tint = visuals.iconTint,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(5.dp))
-
-                    Text(
-                        text = category.name,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            lineHeight = 22.sp
-                        ),
-                        color = TextBluePrimary
-                    )
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
-                    Text(
-                        text = "Explora profesionales",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 12.sp,
-                            lineHeight = 17.sp
-                        ),
-                        color = TextSecondary
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(
-                            if (selected) visuals.accent.copy(alpha = 0.16f) else visuals.buttonBackground
-                        )
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = if (selected) "Seleccionada" else "Ver opciones",
-                        color = visuals.buttonText,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    Icon(
-                        imageVector = TablerIcons.ChevronRight,
-                        contentDescription = null,
-                        tint = visuals.buttonText,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+              Icon(
+                  imageVector = visuals.icon,
+                  contentDescription = null,
+                  tint = visuals.iconTint,
+                  modifier = Modifier.size(30.dp),
+              )
             }
+          }
+
+          Spacer(modifier = Modifier.height(5.dp))
+
+          Text(
+              text = category.name,
+              style =
+                  MaterialTheme.typography.titleMedium.copy(
+                      fontWeight = FontWeight.Bold,
+                      fontSize = 15.sp,
+                      lineHeight = 22.sp,
+                  ),
+              color = TextBluePrimary,
+          )
+
+          Spacer(modifier = Modifier.height(2.dp))
+
+          Text(
+              text = "Explora profesionales",
+              style =
+                  MaterialTheme.typography.bodySmall.copy(
+                      fontWeight = FontWeight.Medium,
+                      fontSize = 12.sp,
+                      lineHeight = 17.sp,
+                  ),
+              color = TextSecondary,
+          )
         }
+
+        Row(
+            modifier =
+                Modifier.align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(50.dp))
+                    .background(
+                        if (selected) visuals.accent.copy(alpha = 0.16f)
+                        else visuals.buttonBackground
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+              text = if (selected) "Seleccionada" else "Ver opciones",
+              color = visuals.buttonText,
+              style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+          )
+
+          Spacer(modifier = Modifier.width(6.dp))
+
+          Icon(
+              imageVector = TablerIcons.ChevronRight,
+              contentDescription = null,
+              tint = visuals.buttonText,
+              modifier = Modifier.size(16.dp),
+          )
+        }
+      }
     }
+  }
 }

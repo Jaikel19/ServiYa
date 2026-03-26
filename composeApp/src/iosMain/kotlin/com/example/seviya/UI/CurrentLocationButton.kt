@@ -5,8 +5,15 @@ import androidx.compose.runtime.Composable
 // TODO: iOS location implementation pending
 @Composable
 actual fun CurrentLocationButton(
-    onLocationObtained: (latitude: Double, longitude: Double, province: String, canton: String, district: String) -> Unit,
-    onError: () -> Unit
+    onLocationObtained:
+        (
+            latitude: Double,
+            longitude: Double,
+            province: String,
+            canton: String,
+            district: String,
+        ) -> Unit,
+    onError: () -> Unit,
 ) {
-    // No-op for iOS — implementation will be added in a future sprint
+  // No-op for iOS — implementation will be added in a future sprint
 }

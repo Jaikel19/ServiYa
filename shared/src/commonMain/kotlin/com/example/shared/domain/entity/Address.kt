@@ -12,5 +12,5 @@ data class Address(
     val longitude: Double = 0.0,
     val province: String = "",
     val reference: String = "",
-    val isDefault: Boolean = false
+    val isDefault: Boolean = false,
 )

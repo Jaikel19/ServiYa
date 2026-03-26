@@ -9,5 +9,5 @@ data class WorkerCategoriesUiState(
     val searchQuery: String = "",
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

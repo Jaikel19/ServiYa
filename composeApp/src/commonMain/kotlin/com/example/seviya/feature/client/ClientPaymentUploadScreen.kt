@@ -6,27 +6,21 @@ import com.example.shared.presentation.ClientPaymentUpload.ClientPaymentUploadVi
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ClientPaymentUploadScreen(
-    appointmentId: String,
-    onBack: () -> Unit
-) {
-    val viewModel: ClientPaymentUploadViewModel = koinViewModel()
+fun ClientPaymentUploadScreen(appointmentId: String, onBack: () -> Unit) {
+  val viewModel: ClientPaymentUploadViewModel = koinViewModel()
 
-    LaunchedEffect(appointmentId) {
-        viewModel.loadData(appointmentId)
-    }
+  LaunchedEffect(appointmentId) { viewModel.loadData(appointmentId) }
 
-    ClientPaymentUploadPlatformScreen(
-        appointmentId = appointmentId,
-        viewModel = viewModel,
-        onBack = onBack
-    )
+  ClientPaymentUploadPlatformScreen(
+      appointmentId = appointmentId,
+      viewModel = viewModel,
+      onBack = onBack,
+  )
 }
-
 
 @Composable
 expect fun ClientPaymentUploadPlatformScreen(
     appointmentId: String,
     viewModel: ClientPaymentUploadViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 )

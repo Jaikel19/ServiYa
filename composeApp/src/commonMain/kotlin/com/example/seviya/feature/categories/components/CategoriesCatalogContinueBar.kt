@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -18,47 +19,39 @@ import com.example.seviya.core.designsystem.theme.BorderSoftAlt
 import com.example.seviya.core.designsystem.theme.BrandBlue
 import com.example.seviya.core.designsystem.theme.InactiveSoft
 import com.example.seviya.core.designsystem.theme.White
-import androidx.compose.foundation.shape.RoundedCornerShape
 
 @Composable
 internal fun ContinueButtonBar(
     enabled: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 14.dp,
-                shape = RoundedCornerShape(24.dp),
-                clip = false
-            ),
-        shape = RoundedCornerShape(24.dp),
-        color = White,
-        border = BorderStroke(1.dp, BorderSoftAlt)
-    ) {
-        Button(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-                .height(56.dp),
-            shape = RoundedCornerShape(18.dp),
-            colors = ButtonDefaults.buttonColors(
+  Surface(
+      modifier =
+          modifier
+              .fillMaxWidth()
+              .shadow(elevation = 14.dp, shape = RoundedCornerShape(24.dp), clip = false),
+      shape = RoundedCornerShape(24.dp),
+      color = White,
+      border = BorderStroke(1.dp, BorderSoftAlt),
+  ) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth().padding(12.dp).height(56.dp),
+        shape = RoundedCornerShape(18.dp),
+        colors =
+            ButtonDefaults.buttonColors(
                 containerColor = BrandBlue,
                 disabledContainerColor = InactiveSoft.copy(alpha = 0.35f),
                 contentColor = White,
-                disabledContentColor = White.copy(alpha = 0.75f)
-            )
-        ) {
-            Text(
-                text = "Ver trabajadores",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
+                disabledContentColor = White.copy(alpha = 0.75f),
+            ),
+    ) {
+      Text(
+          text = "Ver trabajadores",
+          style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+      )
     }
+  }
 }

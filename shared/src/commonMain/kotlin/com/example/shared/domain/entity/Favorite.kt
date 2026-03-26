@@ -7,5 +7,5 @@ data class Favorite(
     val id: String = "",
     val workerId: String = "",
     val workerName: String = "",
-    val addedAt: String = ""
+    val addedAt: String = "",
 )

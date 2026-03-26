@@ -8,5 +8,5 @@ data class WorkerPaymentDetailUiState(
     val paymentReceipt: PaymentReceipt? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val paymentVerified: Boolean = false
+    val paymentVerified: Boolean = false,
 )

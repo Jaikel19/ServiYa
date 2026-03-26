@@ -5,7 +5,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual fun platformModule(): Module = module {
-    // Dependencias específicas de Android
-    // DriverFactory(Context), etc...
-    single { DriverFactory(get()) } // get() = Context de Android
+  // Dependencias específicas de Android
+  // DriverFactory(Context), etc...
+  single { DriverFactory(get()) } // get() = Context de Android
 }

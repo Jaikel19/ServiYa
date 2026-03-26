@@ -9,5 +9,5 @@ data class ClientToWorkerReviewUiState(
     val imageUrls: List<String> = emptyList(),
     val isSubmitting: Boolean = false,
     val submitSuccess: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 )

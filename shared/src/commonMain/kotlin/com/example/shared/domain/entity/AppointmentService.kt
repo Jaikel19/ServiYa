@@ -9,5 +9,5 @@ data class AppointmentService(
     val description: String = "",
     val cost: Int = 0,
     val durationMinutes: Int = 0,
-    val subtotal: Int = 0
+    val subtotal: Int = 0,
 )

@@ -33,27 +33,25 @@ import org.koin.compose.viewmodel.koinViewModel
 fun WorkerStartAppointmentOtpScreen(
     appointmentId: String,
     onBack: () -> Unit = {},
-    onStartSuccess: () -> Unit = {}
+    onStartSuccess: () -> Unit = {},
 ) {
-    val viewModel: WorkerStartAppointmentOtpViewModel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsState()
+  val viewModel: WorkerStartAppointmentOtpViewModel = koinViewModel()
+  val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(appointmentId) {
-        viewModel.loadData(appointmentId)
+  LaunchedEffect(appointmentId) { viewModel.loadData(appointmentId) }
+
+  LaunchedEffect(uiState.startSuccess) {
+    if (uiState.startSuccess) {
+      onStartSuccess()
     }
+  }
 
-    LaunchedEffect(uiState.startSuccess) {
-        if (uiState.startSuccess) {
-            onStartSuccess()
-        }
-    }
-
-    WorkerStartAppointmentOtpContent(
-        uiState = uiState,
-        onBack = onBack,
-        onOtpChange = viewModel::onOtpChanged,
-        onStartAppointment = { viewModel.startAppointmentWithOtp() }
-    )
+  WorkerStartAppointmentOtpContent(
+      uiState = uiState,
+      onBack = onBack,
+      onOtpChange = viewModel::onOtpChanged,
+      onStartAppointment = { viewModel.startAppointmentWithOtp() },
+  )
 }
 
 @Composable
@@ -61,102 +59,78 @@ private fun WorkerStartAppointmentOtpContent(
     uiState: WorkerStartAppointmentOtpUiState,
     onBack: () -> Unit = {},
     onOtpChange: (String) -> Unit = {},
-    onStartAppointment: () -> Unit = {}
+    onStartAppointment: () -> Unit = {},
 ) {
-    val appointment = uiState.appointment
+  val appointment = uiState.appointment
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF3F5F8))
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = "Confirmar Inicio",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
+  Column(
+      modifier =
+          Modifier.fillMaxSize()
+              .background(Color(0xFFF3F5F8))
+              .windowInsetsPadding(WindowInsets.statusBars)
+              .padding(20.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+  ) {
+    Text(
+        text = "Confirmar Inicio",
+        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
+    )
 
-        appointment?.let {
-            Surface(
-                shape = RoundedCornerShape(24.dp),
-                color = Color.White
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "CITA CONFIRMADA",
-                        color = Color(0xFF0A4DB3),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-
-                    Text(
-                        text = it.clientName,
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    )
-
-                    Text(
-                        text = it.location.reference,
-                        color = Color(0xFF6B7A90)
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Ingresar Código OTP",
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Text(
-            text = "Solicita al cliente el código de 6 dígitos para iniciar el servicio.",
-            color = Color(0xFF6B7A90)
-        )
-
-        OutlinedTextField(
-            value = uiState.otpInput,
-            onValueChange = onOtpChange,
-            label = { Text("OTP") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        uiState.errorMessage?.let {
-            Text(
-                text = it,
-                color = Color(0xFFE54848),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-
-        Button(
-            onClick = onStartAppointment,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.isLoading
+    appointment?.let {
+      Surface(shape = RoundedCornerShape(24.dp), color = Color.White) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text("Iniciar cita")
-        }
+          Text(
+              text = "CITA CONFIRMADA",
+              color = Color(0xFF0A4DB3),
+              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+          )
 
-        Button(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Volver")
+          Text(
+              text = it.clientName,
+              style =
+                  MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold),
+          )
+
+          Text(text = it.location.reference, color = Color(0xFF6B7A90))
         }
+      }
     }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = "Ingresar Código OTP",
+        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold),
+    )
+
+    Text(
+        text = "Solicita al cliente el código de 6 dígitos para iniciar el servicio.",
+        color = Color(0xFF6B7A90),
+    )
+
+    OutlinedTextField(
+        value = uiState.otpInput,
+        onValueChange = onOtpChange,
+        label = { Text("OTP") },
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+    )
+
+    uiState.errorMessage?.let {
+      Text(text = it, color = Color(0xFFE54848), style = MaterialTheme.typography.bodyMedium)
+    }
+
+    Button(
+        onClick = onStartAppointment,
+        modifier = Modifier.fillMaxWidth(),
+        enabled = !uiState.isLoading,
+    ) {
+      Text("Iniciar cita")
+    }
+
+    Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Volver") }
+  }
 }

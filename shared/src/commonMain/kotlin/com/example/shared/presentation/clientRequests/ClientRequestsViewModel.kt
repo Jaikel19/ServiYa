@@ -10,47 +10,52 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class ClientRequestsViewModel(
-    private val appointmentRepository: IAppointmentRepository
-) : ViewModel() {
+class ClientRequestsViewModel(private val appointmentRepository: IAppointmentRepository) :
+    ViewModel() {
 
-    private val _state = MutableStateFlow(ClientRequestsUiState())
-    val uiState: StateFlow<ClientRequestsUiState> = _state.asStateFlow()
+  private val _state = MutableStateFlow(ClientRequestsUiState())
+  val uiState: StateFlow<ClientRequestsUiState> = _state.asStateFlow()
 
-    fun loadRequests(clientId: String) {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(
-                isLoading = true,
-                pendingAppointments = emptyList(),
-                approvedAppointments = emptyList(),
-                errorMessage = null
-            )
+  fun loadRequests(clientId: String) {
+    viewModelScope.launch {
+      _state.value =
+          _state.value.copy(
+              isLoading = true,
+              pendingAppointments = emptyList(),
+              approvedAppointments = emptyList(),
+              errorMessage = null,
+          )
 
-            appointmentRepository.getAppointmentsByClient(clientId)
-                .catch { e ->
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        pendingAppointments = emptyList(),
-                        approvedAppointments = emptyList(),
-                        errorMessage = e.message ?: "Error fetching client requests"
-                    )
-                }
-                .collectLatest { appointments ->
-                    val pending = appointments
-                        .filter { it.status.equals("pending", ignoreCase = true) }
-                        .sortedBy { it.serviceStartAt }
+      appointmentRepository
+          .getAppointmentsByClient(clientId)
+          .catch { e ->
+            _state.value =
+                _state.value.copy(
+                    isLoading = false,
+                    pendingAppointments = emptyList(),
+                    approvedAppointments = emptyList(),
+                    errorMessage = e.message ?: "Error fetching client requests",
+                )
+          }
+          .collectLatest { appointments ->
+            val pending =
+                appointments
+                    .filter { it.status.equals("pending", ignoreCase = true) }
+                    .sortedBy { it.serviceStartAt }
 
-                    val approved = appointments
-                        .filter { it.status.equals("approved", ignoreCase = true) }
-                        .sortedBy { it.serviceStartAt }
+            val approved =
+                appointments
+                    .filter { it.status.equals("approved", ignoreCase = true) }
+                    .sortedBy { it.serviceStartAt }
 
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        pendingAppointments = pending,
-                        approvedAppointments = approved,
-                        errorMessage = null
-                    )
-                }
-        }
+            _state.value =
+                _state.value.copy(
+                    isLoading = false,
+                    pendingAppointments = pending,
+                    approvedAppointments = approved,
+                    errorMessage = null,
+                )
+          }
     }
+  }
 }

@@ -16,5 +16,5 @@ data class User(
     val trustScore: Int? = null,
     val travelTime: Int? = null,
     val categories: List<Category> = emptyList(),
-    val createdAt: String  = "",
+    val createdAt: String = "",
 )

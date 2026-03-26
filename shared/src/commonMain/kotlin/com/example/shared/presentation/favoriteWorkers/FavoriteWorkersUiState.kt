@@ -6,5 +6,5 @@ data class FavoriteWorkersUiState(
     val isLoading: Boolean = false,
     val workers: List<WorkerListItemData> = emptyList(),
     val errorMessage: String? = null,
-    val debugMessage: String = ""
+    val debugMessage: String = "",
 )

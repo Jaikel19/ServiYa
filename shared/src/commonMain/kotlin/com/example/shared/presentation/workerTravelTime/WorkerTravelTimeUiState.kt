@@ -5,8 +5,11 @@ data class WorkerTravelTimeUiState(
     val minutesText: String = "",
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 ) {
-    val minutesValue: Int? get() = minutesText.toIntOrNull()
-    val isValid: Boolean get() = minutesValue != null && minutesValue in 0..600
+  val minutesValue: Int?
+    get() = minutesText.toIntOrNull()
+
+  val isValid: Boolean
+    get() = minutesValue != null && minutesValue in 0..600
 }

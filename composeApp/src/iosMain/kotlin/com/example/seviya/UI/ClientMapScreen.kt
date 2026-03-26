@@ -12,12 +12,9 @@ import com.example.shared.presentation.clientMap.ClientMapViewModel
 actual fun ClientMapPlatformScreen(
     clientId: String,
     viewModel: ClientMapViewModel,
-    onWorkerClick: (workerId: String) -> Unit
+    onWorkerClick: (workerId: String) -> Unit,
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Mapa no disponible en iOS por ahora")
-    }
+  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Text("Mapa no disponible en iOS por ahora")
+  }
 }

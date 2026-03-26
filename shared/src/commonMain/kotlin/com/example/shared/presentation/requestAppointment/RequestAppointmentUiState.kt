@@ -9,5 +9,5 @@ data class RequestAppointmentUiState(
     val errorMessage: String? = null,
     val isLoadingAddresses: Boolean = false,
     val savedAddresses: List<Address> = emptyList(),
-    val selectedAddressId: String = ""
+    val selectedAddressId: String = "",
 )

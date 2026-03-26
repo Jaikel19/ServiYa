@@ -9,20 +9,18 @@ import org.koin.compose.viewmodel.koinViewModel
 fun WorkerDailyAppointmentsScreen(
     workerId: String,
     onBack: () -> Unit,
-    onOpenMaps: (latitude: Double, longitude: Double, clientName: String) -> Unit
+    onOpenMaps: (latitude: Double, longitude: Double, clientName: String) -> Unit,
 ) {
-    val viewModel: WorkerDailyAppointmentsViewModel = koinViewModel()
+  val viewModel: WorkerDailyAppointmentsViewModel = koinViewModel()
 
-    LaunchedEffect(workerId) {
-        viewModel.loadAppointments(workerId)
-    }
+  LaunchedEffect(workerId) { viewModel.loadAppointments(workerId) }
 
-    WorkerDailyAppointmentsPlatformScreen(
-        workerId = workerId,
-        viewModel = viewModel,
-        onBack = onBack,
-        onOpenMaps = onOpenMaps
-    )
+  WorkerDailyAppointmentsPlatformScreen(
+      workerId = workerId,
+      viewModel = viewModel,
+      onBack = onBack,
+      onOpenMaps = onOpenMaps,
+  )
 }
 
 @Composable
@@ -30,5 +28,5 @@ expect fun WorkerDailyAppointmentsPlatformScreen(
     workerId: String,
     viewModel: WorkerDailyAppointmentsViewModel,
     onBack: () -> Unit,
-    onOpenMaps: (latitude: Double, longitude: Double, clientName: String) -> Unit
+    onOpenMaps: (latitude: Double, longitude: Double, clientName: String) -> Unit,
 )

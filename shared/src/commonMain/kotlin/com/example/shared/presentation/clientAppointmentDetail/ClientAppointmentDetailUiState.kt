@@ -19,24 +19,25 @@ data class ClientAppointmentDetailUiState(
     val isPreparingCancellationPreview: Boolean = false,
     val isCancellingAppointment: Boolean = false,
     val successMessage: String? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
 ) {
-    val canShowClientSummary: Boolean
-        get() = appointment != null
+  val canShowClientSummary: Boolean
+    get() = appointment != null
 
-    val canShowOtp: Boolean
-        get() = appointment?.status.equals("confirmed", ignoreCase = true) &&
-                !otp?.code.isNullOrBlank()
+  val canShowOtp: Boolean
+    get() = appointment?.status.equals("confirmed", ignoreCase = true) && !otp?.code.isNullOrBlank()
 
-    val canCancel: Boolean
-        get() = appointment?.status == "confirmed" && !isCancellingAppointment
+  val canCancel: Boolean
+    get() = appointment?.status == "confirmed" && !isCancellingAppointment
 
-    val canChat: Boolean
-        get() = appointment?.status.equals("confirmed", ignoreCase = true) ||
-                appointment?.status.equals("in_progress", ignoreCase = true) ||
-                appointment?.status.equals("completed", ignoreCase = true)
+  val canChat: Boolean
+    get() =
+        appointment?.status.equals("confirmed", ignoreCase = true) ||
+            appointment?.status.equals("in_progress", ignoreCase = true) ||
+            appointment?.status.equals("completed", ignoreCase = true)
 
-    val canReview: Boolean
-        get() = appointment?.status.equals("completed", ignoreCase = true) &&
-                !reviewMeta.clientToWorkerCreated
+  val canReview: Boolean
+    get() =
+        appointment?.status.equals("completed", ignoreCase = true) &&
+            !reviewMeta.clientToWorkerCreated
 }

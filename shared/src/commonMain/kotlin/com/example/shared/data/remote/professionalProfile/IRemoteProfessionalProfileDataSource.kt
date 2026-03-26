@@ -9,22 +9,31 @@ import com.example.shared.domain.entity.WorkerSchedule
 import kotlinx.coroutines.flow.Flow
 
 interface IRemoteProfessionalProfileDataSource {
-    suspend fun getWorkerProfile(workerId: String): Flow<WorkerProfile?>
-    suspend fun getCategoryNames(categoryIds: List<String>): List<String>
-    suspend fun getWorkerProvinceFromAddresses(workerId: String): String?
-    suspend fun getWorkerCancellationPolicy(workerId: String): CancellationPolicy?
+  suspend fun getWorkerProfile(workerId: String): Flow<WorkerProfile?>
 
-    suspend fun getWorkerSchedule(workerId: String): List<WorkerSchedule>
+  suspend fun getCategoryNames(categoryIds: List<String>): List<String>
 
-    suspend fun getWorkerPortfolios(workerId: String): List<PortfolioItem>
+  suspend fun getWorkerProvinceFromAddresses(workerId: String): String?
 
-    suspend fun getWorkerReviews(workerId: String): List<WorkerReviewItem>
-    suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>>
+  suspend fun getWorkerCancellationPolicy(workerId: String): CancellationPolicy?
 
-    suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>>
-    suspend fun addFavorite(clientId: String, workerId: String)
-    suspend fun removeFavorite(clientId: String, workerId: String)
-    suspend fun updateWorkerCategories(workerId: String, categoryIds: List<String>)
-    suspend fun getWorkerTravelTime(workerId: String): Flow<Int>
-    suspend fun updateTravelTime(workerId: String, minutes: Int)
+  suspend fun getWorkerSchedule(workerId: String): List<WorkerSchedule>
+
+  suspend fun getWorkerPortfolios(workerId: String): List<PortfolioItem>
+
+  suspend fun getWorkerReviews(workerId: String): List<WorkerReviewItem>
+
+  suspend fun getWorkerAppointments(workerId: String): Flow<List<Appointment>>
+
+  suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>>
+
+  suspend fun addFavorite(clientId: String, workerId: String)
+
+  suspend fun removeFavorite(clientId: String, workerId: String)
+
+  suspend fun updateWorkerCategories(workerId: String, categoryIds: List<String>)
+
+  suspend fun getWorkerTravelTime(workerId: String): Flow<Int>
+
+  suspend fun updateTravelTime(workerId: String, minutes: Int)
 }

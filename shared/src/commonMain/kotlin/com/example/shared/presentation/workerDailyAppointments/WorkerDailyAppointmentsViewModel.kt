@@ -10,36 +10,37 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class WorkerDailyAppointmentsViewModel(
-    private val appointmentRepository: IAppointmentRepository
-) : ViewModel() {
+class WorkerDailyAppointmentsViewModel(private val appointmentRepository: IAppointmentRepository) :
+    ViewModel() {
 
-    private val _state = MutableStateFlow(WorkerDailyAppointmentsUiState())
-    val uiState: StateFlow<WorkerDailyAppointmentsUiState> = _state.asStateFlow()
+  private val _state = MutableStateFlow(WorkerDailyAppointmentsUiState())
+  val uiState: StateFlow<WorkerDailyAppointmentsUiState> = _state.asStateFlow()
 
-    fun loadAppointments(workerId: String) {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+  fun loadAppointments(workerId: String) {
+    viewModelScope.launch {
+      _state.value = _state.value.copy(isLoading = true, errorMessage = null)
 
-            appointmentRepository.getAppointmentsByWorker(workerId)
-                .catch { e ->
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Error cargando citas"
-                    )
-                }
-                .collectLatest { appointments ->
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        appointments = appointments.filter {
-                            it.status !in listOf("cancelled", "rejected")
-                        }
-                    )
-                }
-        }
+      appointmentRepository
+          .getAppointmentsByWorker(workerId)
+          .catch { e ->
+            _state.value =
+                _state.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Error cargando citas",
+                )
+          }
+          .collectLatest { appointments ->
+            _state.value =
+                _state.value.copy(
+                    isLoading = false,
+                    appointments =
+                        appointments.filter { it.status !in listOf("cancelled", "rejected") },
+                )
+          }
     }
+  }
 
-    fun onViewChanged(view: DailyView) {
-        _state.value = _state.value.copy(currentView = view)
-    }
+  fun onViewChanged(view: DailyView) {
+    _state.value = _state.value.copy(currentView = view)
+  }
 }
