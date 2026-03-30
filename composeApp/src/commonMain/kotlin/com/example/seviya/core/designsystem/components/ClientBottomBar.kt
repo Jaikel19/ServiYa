@@ -20,7 +20,7 @@ fun ClientBottomBar(
     menuActive: Boolean,
     onGoServices: () -> Unit,
     onGoMap: () -> Unit,
-    onGoSearch: () -> Unit,
+    onGoDashboard: () -> Unit,
     onGoAlerts: () -> Unit,
     onGoMenu: () -> Unit,
 ) {
@@ -29,9 +29,9 @@ fun ClientBottomBar(
       tonalElevation = 1.dp,
       modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
   ) {
-    ClientBottomItem("Servicios", TablerIcons.Apps, currentTab == ClientTab.SERVICES, onGoServices)
+    ClientBottomItem("Dashboard", TablerIcons.Apps, currentTab == ClientTab.DASHBOARD, onGoDashboard)
     ClientBottomItem("Mapa", TablerIcons.Globe, currentTab == ClientTab.MAP, onGoMap)
-    ClientBottomItem("Buscar", TablerIcons.Search, currentTab == ClientTab.SEARCH, onGoSearch)
+    ClientBottomItem("Servicios", TablerIcons.Search, currentTab == ClientTab.SERVICES, onGoServices)
     ClientBottomItem("Alertas", TablerIcons.Bell, currentTab == ClientTab.ALERTS, onGoAlerts)
     ClientBottomItem("Menú", TablerIcons.Menu2, menuActive, onGoMenu)
   }
@@ -40,7 +40,7 @@ fun ClientBottomBar(
 enum class ClientTab {
   SERVICES,
   MAP,
-  SEARCH,
+  DASHBOARD,
   ALERTS,
 }
 

@@ -76,8 +76,10 @@ import com.example.shared.presentation.workerDashboard.WorkerDashboardUiState
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
+import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.ChartBar
 import compose.icons.tablericons.Clock
+import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Message
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Tool
@@ -89,11 +91,11 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun WorkerDashboardScreen(
     workerId: String,
-    onOpenMessages: () -> Unit = {},
-    onOpenReports: () -> Unit = {},
+    onOpenCategories: () -> Unit = {},
+    onOpenTravelTime: () -> Unit = {},
+    onOpenDailyAgenda: () -> Unit = {},
     onOpenSchedule: () -> Unit = {},
     onOpenPortfolio: () -> Unit = {},
-    onOpenSettings: () -> Unit = {},
     onOpenAppointmentDetail: (Booking) -> Unit = {},
     onStartAppointment: (Booking) -> Unit = {},
     onCompleteAppointment: (Booking) -> Unit = {},
@@ -106,11 +108,11 @@ fun WorkerDashboardScreen(
 
   WorkerDashboardContent(
       state = state,
-      onOpenMessages = onOpenMessages,
-      onOpenReports = onOpenReports,
+      onOpenCategories = onOpenCategories,
+      onOpenTravelTime = onOpenTravelTime,
+      onOpenDailyAgenda = onOpenDailyAgenda,
       onOpenSchedule = onOpenSchedule,
       onOpenPortfolio = onOpenPortfolio,
-      onOpenSettings = onOpenSettings,
       onOpenAppointmentDetail = onOpenAppointmentDetail,
       onStartAppointment = onStartAppointment,
       onCompleteAppointment = onCompleteAppointment,
@@ -121,11 +123,11 @@ fun WorkerDashboardScreen(
 @Composable
 private fun WorkerDashboardContent(
     state: WorkerDashboardUiState,
-    onOpenMessages: () -> Unit = {},
-    onOpenReports: () -> Unit = {},
+    onOpenCategories: () -> Unit = {},
+    onOpenTravelTime: () -> Unit = {},
+    onOpenDailyAgenda: () -> Unit = {},
     onOpenSchedule: () -> Unit = {},
     onOpenPortfolio: () -> Unit = {},
-    onOpenSettings: () -> Unit = {},
     onOpenAppointmentDetail: (Booking) -> Unit = {},
     onStartAppointment: (Booking) -> Unit = {},
     onCompleteAppointment: (Booking) -> Unit = {},
@@ -205,11 +207,11 @@ private fun WorkerDashboardContent(
             )
 
             QuickAccessSection(
-                onOpenMessages = onOpenMessages,
-                onOpenReports = onOpenReports,
+                onOpenCategories = onOpenCategories,
+                onOpenTravelTime = onOpenTravelTime,
+                onOpenDailyAgenda = onOpenDailyAgenda,
                 onOpenSchedule = onOpenSchedule,
                 onOpenPortfolio = onOpenPortfolio,
-                onOpenSettings = onOpenSettings,
             )
 
             UpcomingAppointmentsSection(
@@ -590,11 +592,11 @@ private fun AppointmentProgressRing(
 
 @Composable
 private fun QuickAccessSection(
-    onOpenMessages: () -> Unit,
-    onOpenReports: () -> Unit,
+    onOpenCategories: () -> Unit,
+    onOpenTravelTime: () -> Unit,
+    onOpenDailyAgenda: () -> Unit,
     onOpenSchedule: () -> Unit,
     onOpenPortfolio: () -> Unit,
-    onOpenSettings: () -> Unit,
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
     Text(
@@ -610,23 +612,31 @@ private fun QuickAccessSection(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      QuickAccessItem(
-          title = "Mensajes",
-          icon = TablerIcons.Message,
-          iconTint = BrandBlue,
-          background = SoftBlueSurface,
-          onClick = onOpenMessages,
-      )
+        QuickAccessItem(
+            title = "Categoría",
+            icon = TablerIcons.Adjustments,
+            iconTint = BrandBlue,
+            background = SoftBlueSurface,
+            onClick = onOpenCategories,
+        )
 
-      QuickAccessItem(
-          title = "Reportes",
-          icon = TablerIcons.ChartBar,
-          iconTint = BrandBlue,
-          background = SoftBlueSurface,
-          onClick = onOpenReports,
-      )
+        QuickAccessItem(
+            title = "Traslado",
+            icon = TablerIcons.MapPin,
+            iconTint = BrandBlue,
+            background = SoftBlueSurface,
+            onClick = onOpenTravelTime,
+        )
 
-      QuickAccessItem(
+        QuickAccessItem(
+            title = "Agenda Diaria",
+            icon = TablerIcons.CalendarEvent,
+            iconTint = BrandBlue,
+            background = SoftBlueSurface,
+            onClick = onOpenDailyAgenda,
+        )
+
+        QuickAccessItem(
           title = "Horario",
           icon = TablerIcons.Clock,
           iconTint = BrandBlue,
@@ -640,14 +650,6 @@ private fun QuickAccessSection(
           iconTint = BrandBlue,
           background = SoftBlueSurface,
           onClick = onOpenPortfolio,
-      )
-
-      QuickAccessItem(
-          title = "Ajustes",
-          icon = TablerIcons.Adjustments,
-          iconTint = VibrantRed,
-          background = SoftRedSurface,
-          onClick = onOpenSettings,
       )
     }
   }

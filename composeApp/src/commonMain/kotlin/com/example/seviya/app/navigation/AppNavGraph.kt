@@ -227,17 +227,17 @@ fun NavGraphBuilder.homeNavGraph(
 
     CategoriesCatalogScreen(
         selectedCategoryId = selectedCategoryId,
-        onGoServices = {
-          onCurrentClientTabChange(ClientTab.SERVICES)
-          navController.navigateSingleTop(ClientHome)
+        onGoDashboard = {
+            onCurrentClientTabChange(ClientTab.DASHBOARD)
+            navController.navigateSingleTop(ClientDashboard)
         },
         onGoMap = {
           onCurrentClientTabChange(ClientTab.MAP)
           navController.navigateSingleTop(ClientMap)
         },
-        onGoSearch = {
-          onCurrentClientTabChange(ClientTab.SEARCH)
-          navController.navigateSingleTop(ClientSearch)
+        onGoServices = {
+            onCurrentClientTabChange(ClientTab.SERVICES)
+            navController.navigateSingleTop(ClientHome)
         },
         onGoAlerts = {
           onCurrentClientTabChange(ClientTab.ALERTS)
@@ -247,7 +247,6 @@ fun NavGraphBuilder.homeNavGraph(
         onGoProfile = { navController.navigateSingleTop(ClientProfile) },
         onGoConfiguration = { navController.navigateSingleTop(ClientConfiguration) },
         onGoMessages = { navController.navigateSingleTop(ClientMessages) },
-        onGoDashboard = { navController.navigateSingleTop(ClientDashboard) },
         onGoSettings = { navController.navigateSingleTop(ClientSettings) },
         onCategoryClick = { category ->
           selectedCategoryId = category.id
@@ -277,17 +276,17 @@ fun NavGraphBuilder.homeNavGraph(
           navController.navigate(ProfessionalProfile(workerId = workerId))
         },
         onFavoritesClick = { navController.navigateSingleTop(ClientFavorites) },
-        onBottomServices = {
-          onCurrentClientTabChange(ClientTab.SERVICES)
-          navController.navigateSingleTop(ClientHome)
+        onBottomDashboard = {
+            onCurrentClientTabChange(ClientTab.DASHBOARD)
+            navController.navigateSingleTop(ClientDashboard)
         },
         onBottomMap = {
           onCurrentClientTabChange(ClientTab.MAP)
           navController.navigateSingleTop(ClientMap)
         },
-        onBottomSearch = {
-          onCurrentClientTabChange(ClientTab.SEARCH)
-          navController.navigateSingleTop(ClientSearch)
+        onBottomServices = {
+            onCurrentClientTabChange(ClientTab.SERVICES)
+            navController.navigateSingleTop(ClientHome)
         },
         onBottomNotifications = {
           onCurrentClientTabChange(ClientTab.ALERTS)
@@ -307,17 +306,17 @@ fun NavGraphBuilder.homeNavGraph(
         clientId = currentClientId,
         workerId = route.workerId,
         onBack = { navController.popBackStack() },
-        onBottomServices = {
-          onCurrentClientTabChange(ClientTab.SERVICES)
-          navController.navigateSingleTop(ClientHome)
+        onBottomDashboard = {
+            onCurrentClientTabChange(ClientTab.DASHBOARD)
+            navController.navigateSingleTop(ClientDashboard)
         },
         onBottomMap = {
           onCurrentClientTabChange(ClientTab.MAP)
           navController.navigateSingleTop(ClientMap)
         },
-        onBottomSearch = {
-          onCurrentClientTabChange(ClientTab.SEARCH)
-          navController.navigateSingleTop(ClientSearch)
+        onBottomServices = {
+            onCurrentClientTabChange(ClientTab.SERVICES)
+            navController.navigateSingleTop(ClientHome)
         },
         onBottomNotifications = {
           onCurrentClientTabChange(ClientTab.ALERTS)

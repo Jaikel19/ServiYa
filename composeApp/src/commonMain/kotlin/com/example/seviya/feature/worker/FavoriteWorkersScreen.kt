@@ -78,7 +78,7 @@ fun FavoriteWorkersScreen(
     onCategoriesClick: () -> Unit = {},
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
-    onBottomSearch: () -> Unit = {},
+    onBottomDashboard: () -> Unit = {},
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {},
 ) {
@@ -99,7 +99,7 @@ fun FavoriteWorkersScreen(
       onCategoriesClick = onCategoriesClick,
       onBottomServices = onBottomServices,
       onBottomMap = onBottomMap,
-      onBottomSearch = onBottomSearch,
+      onBottomDashboard = onBottomDashboard,
       onBottomNotifications = onBottomNotifications,
       onBottomMenu = onBottomMenu,
   )
@@ -116,7 +116,7 @@ private fun FavoriteWorkersContent(
     onCategoriesClick: () -> Unit = {},
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
-    onBottomSearch: () -> Unit = {},
+    onBottomDashboard: () -> Unit = {},
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {},
 ) {

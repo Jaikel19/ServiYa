@@ -90,7 +90,7 @@ fun ClientAppointmentDetailScreen(
     onReviewClick: () -> Unit = {},
     onGoServices: () -> Unit = {},
     onGoMap: () -> Unit = {},
-    onGoSearch: () -> Unit = {},
+    onGoDashboard: () -> Unit = {},
     onGoAlerts: () -> Unit = {},
     onGoMenu: () -> Unit = {},
 ) {
@@ -112,7 +112,7 @@ fun ClientAppointmentDetailScreen(
       onReviewClick = onReviewClick,
       onGoServices = onGoServices,
       onGoMap = onGoMap,
-      onGoSearch = onGoSearch,
+      onGoDashboard = onGoDashboard,
       onGoAlerts = onGoAlerts,
       onGoMenu = onGoMenu,
   )
@@ -129,7 +129,7 @@ private fun ClientAppointmentDetailContent(
     onReviewClick: () -> Unit = {},
     onGoServices: () -> Unit = {},
     onGoMap: () -> Unit = {},
-    onGoSearch: () -> Unit = {},
+    onGoDashboard: () -> Unit = {},
     onGoAlerts: () -> Unit = {},
     onGoMenu: () -> Unit = {},
 ) {
@@ -150,7 +150,7 @@ private fun ClientAppointmentDetailContent(
             menuActive = false,
             onGoServices = onGoServices,
             onGoMap = onGoMap,
-            onGoSearch = onGoSearch,
+            onGoDashboard = onGoDashboard,
             onGoAlerts = onGoAlerts,
             onGoMenu = onGoMenu,
         )
