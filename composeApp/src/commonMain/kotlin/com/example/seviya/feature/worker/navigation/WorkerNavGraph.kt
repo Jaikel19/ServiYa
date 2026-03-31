@@ -92,6 +92,10 @@ fun NavGraphBuilder.workerNavGraph(
         workerId = route.workerId,
         onBack = { navController.popBackStack() },
         onOpenMaps = { _, _, _ -> },
+        onOpenAppointmentDetail = { appointment ->
+            monthlyCalendarViewModel.selectAppointment(appointment)
+            navController.navigateSingleTop(WorkerAppointmentDetail)
+        },
     )
   }
 
