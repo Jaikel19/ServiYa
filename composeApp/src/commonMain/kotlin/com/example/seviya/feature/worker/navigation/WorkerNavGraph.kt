@@ -157,6 +157,9 @@ fun NavGraphBuilder.workerNavGraph(
             onCurrentWorkerTabChange(WorkerTab.DASHBOARD)
             navController.navigateSingleTop(WorkerDashboard)
           },
+          onOpenPaymentDetail = { appointmentId ->
+              navController.navigate(WorkerPaymentDetail(bookingId = appointmentId))
+          },
           onGoMap = {},
           onGoSearch = {
             onCurrentWorkerTabChange(WorkerTab.REQUESTS)
