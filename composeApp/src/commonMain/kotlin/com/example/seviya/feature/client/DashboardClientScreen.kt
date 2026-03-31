@@ -79,6 +79,7 @@ import com.example.shared.domain.entity.Booking
 import com.example.shared.presentation.clientDashboard.ClientDashboardUiState
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
 import compose.icons.TablerIcons
+import compose.icons.tablericons.Apps
 import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.ChartBar
 import compose.icons.tablericons.Check
@@ -86,6 +87,8 @@ import compose.icons.tablericons.ChevronDown
 import compose.icons.tablericons.ChevronUp
 import compose.icons.tablericons.Clock
 import compose.icons.tablericons.FileText
+import compose.icons.tablericons.Globe
+import compose.icons.tablericons.Heart
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Message
 import compose.icons.tablericons.User
@@ -103,10 +106,10 @@ fun ClientDashboardScreen(
     avatarPainter: Painter? = null,
     onOpenAppointmentDetail: (String) -> Unit = {},
     onOpenAgenda: () -> Unit = {},
-    onOpenMessages: () -> Unit = {},
     onOpenProfile: () -> Unit = {},
-    onOpenLocations: () -> Unit = {},
-    onOpenReports: () -> Unit = {},
+    onOpenMap: () -> Unit = {},
+    onOpenFavorites: () -> Unit = {},
+    onOpenServices: () -> Unit = {},
     onOpenRequests: () -> Unit = {},
     onOpenCategories: () -> Unit = {},
     onOpenMenu: () -> Unit = {},
@@ -121,13 +124,12 @@ fun ClientDashboardScreen(
       avatarPainter = avatarPainter,
       onOpenAppointmentDetail = onOpenAppointmentDetail,
       onOpenAgenda = onOpenAgenda,
-      onOpenMessages = onOpenMessages,
-      onOpenProfile = onOpenProfile,
-      onOpenLocations = onOpenLocations,
-      onOpenReports = onOpenReports,
+      onOpenFavorites = onOpenFavorites,
+      onOpenMap = onOpenMap,
+      onOpenServices = onOpenServices,
+      onOpenRequests = onOpenRequests,
       onOpenCategories = onOpenCategories,
       onOpenMenu = onOpenMenu,
-      onOpenRequests = onOpenRequests,
   )
 }
 
@@ -138,10 +140,9 @@ private fun ClientDashboardContent(
     clientPhotoUrl: String? = null,
     onOpenAppointmentDetail: (String) -> Unit = {},
     onOpenAgenda: () -> Unit = {},
-    onOpenMessages: () -> Unit = {},
-    onOpenProfile: () -> Unit = {},
-    onOpenLocations: () -> Unit = {},
-    onOpenReports: () -> Unit = {},
+    onOpenFavorites: () -> Unit = {},
+    onOpenMap: () -> Unit = {},
+    onOpenServices: () -> Unit = {},
     onOpenRequests: () -> Unit = {},
     onOpenCategories: () -> Unit = {},
     onOpenMenu: () -> Unit = {},
@@ -223,11 +224,10 @@ private fun ClientDashboardContent(
             item {
               QuickActionsRow(
                   onOpenAgenda = onOpenAgenda,
-                  onOpenMessages = onOpenMessages,
-                  onOpenProfile = onOpenProfile,
-                  onOpenLocations = onOpenLocations,
-                  onOpenReports = onOpenReports,
                   onOpenRequests = onOpenRequests,
+                  onOpenFavorites = onOpenFavorites,
+                  onOpenServices = onOpenServices,
+                  onOpenMap = onOpenMap,
               )
             }
 
@@ -551,11 +551,10 @@ private fun ProgressZeroRing(size: Dp) {
 @Composable
 private fun QuickActionsRow(
     onOpenAgenda: () -> Unit,
-    onOpenMessages: () -> Unit,
-    onOpenProfile: () -> Unit,
-    onOpenLocations: () -> Unit,
-    onOpenReports: () -> Unit,
     onOpenRequests: () -> Unit,
+    onOpenFavorites: () -> Unit,
+    onOpenServices: () -> Unit,
+    onOpenMap: () -> Unit,
 ) {
   Column(modifier = Modifier.fillMaxWidth()) {
     Text(
@@ -573,15 +572,14 @@ private fun QuickActionsRow(
     ) {
       QuickActionItem(label = "AGENDA", icon = TablerIcons.CalendarEvent, onClick = onOpenAgenda)
 
-      QuickActionItem(label = "MENSAJES", icon = TablerIcons.Message, onClick = onOpenMessages)
-
       QuickActionItem(label = "SOLICITUDES", icon = TablerIcons.FileText, onClick = onOpenRequests)
 
-      QuickActionItem(label = "PERFIL", icon = TablerIcons.User, onClick = onOpenProfile)
+      QuickActionItem(label = "FAVORITOS", icon = TablerIcons.Heart, onClick = onOpenFavorites)
 
-      QuickActionItem(label = "UBICACIONES", icon = TablerIcons.MapPin, onClick = onOpenLocations)
+      QuickActionItem(label = "SERVICIOS", icon = TablerIcons.Apps, onClick = onOpenServices)
 
-      QuickActionItem(label = "REPORTES", icon = TablerIcons.ChartBar, onClick = onOpenReports)
+      QuickActionItem(label = "MAPA", icon = TablerIcons.Globe, onClick = onOpenMap)
+
     }
   }
 }

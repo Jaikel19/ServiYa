@@ -61,14 +61,9 @@ fun NavDestination?.isClientScaffoldDestination(): Boolean {
       destination.hasRoute<WorkersList>() ||
       destination.hasRoute<ProfessionalProfile>() ||
       destination.hasRoute<ClientMap>() ||
-      destination.hasRoute<ClientSearch>() ||
       destination.hasRoute<ClientAlerts>() ||
       destination.hasRoute<ClientDashboard>() ||
       destination.hasRoute<ClientAgenda>() ||
-      destination.hasRoute<ClientProfile>() ||
-      destination.hasRoute<ClientMessages>() ||
-      destination.hasRoute<ClientConfiguration>() ||
-      destination.hasRoute<ClientSettings>() ||
       destination.hasRoute<ClientFavorites>() ||
       destination.hasRoute<RequestAppointment>() ||
       destination.hasRoute<ClientRequests>() ||
@@ -137,11 +132,12 @@ fun ClientFeatureBottomBar(
         onCurrentTabChange(ClientTab.MAP)
         navController.navigateSingleTop(ClientMap)
       },
-      onGoSearch = {
+
+      onGoDashboard = {
         onClientMenuExpandedChange(false)
         onWorkerMenuExpandedChange(false)
-        onCurrentTabChange(ClientTab.SEARCH)
-        navController.navigateSingleTop(ClientSearch)
+        onCurrentTabChange(ClientTab.DASHBOARD)
+        navController.navigateSingleTop(ClientDashboard)
       },
       onGoAlerts = {
         onClientMenuExpandedChange(false)
@@ -234,26 +230,6 @@ private fun clientMenuOptions(
           },
       ),
       MenuOption(
-          title = "Perfil",
-          subtitle = "Datos personales e información de la cuenta",
-          icon = TablerIcons.User,
-          iconColor = Color(0xFF8E7CC3),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientProfile)
-          },
-      ),
-      MenuOption(
-          title = "Mensajes",
-          subtitle = "Chats y conversaciones con trabajadores",
-          icon = TablerIcons.Message,
-          iconColor = Color(0xFF67B99A),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientMessages)
-          },
-      ),
-      MenuOption(
           title = "Dashboard",
           subtitle = "Resumen general y actividad reciente",
           icon = TablerIcons.Dashboard,
@@ -261,26 +237,6 @@ private fun clientMenuOptions(
           onClick = {
             closeMenu()
             navController.navigateSingleTop(ClientDashboard)
-          },
-      ),
-      MenuOption(
-          title = "Configuración",
-          subtitle = "Opciones principales de la aplicación",
-          icon = TablerIcons.Settings,
-          iconColor = Color(0xFF9BB85D),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientConfiguration)
-          },
-      ),
-      MenuOption(
-          title = "Ajustes",
-          subtitle = "Preferencias y personalización",
-          icon = TablerIcons.Adjustments,
-          iconColor = Color(0xFFD7B85A),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientSettings)
           },
       ),
       MenuOption(

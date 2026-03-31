@@ -96,7 +96,7 @@ fun WorkersListScreen(
     onFavoritesClick: () -> Unit = {},
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
-    onBottomSearch: () -> Unit = {},
+    onBottomDashboard: () -> Unit = {},
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {},
 ) {
@@ -121,7 +121,7 @@ fun WorkersListScreen(
       onFavoritesClick = onFavoritesClick,
       onBottomServices = onBottomServices,
       onBottomMap = onBottomMap,
-      onBottomSearch = onBottomSearch,
+      onBottomSearch = onBottomDashboard,
       onBottomNotifications = onBottomNotifications,
       onBottomMenu = onBottomMenu,
   )

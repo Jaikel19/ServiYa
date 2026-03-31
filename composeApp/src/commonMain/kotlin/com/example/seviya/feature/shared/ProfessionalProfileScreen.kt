@@ -120,7 +120,7 @@ fun ProfessionalProfileScreen(
         },
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
-    onBottomSearch: () -> Unit = {},
+    onBottomDashboard: () -> Unit = {},
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {},
 ) {
@@ -140,7 +140,7 @@ fun ProfessionalProfileScreen(
       onProcessAppointment = onProcessAppointment,
       onBottomServices = onBottomServices,
       onBottomMap = onBottomMap,
-      onBottomSearch = onBottomSearch,
+      onBottomDashboard = onBottomDashboard,
       onBottomNotifications = onBottomNotifications,
       onBottomMenu = onBottomMenu,
   )
@@ -158,7 +158,7 @@ private fun ProfessionalProfileContent(
         },
     onBottomServices: () -> Unit = {},
     onBottomMap: () -> Unit = {},
-    onBottomSearch: () -> Unit = {},
+    onBottomDashboard: () -> Unit = {},
     onBottomNotifications: () -> Unit = {},
     onBottomMenu: () -> Unit = {},
 ) {

@@ -72,17 +72,19 @@ fun NavGraphBuilder.clientNavGraph(
           navController.navigate(ClientAppointmentDetail(bookingId = bookingId))
         },
         onOpenAgenda = { navController.navigateSingleTop(ClientAgenda) },
-        onOpenMessages = { navController.navigateSingleTop(ClientMessages) },
-        onOpenProfile = { navController.navigateSingleTop(ClientProfile) },
-        onOpenLocations = {
+        onOpenMap = {
           onCurrentClientTabChange(ClientTab.MAP)
           navController.navigateSingleTop(ClientMap)
         },
-        onOpenReports = { navController.navigateSingleTop(ClientConfiguration) },
         onOpenRequests = { navController.navigateSingleTop(ClientRequests) },
+        onOpenFavorites = { navController.navigateSingleTop(ClientFavorites) },
         onOpenCategories = {
           onCurrentClientTabChange(ClientTab.SERVICES)
           navController.navigateSingleTop(ClientHome)
+        },
+        onOpenServices = {
+            onCurrentClientTabChange(ClientTab.SERVICES)
+            navController.navigateSingleTop(ClientHome)
         },
         onOpenMenu = {
           onClientMenuExpandedChange(true)
@@ -101,17 +103,17 @@ fun NavGraphBuilder.clientNavGraph(
           onCurrentClientTabChange(ClientTab.SERVICES)
           navController.navigateSingleTop(ClientHome)
         },
-        onBottomServices = {
-          onCurrentClientTabChange(ClientTab.SERVICES)
-          navController.navigateSingleTop(ClientHome)
+        onBottomDashboard = {
+          onCurrentClientTabChange(ClientTab.DASHBOARD)
+          navController.navigateSingleTop(ClientDashboard)
         },
         onBottomMap = {
           onCurrentClientTabChange(ClientTab.MAP)
           navController.navigateSingleTop(ClientMap)
         },
-        onBottomSearch = {
-          onCurrentClientTabChange(ClientTab.SEARCH)
-          navController.navigateSingleTop(ClientSearch)
+        onBottomServices = {
+          onCurrentClientTabChange(ClientTab.SERVICES)
+          navController.navigateSingleTop(ClientHome)
         },
         onBottomNotifications = {
           onCurrentClientTabChange(ClientTab.ALERTS)
@@ -159,17 +161,17 @@ fun NavGraphBuilder.clientNavGraph(
         onReviewClick = {
           navController.navigate(ClientToWorkerReview(appointmentId = route.bookingId))
         },
-        onGoServices = {
-          onCurrentClientTabChange(ClientTab.SERVICES)
-          navController.navigateSingleTop(ClientHome)
+        onGoDashboard = {
+          onCurrentClientTabChange(ClientTab.DASHBOARD)
+          navController.navigateSingleTop(ClientDashboard)
         },
         onGoMap = {
           onCurrentClientTabChange(ClientTab.MAP)
           navController.navigateSingleTop(ClientMap)
         },
-        onGoSearch = {
-          onCurrentClientTabChange(ClientTab.SEARCH)
-          navController.navigateSingleTop(ClientSearch)
+        onGoServices = {
+          onCurrentClientTabChange(ClientTab.SERVICES)
+          navController.navigateSingleTop(ClientHome)
         },
         onGoAlerts = {
           onCurrentClientTabChange(ClientTab.ALERTS)
@@ -264,27 +266,6 @@ fun NavGraphBuilder.clientNavGraph(
     FeaturePlaceholder(
         title = "Perfil del cliente",
         subtitle = "Aquí irá la información del perfil del cliente.",
-    )
-  }
-
-  composable<ClientMessages> {
-    FeaturePlaceholder(
-        title = "Mensajes",
-        subtitle = "Aquí irán los chats del cliente con los trabajadores.",
-    )
-  }
-
-  composable<ClientConfiguration> {
-    FeaturePlaceholder(
-        title = "Configuración",
-        subtitle = "Aquí irán las opciones principales de configuración del cliente.",
-    )
-  }
-
-  composable<ClientSettings> {
-    FeaturePlaceholder(
-        title = "Ajustes",
-        subtitle = "Aquí irán las preferencias y personalización del cliente.",
     )
   }
 }

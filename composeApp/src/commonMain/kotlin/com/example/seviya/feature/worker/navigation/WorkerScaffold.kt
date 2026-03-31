@@ -59,11 +59,6 @@ fun NavDestination?.isWorkerScaffoldDestination(): Boolean {
       destination.hasRoute<WorkerAgenda>() ||
       destination.hasRoute<WorkerRequests>() ||
       destination.hasRoute<WorkerAlerts>() ||
-      destination.hasRoute<WorkerProfile>() ||
-      destination.hasRoute<WorkerMessages>() ||
-      destination.hasRoute<WorkerConfiguration>() ||
-      destination.hasRoute<WorkerSettings>() ||
-      destination.hasRoute<WorkerReports>() ||
       destination.hasRoute<WorkerPortfolio>() ||
       destination.hasRoute<WorkerServices>() ||
       destination.hasRoute<WorkerSchedule>() ||
@@ -216,7 +211,7 @@ private fun workerMenuOptions(
           },
       ),
       MenuOption(
-          title = "Servicios",
+          title = "Mis Servicios",
           subtitle = "Registrar y modificar servicios ofrecidos",
           icon = TablerIcons.Briefcase,
           iconColor = Color(0xFF4CB5AE),
@@ -243,46 +238,6 @@ private fun workerMenuOptions(
           onClick = {
             closeMenu()
             navController.navigateSingleTop(TravelTimeConfig)
-          },
-      ),
-      MenuOption(
-          title = "Mensajes",
-          subtitle = "Chats y conversaciones con clientes",
-          icon = TablerIcons.Message,
-          iconColor = Color(0xFF67B99A),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(WorkerMessages)
-          },
-      ),
-      MenuOption(
-          title = "Configuración",
-          subtitle = "Opciones principales de la aplicación",
-          icon = TablerIcons.Settings,
-          iconColor = Color(0xFF9BB85D),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(WorkerConfiguration)
-          },
-      ),
-      MenuOption(
-          title = "Ajustes",
-          subtitle = "Preferencias y personalización",
-          icon = TablerIcons.Adjustments,
-          iconColor = Color(0xFFD7B85A),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(WorkerSettings)
-          },
-      ),
-      MenuOption(
-          title = "Reportes",
-          subtitle = "Indicadores, ingresos y desempeño",
-          icon = TablerIcons.ChartBar,
-          iconColor = Color(0xFF5F8EFA),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(WorkerReports)
           },
       ),
       MenuOption(

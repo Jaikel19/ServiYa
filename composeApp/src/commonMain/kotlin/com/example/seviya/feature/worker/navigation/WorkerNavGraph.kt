@@ -44,6 +44,7 @@ import com.example.seviya.feature.worker.WorkerToClientReviewScreen
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
+import com.example.seviya.core.navigation.TravelTimeConfig
 
 fun NavGraphBuilder.workerNavGraph(
     navController: NavHostController,
@@ -57,11 +58,18 @@ fun NavGraphBuilder.workerNavGraph(
   composable<WorkerDashboard> {
     WorkerDashboardScreen(
         workerId = currentWorkerId,
-        onOpenMessages = { navController.navigateSingleTop(WorkerMessages) },
-        onOpenReports = { navController.navigateSingleTop(WorkerReports) },
+        onOpenCategories = {
+            navController.navigateSingleTop(WorkerCategories)
+        },
+        onOpenTravelTime = {
+            navController.navigateSingleTop(TravelTimeConfig)
+        },
+        onOpenDailyAgenda = {
+            onCurrentWorkerTabChange(WorkerTab.AGENDA)
+            navController.navigate(WorkerDailyAgenda(workerId = currentWorkerId))
+        },
         onOpenSchedule = { navController.navigateSingleTop(WorkerSchedule) },
         onOpenPortfolio = { navController.navigateSingleTop(WorkerPortfolio) },
-        onOpenSettings = { navController.navigateSingleTop(WorkerSettings) },
         onOpenAppointmentDetail = { booking ->
           monthlyCalendarViewModel.selectAppointment(booking.toAppointment())
           navController.navigateSingleTop(WorkerAppointmentDetail)
@@ -84,6 +92,10 @@ fun NavGraphBuilder.workerNavGraph(
         workerId = route.workerId,
         onBack = { navController.popBackStack() },
         onOpenMaps = { _, _, _ -> },
+        onOpenAppointmentDetail = { appointment ->
+            monthlyCalendarViewModel.selectAppointment(appointment)
+            navController.navigateSingleTop(WorkerAppointmentDetail)
+        },
     )
   }
 
@@ -148,6 +160,9 @@ fun NavGraphBuilder.workerNavGraph(
           onGoServices = {
             onCurrentWorkerTabChange(WorkerTab.DASHBOARD)
             navController.navigateSingleTop(WorkerDashboard)
+          },
+          onOpenPaymentDetail = { appointmentId ->
+              navController.navigate(WorkerPaymentDetail(bookingId = appointmentId))
           },
           onGoMap = {},
           onGoSearch = {
@@ -214,41 +229,6 @@ fun NavGraphBuilder.workerNavGraph(
     FeaturePlaceholder(
         title = "Alertas del trabajador",
         subtitle = "Aquí irán las alertas y recordatorios del trabajador.",
-    )
-  }
-
-  composable<WorkerProfile> {
-    FeaturePlaceholder(
-        title = "Perfil del trabajador",
-        subtitle = "Aquí irá la información pública y privada del trabajador.",
-    )
-  }
-
-  composable<WorkerMessages> {
-    FeaturePlaceholder(
-        title = "Mensajes",
-        subtitle = "Aquí irán los chats y conversaciones con clientes.",
-    )
-  }
-
-  composable<WorkerConfiguration> {
-    FeaturePlaceholder(
-        title = "Configuración del trabajador",
-        subtitle = "Aquí irán las opciones principales de configuración del trabajador.",
-    )
-  }
-
-  composable<WorkerSettings> {
-    FeaturePlaceholder(
-        title = "Ajustes del trabajador",
-        subtitle = "Aquí irán las preferencias y personalización del trabajador.",
-    )
-  }
-
-  composable<WorkerReports> {
-    FeaturePlaceholder(
-        title = "Reportes",
-        subtitle = "Aquí irán métricas, ingresos y reportes del trabajador.",
     )
   }
 
