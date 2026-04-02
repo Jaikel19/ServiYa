@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
 import com.example.shared.data.repository.ReviewMeta.IReviewMetaRepository
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.cancellation.AppointmentCancellationCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +23,7 @@ class WorkerAppointmentDetailViewModel(
     private val paymentReceiptRepository: IPaymentReceiptRepository,
     private val reviewMetaRepository: IReviewMetaRepository,
     private val appointmentRepository: IAppointmentRepository,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow(WorkerAppointmentDetailUiState())
@@ -136,6 +141,17 @@ class WorkerAppointmentDetailViewModel(
             policyLabel = preview.policyLabel,
             warningMessage = preview.warningMessage,
         )
+
+          notificationsRepository.pushNotification(
+              userId = appointment.clientId,
+              recipientRole = "client",
+              title = "Cita cancelada",
+              message = "${appointment.workerName} canceló la cita programada.",
+              type = NotificationTypes.APPOINTMENT_CANCELLED,
+              appointmentId = appointment.id,
+              deepLink = NotificationDeepLinks.CLIENT_APPOINTMENT_DETAIL,
+              actorId = appointment.workerId,
+          )
 
         _uiState.value =
             _uiState.value.copy(

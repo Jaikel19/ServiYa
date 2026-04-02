@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Address.IAddressRepository
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
 import com.example.shared.domain.entity.Address
 import com.example.shared.domain.entity.Appointment
 import kotlinx.coroutines.Job
@@ -15,6 +19,7 @@ import kotlinx.coroutines.launch
 class RequestAppointmentViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val addressRepository: IAddressRepository,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow(RequestAppointmentUiState())
@@ -72,44 +77,56 @@ class RequestAppointmentViewModel(
     _uiState.value = _uiState.value.copy(selectedAddressId = addressId)
   }
 
-  fun createAppointment(appointment: Appointment) {
-    viewModelScope.launch {
-      _uiState.value =
-          _uiState.value.copy(
-              isCreating = true,
-              isCreated = false,
-              createdAppointmentId = null,
-              errorMessage = null,
-          )
+    fun createAppointment(appointment: Appointment) {
+        viewModelScope.launch {
+            _uiState.value =
+                _uiState.value.copy(
+                    isCreating = true,
+                    isCreated = false,
+                    createdAppointmentId = null,
+                    errorMessage = null,
+                )
 
-      try {
-        val appointmentId =
-            appointmentRepository.createAppointment(appointment.copy(status = "pending"))
+            try {
+                val pendingAppointment = appointment.copy(status = "pending")
+                val appointmentId = appointmentRepository.createAppointment(pendingAppointment)
 
-        if (appointmentId.isBlank()) {
-          _uiState.value =
-              _uiState.value.copy(
-                  isCreating = false,
-                  isCreated = false,
-                  errorMessage = "No se pudo crear la solicitud.",
-              )
-        } else {
-          _uiState.value =
-              _uiState.value.copy(
-                  isCreating = false,
-                  isCreated = true,
-                  createdAppointmentId = appointmentId,
-                  errorMessage = null,
-              )
+                if (appointmentId.isBlank()) {
+                    _uiState.value =
+                        _uiState.value.copy(
+                            isCreating = false,
+                            isCreated = false,
+                            errorMessage = "No se pudo crear la solicitud.",
+                        )
+                } else {
+                    notificationsRepository.pushNotification(
+                        userId = appointment.workerId,
+                        recipientRole = "worker",
+                        title = "Nueva solicitud recibida",
+                        message = "${appointment.clientName} te envió una nueva solicitud de cita.",
+                        type = NotificationTypes.NEW_REQUEST_RECEIVED,
+                        appointmentId = appointmentId,
+                        deepLink = NotificationDeepLinks.WORKER_REQUEST_DETAIL,
+                        actorId = appointment.clientId,
+                    )
+
+                    _uiState.value =
+                        _uiState.value.copy(
+                            isCreating = false,
+                            isCreated = true,
+                            createdAppointmentId = appointmentId,
+                            errorMessage = null,
+                        )
+                }
+            } catch (e: Exception) {
+                _uiState.value =
+                    _uiState.value.copy(
+                        isCreating = false,
+                        isCreated = false,
+                        errorMessage = e.message ?: "Ocurrió un error al crear la solicitud.",
+                    )
+            }
         }
-      } catch (e: Exception) {
-        _uiState.value =
-            _uiState.value.copy(
-                isCreating = false,
-                isCreated = false,
-                errorMessage = e.message ?: "Ocurrió un error al crear la solicitud.",
-            )
-      }
     }
-  }
 }
+

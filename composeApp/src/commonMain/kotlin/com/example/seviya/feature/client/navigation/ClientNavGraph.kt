@@ -11,19 +11,16 @@ import com.example.seviya.core.navigation.CategoriesCatalog
 import com.example.seviya.core.navigation.ClientAgenda
 import com.example.seviya.core.navigation.ClientAlerts
 import com.example.seviya.core.navigation.ClientAppointmentDetail
-import com.example.seviya.core.navigation.ClientConfiguration
 import com.example.seviya.core.navigation.ClientDailyAppointments
 import com.example.seviya.core.navigation.ClientDashboard
 import com.example.seviya.core.navigation.ClientFavorites
 import com.example.seviya.core.navigation.ClientHome
 import com.example.seviya.core.navigation.ClientLocationCatalog
 import com.example.seviya.core.navigation.ClientMap
-import com.example.seviya.core.navigation.ClientMessages
 import com.example.seviya.core.navigation.ClientPaymentUpload
 import com.example.seviya.core.navigation.ClientProfile
 import com.example.seviya.core.navigation.ClientRequests
 import com.example.seviya.core.navigation.ClientSearch
-import com.example.seviya.core.navigation.ClientSettings
 import com.example.seviya.core.navigation.ClientToWorkerReview
 import com.example.seviya.core.navigation.ClientWeeklyAppointments
 import com.example.seviya.core.navigation.ProfessionalProfile
@@ -42,6 +39,7 @@ import com.example.seviya.feature.shared.WeeklyAgendaScreen
 import com.example.seviya.feature.worker.FavoriteWorkersScreen
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
+import com.example.seviya.feature.client.ClientAlertsScreen
 
 fun NavGraphBuilder.clientNavGraph(
     navController: NavHostController,
@@ -200,12 +198,19 @@ fun NavGraphBuilder.clientNavGraph(
     )
   }
 
-  composable<ClientAlerts> {
-    FeaturePlaceholder(
-        title = "Alertas del cliente",
-        subtitle = "Aquí irán las notificaciones y recordatorios del cliente.",
-    )
-  }
+    composable<ClientAlerts> {
+        ClientAlertsScreen(
+            clientId = currentClientId,
+            onBack = { navController.popBackStack() },
+            onOpenAppointmentDetail = { appointmentId ->
+                navController.navigate(ClientAppointmentDetail(bookingId = appointmentId))
+            },
+            onOpenRequests = { navController.navigateSingleTop(ClientRequests) },
+            onOpenPaymentUpload = { appointmentId ->
+                navController.navigate(ClientPaymentUpload(appointmentId = appointmentId))
+            },
+        )
+    }
 
   composable<ClientDailyAppointments> { backStackEntry ->
     val route = backStackEntry.toRoute<ClientDailyAppointments>()

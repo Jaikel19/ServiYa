@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.Review.IReviewRepository
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
 import com.example.shared.domain.entity.Review
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -19,6 +23,7 @@ import kotlinx.datetime.toLocalDateTime
 class ClientToWorkerReviewViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val reviewRepository: IReviewRepository,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow(ClientToWorkerReviewUiState())
@@ -96,6 +101,28 @@ class ClientToWorkerReviewViewModel(
               )
           return@launch
         }
+
+          notificationsRepository.pushNotification(
+              userId = appointment.clientId,
+              recipientRole = "client",
+              title = "Reseña enviada",
+              message = "Tu reseña al trabajador se envió correctamente.",
+              type = NotificationTypes.REVIEW_SUBMITTED_SUCCESS,
+              appointmentId = appointment.id,
+              deepLink = NotificationDeepLinks.CLIENT_APPOINTMENT_DETAIL,
+              actorId = appointment.clientId,
+          )
+
+          notificationsRepository.pushNotification(
+              userId = appointment.workerId,
+              recipientRole = "worker",
+              title = "Nueva reseña recibida",
+              message = "${appointment.clientName} te dejó una nueva reseña.",
+              type = NotificationTypes.REVIEW_RECEIVED,
+              appointmentId = appointment.id,
+              deepLink = NotificationDeepLinks.WORKER_REQUESTS,
+              actorId = appointment.clientId,
+          )
 
         _uiState.value =
             _uiState.value.copy(isSubmitting = false, submitSuccess = true, errorMessage = null)

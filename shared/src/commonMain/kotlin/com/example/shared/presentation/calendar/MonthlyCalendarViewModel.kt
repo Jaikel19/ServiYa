@@ -4,6 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.domain.entity.Appointment
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
+import kotlinx.coroutines.flow.first
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +22,10 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalTime::class)
-class MonthlyCalendarViewModel(private val appointmentRepository: IAppointmentRepository) :
-    ViewModel() {
+class MonthlyCalendarViewModel(
+    private val appointmentRepository: IAppointmentRepository,
+    private val notificationsRepository: INotificationsRepository,
+) : ViewModel() {
 
   private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
@@ -189,15 +196,66 @@ class MonthlyCalendarViewModel(private val appointmentRepository: IAppointmentRe
     }
   }
 
-  fun completeAppointment(appointmentId: String) {
-    viewModelScope.launch {
-      try {
-        appointmentRepository.completeAppointment(appointmentId)
-      } catch (e: Exception) {
-        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al completar cita")
-      }
+    fun completeAppointment(appointmentId: String) {
+        viewModelScope.launch {
+            try {
+                val appointment = appointmentRepository.getAppointmentById(appointmentId).first()
+
+                if (appointment == null) {
+                    _uiState.value = _uiState.value.copy(errorMessage = "No se encontró la cita")
+                    return@launch
+                }
+
+                appointmentRepository.completeAppointment(appointmentId)
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Cita finalizada",
+                    message = "${appointment.workerName} marcó tu cita como finalizada.",
+                    type = NotificationTypes.APPOINTMENT_COMPLETED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_APPOINTMENT_DETAIL,
+                    actorId = appointment.workerId,
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.workerId,
+                    recipientRole = "worker",
+                    title = "Cita finalizada",
+                    message = "La cita con ${appointment.clientName} fue finalizada correctamente.",
+                    type = NotificationTypes.APPOINTMENT_COMPLETED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.WORKER_REQUESTS,
+                    actorId = appointment.clientId,
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Reseña pendiente",
+                    message = "La cita finalizó. Ahora debes calificar al trabajador.",
+                    type = NotificationTypes.REVIEW_PENDING_CLIENT,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_APPOINTMENT_DETAIL,
+                    actorId = appointment.workerId,
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.workerId,
+                    recipientRole = "worker",
+                    title = "Reseña pendiente",
+                    message = "La cita finalizó. Ahora puedes calificar al cliente.",
+                    type = NotificationTypes.REVIEW_PENDING_WORKER,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.WORKER_REQUESTS,
+                    actorId = appointment.clientId,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al completar cita")
+            }
+        }
     }
-  }
 
   fun rejectAppointmentByWorker(appointmentId: String) {
     viewModelScope.launch {

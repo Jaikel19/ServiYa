@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.PaymentReceipt
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +21,7 @@ import kotlinx.coroutines.launch
 class WorkerRequestsViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val paymentReceiptRepository: IPaymentReceiptRepository,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(WorkerRequestsUiState())
@@ -96,32 +101,65 @@ class WorkerRequestsViewModel(
     }
   }
 
-  fun acceptRequest(appointment: Appointment) {
-    viewModelScope.launch {
-      // Aprobar la cita
-      appointmentRepository.approveAppointment(appointment.id)
+    fun acceptRequest(appointment: Appointment) {
+        viewModelScope.launch {
+            appointmentRepository.approveAppointment(appointment.id)
 
-      // Crear PaymentReceipt con campos vacíos y status "pending"
-      val receipt =
-          PaymentReceipt(
-              id = "",
-              attemptNumber = 0L,
-              imageUrl = "",
-              note = null,
-              sentAt = "",
-              reviewedAt = null,
-              reviewedBy = null,
-              rejectionReason = null,
-              status = "pending",
-          )
+            val receipt =
+                PaymentReceipt(
+                    id = "",
+                    attemptNumber = 0L,
+                    imageUrl = "",
+                    note = null,
+                    sentAt = "",
+                    reviewedAt = null,
+                    reviewedBy = null,
+                    rejectionReason = null,
+                    status = "pending",
+                )
 
-      paymentReceiptRepository.createReceipt(appointmentId = appointment.id, receipt = receipt)
+            paymentReceiptRepository.createReceipt(appointmentId = appointment.id, receipt = receipt)
+
+            notificationsRepository.pushNotification(
+                userId = appointment.clientId,
+                recipientRole = "client",
+                title = "Solicitud aceptada",
+                message = "${appointment.workerName} aceptó tu solicitud de cita.",
+                type = NotificationTypes.REQUEST_ACCEPTED,
+                appointmentId = appointment.id,
+                deepLink = NotificationDeepLinks.CLIENT_PAYMENT_UPLOAD,
+                actorId = appointment.workerId,
+            )
+
+            notificationsRepository.pushNotification(
+                userId = appointment.clientId,
+                recipientRole = "client",
+                title = "Pago pendiente",
+                message = "Tu solicitud fue aceptada. Ahora debes subir el comprobante SINPE.",
+                type = NotificationTypes.PAYMENT_PENDING,
+                appointmentId = appointment.id,
+                deepLink = NotificationDeepLinks.CLIENT_PAYMENT_UPLOAD,
+                actorId = appointment.workerId,
+            )
+        }
     }
-  }
 
-  fun rejectRequest(appointment: Appointment) {
-    viewModelScope.launch { appointmentRepository.rejectAppointmentByWorker(appointment.id) }
-  }
+    fun rejectRequest(appointment: Appointment) {
+        viewModelScope.launch {
+            appointmentRepository.rejectAppointmentByWorker(appointment.id)
+
+            notificationsRepository.pushNotification(
+                userId = appointment.clientId,
+                recipientRole = "client",
+                title = "Solicitud rechazada",
+                message = "${appointment.workerName} rechazó tu solicitud de cita.",
+                type = NotificationTypes.REQUEST_REJECTED,
+                appointmentId = appointment.id,
+                deepLink = NotificationDeepLinks.CLIENT_REQUESTS,
+                actorId = appointment.workerId,
+            )
+        }
+    }
 
   fun confirmPayment(appointment: Appointment, receiptId: String) {
     viewModelScope.launch {

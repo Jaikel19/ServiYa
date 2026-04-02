@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +22,7 @@ import kotlinx.datetime.toLocalDateTime
 class WorkerPaymentDetailViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val paymentReceiptRepository: IPaymentReceiptRepository,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow(WorkerPaymentDetailUiState())
@@ -51,56 +56,89 @@ class WorkerPaymentDetailViewModel(
     }
   }
 
-  fun verifyPayment() {
-    val appointment = _uiState.value.appointment ?: return
-    val receipt = _uiState.value.paymentReceipt ?: return
+    fun verifyPayment() {
+        val appointment = _uiState.value.appointment ?: return
+        val receipt = _uiState.value.paymentReceipt ?: return
 
-    viewModelScope.launch {
-      try {
-        val now = currentDateTimeString()
+        viewModelScope.launch {
+            try {
+                val now = currentDateTimeString()
 
-        paymentReceiptRepository.updateReceiptStatus(
-            appointmentId = appointment.id,
-            receiptId = receipt.id,
-            status = "APPROVED",
-            note = null,
-            reviewedAt = now,
-            reviewedBy = appointment.workerId,
-            rejectionReason = null,
-        )
+                paymentReceiptRepository.updateReceiptStatus(
+                    appointmentId = appointment.id,
+                    receiptId = receipt.id,
+                    status = "APPROVED",
+                    note = null,
+                    reviewedAt = now,
+                    reviewedBy = appointment.workerId,
+                    rejectionReason = null,
+                )
 
-        appointmentRepository.confirmPayment(appointment.id)
+                appointmentRepository.confirmPayment(appointment.id)
 
-        _uiState.value = _uiState.value.copy(paymentVerified = true, errorMessage = null)
-      } catch (e: Exception) {
-        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error verificando pago")
-      }
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Pago verificado",
+                    message = "Tu pago fue verificado y la cita quedó confirmada.",
+                    type = NotificationTypes.PAYMENT_VERIFIED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_APPOINTMENT_DETAIL,
+                    actorId = appointment.workerId,
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.workerId,
+                    recipientRole = "worker",
+                    title = "Cita confirmada",
+                    message = "El pago de ${appointment.clientName} fue verificado y la cita quedó confirmada.",
+                    type = NotificationTypes.APPOINTMENT_CONFIRMED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.WORKER_DAILY_APPOINTMENTS,
+                    actorId = appointment.clientId,
+                )
+
+                _uiState.value = _uiState.value.copy(paymentVerified = true, errorMessage = null)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error verificando pago")
+            }
+        }
     }
-  }
 
-  fun reportProblem() {
-    val appointment = _uiState.value.appointment ?: return
-    val receipt = _uiState.value.paymentReceipt ?: return
+    fun reportProblem() {
+        val appointment = _uiState.value.appointment ?: return
+        val receipt = _uiState.value.paymentReceipt ?: return
 
-    viewModelScope.launch {
-      try {
-        val now = currentDateTimeString()
+        viewModelScope.launch {
+            try {
+                val now = currentDateTimeString()
 
-        paymentReceiptRepository.updateReceiptStatus(
-            appointmentId = appointment.id,
-            receiptId = receipt.id,
-            status = "REJECTED",
-            note = "Problema con comprobante",
-            reviewedAt = now,
-            reviewedBy = appointment.workerId,
-            rejectionReason = "Problema con comprobante",
-        )
-      } catch (e: Exception) {
-        _uiState.value =
-            _uiState.value.copy(errorMessage = e.message ?: "Error reportando problema con pago")
-      }
+                paymentReceiptRepository.updateReceiptStatus(
+                    appointmentId = appointment.id,
+                    receiptId = receipt.id,
+                    status = "REJECTED",
+                    note = "Problema con comprobante",
+                    reviewedAt = now,
+                    reviewedBy = appointment.workerId,
+                    rejectionReason = "Problema con comprobante",
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Problema con el pago",
+                    message = "${appointment.workerName} reportó un problema con tu comprobante de pago.",
+                    type = NotificationTypes.PAYMENT_ISSUE,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_REQUESTS,
+                    actorId = appointment.workerId,
+                )
+            } catch (e: Exception) {
+                _uiState.value =
+                    _uiState.value.copy(errorMessage = e.message ?: "Error reportando problema con pago")
+            }
+        }
     }
-  }
 
   private fun currentDateTimeString(): String {
     val now = Clock.System.now()

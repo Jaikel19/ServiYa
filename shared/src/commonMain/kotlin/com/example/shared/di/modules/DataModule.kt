@@ -59,6 +59,10 @@ import com.example.shared.data.repository.professionalProfile.IProfessionalProfi
 import com.example.shared.data.repository.professionalProfile.ProfessionalProfileRepository
 import com.example.shared.data.repository.workersList.IWorkersListRepository
 import com.example.shared.data.repository.workersList.WorkersListRepository
+import com.example.shared.data.remote.notifications.IRemoteNotificationsDataSource
+import com.example.shared.data.remote.notifications.RemoteNotificationsDataSource
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.data.repository.notifications.NotificationsRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -126,6 +130,10 @@ val dataModule = module {
   // reviewMeta
   single<IRemoteReviewMetaDataSource> { RemoteReviewMetaDataSource() }
   single<IReviewMetaRepository> { ReviewMetaRepository(get()) }
+
+  // Notifications
+  single<IRemoteNotificationsDataSource> { RemoteNotificationsDataSource() }
+  single<INotificationsRepository> { NotificationsRepository(get()) }
 
   single<IRemoteUserDataSource> { RemoteUserDataSource() }
   single<IUserRepository> { UserRepository(get()) }
