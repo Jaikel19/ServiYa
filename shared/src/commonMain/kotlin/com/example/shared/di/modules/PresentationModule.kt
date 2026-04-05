@@ -25,6 +25,7 @@ import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppo
 import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
+import com.example.shared.presentation.notifications.NotificationsViewModel
 import org.koin.dsl.module
 
 val presentationModule = module {
@@ -32,28 +33,29 @@ val presentationModule = module {
   // ViewModels: LoginViewModel, RegisterViewModel, etc...
 
   factory { ServicesViewModel(get()) }
-  factory { MonthlyCalendarViewModel(get()) }
+  factory { MonthlyCalendarViewModel(get(), get()) }
   factory { DailyAgendaViewModel(get()) }
   factory { ProfessionalProfileViewModel(get()) }
   factory { CategoriesViewModel(get()) }
   factory { WorkersListViewModel(get(), get()) }
-  factory { ClientAppointmentDetailViewModel(get(), get(), get(), get()) }
+  factory { ClientAppointmentDetailViewModel(get(), get(), get(), get(), get()) }
   factory { WorkerDashboardViewModel(get(), get()) }
   factory { ClientDashboardViewModel(get()) }
-  factory { RequestAppointmentViewModel(get(), get()) }
-  factory { WorkerRequestsViewModel(get(), get()) }
-  factory { WorkerPaymentDetailViewModel(get(), get()) }
-  factory { WorkerAppointmentDetailViewModel(get(), get(), get()) }
+  factory { RequestAppointmentViewModel(get(), get(), get()) }
+  factory { WorkerRequestsViewModel(get(), get(), get()) }
+  factory { WorkerPaymentDetailViewModel(get(), get(), get()) }
+  factory { WorkerAppointmentDetailViewModel(get(), get(), get(), get()) }
   factory { FavoriteWorkersViewModel(get()) }
   factory { ClientRequestsViewModel(get()) }
-  factory { WorkerStartAppointmentOtpViewModel(get(), get()) }
+  factory { WorkerStartAppointmentOtpViewModel(get(), get(), get()) }
   factory { ClientMapViewModel(get()) }
-  factory { WorkerRequestDetailViewModel(get(), get()) }
-  factory { ClientPaymentUploadViewModel(get(), get(), get()) }
+  factory { WorkerRequestDetailViewModel(get(), get(), get()) }
+  factory { ClientPaymentUploadViewModel(get(), get(), get(), get()) }
   factory { WorkerDailyAppointmentsViewModel(get()) }
   factory { ClientLocationCatalogViewModel(get()) }
   factory { WorkerCategoriesViewModel(get(), get()) }
   factory { WorkerTravelTimeViewModel(get()) }
-  factory { WorkerToClientReviewViewModel(get(), get()) }
-  factory { ClientToWorkerReviewViewModel(get(), get()) }
+  factory { WorkerToClientReviewViewModel(get(), get(), get()) }
+  factory { ClientToWorkerReviewViewModel(get(), get(), get()) }
+  factory { NotificationsViewModel(get()) }
 }

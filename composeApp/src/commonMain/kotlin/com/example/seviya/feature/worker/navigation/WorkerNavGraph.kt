@@ -16,16 +16,12 @@ import com.example.seviya.core.navigation.WorkerConfiguration
 import com.example.seviya.core.navigation.WorkerDailyAgenda
 import com.example.seviya.core.navigation.WorkerDailyAppointments
 import com.example.seviya.core.navigation.WorkerDashboard
-import com.example.seviya.core.navigation.WorkerMessages
 import com.example.seviya.core.navigation.WorkerPaymentDetail
 import com.example.seviya.core.navigation.WorkerPortfolio
-import com.example.seviya.core.navigation.WorkerProfile
-import com.example.seviya.core.navigation.WorkerReports
 import com.example.seviya.core.navigation.WorkerRequestDetail
 import com.example.seviya.core.navigation.WorkerRequests
 import com.example.seviya.core.navigation.WorkerSchedule
 import com.example.seviya.core.navigation.WorkerServices
-import com.example.seviya.core.navigation.WorkerSettings
 import com.example.seviya.core.navigation.WorkerStartAppointmentOtp
 import com.example.seviya.core.navigation.WorkerToClientReview
 import com.example.seviya.core.navigation.WorkerWeeklyAppointments
@@ -45,6 +41,8 @@ import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.seviya.core.navigation.TravelTimeConfig
+import com.example.seviya.feature.worker.WorkerAlertsScreen
+import com.example.seviya.core.navigation.ProfessionalProfile
 
 fun NavGraphBuilder.workerNavGraph(
     navController: NavHostController,
@@ -225,12 +223,34 @@ fun NavGraphBuilder.workerNavGraph(
     )
   }
 
-  composable<WorkerAlerts> {
-    FeaturePlaceholder(
-        title = "Alertas del trabajador",
-        subtitle = "Aquí irán las alertas y recordatorios del trabajador.",
-    )
-  }
+    composable<WorkerAlerts> {
+        WorkerAlertsScreen(
+            workerId = currentWorkerId,
+            onBack = { navController.popBackStack() },
+            onOpenRequestDetail = { appointmentId ->
+                navController.navigate(WorkerRequestDetail(bookingId = appointmentId))
+            },
+            onOpenPaymentDetail = { appointmentId ->
+                navController.navigate(WorkerPaymentDetail(bookingId = appointmentId))
+            },
+            onOpenRequests = { navController.navigateSingleTop(WorkerRequests) },
+            onOpenDailyAppointments = { workerId ->
+                navController.navigateSingleTop(WorkerDailyAppointments(workerId = workerId))
+            },
+            onOpenAppointmentDetail = { appointmentId ->
+                openWorkerAppointmentDetailFromAlert(
+                    appointmentId = appointmentId,
+                    workerId = currentWorkerId,
+                    selectedAppointment = selectedAppointment,
+                    monthlyCalendarViewModel = monthlyCalendarViewModel,
+                    navController = navController,
+                )
+            },
+            onOpenProfessionalProfile = { workerId ->
+                navController.navigate(ProfessionalProfile(workerId = workerId))
+            },
+        )
+    }
 
   composable<WorkerPortfolio> {
     FeaturePlaceholder(
@@ -266,4 +286,21 @@ fun NavGraphBuilder.workerNavGraph(
         onSubmitSuccess = { navController.popBackStack() },
     )
   }
+}
+
+private fun openWorkerAppointmentDetailFromAlert(
+    appointmentId: String,
+    workerId: String,
+    selectedAppointment: Appointment?,
+    monthlyCalendarViewModel: MonthlyCalendarViewModel,
+    navController: NavHostController,
+) {
+    val currentSelected = selectedAppointment?.takeIf { it.id == appointmentId }
+
+    if (currentSelected != null) {
+        monthlyCalendarViewModel.selectAppointment(currentSelected)
+        navController.navigateSingleTop(WorkerAppointmentDetail)
+    } else {
+        navController.navigateSingleTop(WorkerDailyAppointments(workerId = workerId))
+    }
 }

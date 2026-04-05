@@ -54,21 +54,21 @@ import compose.icons.tablericons.Settings
 import compose.icons.tablericons.User
 
 fun NavDestination?.isClientScaffoldDestination(): Boolean {
-  val destination = this ?: return false
+    val destination = this ?: return false
 
-  return destination.hasRoute<ClientHome>() ||
-      destination.hasRoute<CategoriesCatalog>() ||
-      destination.hasRoute<WorkersList>() ||
-      destination.hasRoute<ProfessionalProfile>() ||
-      destination.hasRoute<ClientMap>() ||
-      destination.hasRoute<ClientAlerts>() ||
-      destination.hasRoute<ClientDashboard>() ||
-      destination.hasRoute<ClientAgenda>() ||
-      destination.hasRoute<ClientFavorites>() ||
-      destination.hasRoute<RequestAppointment>() ||
-      destination.hasRoute<ClientRequests>() ||
-      destination.hasRoute<ClientPaymentUpload>() ||
-      destination.hasRoute<ClientLocationCatalog>()
+    return destination.hasRoute<ClientHome>() ||
+            destination.hasRoute<CategoriesCatalog>() ||
+            destination.hasRoute<WorkersList>() ||
+            destination.hasRoute<ProfessionalProfile>() ||
+            destination.hasRoute<ClientMap>() ||
+            destination.hasRoute<ClientAlerts>() ||
+            destination.hasRoute<ClientDashboard>() ||
+            destination.hasRoute<ClientAgenda>() ||
+            destination.hasRoute<ClientFavorites>() ||
+            destination.hasRoute<RequestAppointment>() ||
+            destination.hasRoute<ClientRequests>() ||
+            destination.hasRoute<ClientPaymentUpload>() ||
+            destination.hasRoute<ClientLocationCatalog>()
 }
 
 @Composable
@@ -76,36 +76,38 @@ fun ClientScaffold(
     navController: NavHostController,
     currentTab: ClientTab,
     menuExpanded: Boolean,
+    unreadAlertsCount: Int,
     onCurrentTabChange: (ClientTab) -> Unit,
     onClientMenuExpandedChange: (Boolean) -> Unit,
     onWorkerMenuExpandedChange: (Boolean) -> Unit,
     onLogout: () -> Unit,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-  Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = {
-          ClientFeatureBottomBar(
-              navController = navController,
-              currentTab = currentTab,
-              menuExpanded = menuExpanded,
-              onCurrentTabChange = onCurrentTabChange,
-              onClientMenuExpandedChange = onClientMenuExpandedChange,
-              onWorkerMenuExpandedChange = onWorkerMenuExpandedChange,
-          )
-        },
-    ) { innerPadding ->
-      content(innerPadding)
-    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            bottomBar = {
+                ClientFeatureBottomBar(
+                    navController = navController,
+                    currentTab = currentTab,
+                    menuExpanded = menuExpanded,
+                    unreadAlertsCount = unreadAlertsCount,
+                    onCurrentTabChange = onCurrentTabChange,
+                    onClientMenuExpandedChange = onClientMenuExpandedChange,
+                    onWorkerMenuExpandedChange = onWorkerMenuExpandedChange,
+                )
+            },
+        ) { innerPadding ->
+            content(innerPadding)
+        }
 
-    ClientFeatureMenu(
-        navController = navController,
-        menuExpanded = menuExpanded,
-        onClientMenuExpandedChange = onClientMenuExpandedChange,
-        onLogout = onLogout,
-    )
-  }
+        ClientFeatureMenu(
+            navController = navController,
+            menuExpanded = menuExpanded,
+            onClientMenuExpandedChange = onClientMenuExpandedChange,
+            onLogout = onLogout,
+        )
+    }
 }
 
 @Composable
@@ -113,43 +115,44 @@ fun ClientFeatureBottomBar(
     navController: NavHostController,
     currentTab: ClientTab,
     menuExpanded: Boolean,
+    unreadAlertsCount: Int,
     onCurrentTabChange: (ClientTab) -> Unit,
     onClientMenuExpandedChange: (Boolean) -> Unit,
     onWorkerMenuExpandedChange: (Boolean) -> Unit,
 ) {
-  ClientBottomBar(
-      currentTab = currentTab,
-      menuActive = menuExpanded,
-      onGoServices = {
-        onClientMenuExpandedChange(false)
-        onWorkerMenuExpandedChange(false)
-        onCurrentTabChange(ClientTab.SERVICES)
-        navController.navigateSingleTop(ClientHome)
-      },
-      onGoMap = {
-        onClientMenuExpandedChange(false)
-        onWorkerMenuExpandedChange(false)
-        onCurrentTabChange(ClientTab.MAP)
-        navController.navigateSingleTop(ClientMap)
-      },
-
-      onGoDashboard = {
-        onClientMenuExpandedChange(false)
-        onWorkerMenuExpandedChange(false)
-        onCurrentTabChange(ClientTab.DASHBOARD)
-        navController.navigateSingleTop(ClientDashboard)
-      },
-      onGoAlerts = {
-        onClientMenuExpandedChange(false)
-        onWorkerMenuExpandedChange(false)
-        onCurrentTabChange(ClientTab.ALERTS)
-        navController.navigateSingleTop(ClientAlerts)
-      },
-      onGoMenu = {
-        onWorkerMenuExpandedChange(false)
-        onClientMenuExpandedChange(!menuExpanded)
-      },
-  )
+    ClientBottomBar(
+        currentTab = currentTab,
+        menuActive = menuExpanded,
+        unreadAlertsCount = unreadAlertsCount,
+        onGoServices = {
+            onClientMenuExpandedChange(false)
+            onWorkerMenuExpandedChange(false)
+            onCurrentTabChange(ClientTab.SERVICES)
+            navController.navigateSingleTop(ClientHome)
+        },
+        onGoMap = {
+            onClientMenuExpandedChange(false)
+            onWorkerMenuExpandedChange(false)
+            onCurrentTabChange(ClientTab.MAP)
+            navController.navigateSingleTop(ClientMap)
+        },
+        onGoDashboard = {
+            onClientMenuExpandedChange(false)
+            onWorkerMenuExpandedChange(false)
+            onCurrentTabChange(ClientTab.DASHBOARD)
+            navController.navigateSingleTop(ClientDashboard)
+        },
+        onGoAlerts = {
+            onClientMenuExpandedChange(false)
+            onWorkerMenuExpandedChange(false)
+            onCurrentTabChange(ClientTab.ALERTS)
+            navController.navigateSingleTop(ClientAlerts)
+        },
+        onGoMenu = {
+            onWorkerMenuExpandedChange(false)
+            onClientMenuExpandedChange(!menuExpanded)
+        },
+    )
 }
 
 @Composable
@@ -159,28 +162,28 @@ fun ClientFeatureMenu(
     onClientMenuExpandedChange: (Boolean) -> Unit,
     onLogout: () -> Unit,
 ) {
-  AnimatedVisibility(
-      visible = menuExpanded,
-      enter =
-          slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) +
-              fadeIn(animationSpec = tween(220)) +
-              scaleIn(initialScale = 0.98f, animationSpec = tween(300)),
-      exit =
-          slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(260)) +
-              fadeOut(animationSpec = tween(180)) +
-              scaleOut(targetScale = 0.98f, animationSpec = tween(260)),
-  ) {
-    FullScreenMenu(
-        title = "Menú cliente",
-        options =
-            clientMenuOptions(
-                navController = navController,
-                closeMenu = { onClientMenuExpandedChange(false) },
-                onLogout = onLogout,
-            ),
-        onDismiss = { onClientMenuExpandedChange(false) },
-    )
-  }
+    AnimatedVisibility(
+        visible = menuExpanded,
+        enter =
+            slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) +
+                    fadeIn(animationSpec = tween(220)) +
+                    scaleIn(initialScale = 0.98f, animationSpec = tween(300)),
+        exit =
+            slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(260)) +
+                    fadeOut(animationSpec = tween(180)) +
+                    scaleOut(targetScale = 0.98f, animationSpec = tween(260)),
+    ) {
+        FullScreenMenu(
+            title = "Menú cliente",
+            options =
+                clientMenuOptions(
+                    navController = navController,
+                    closeMenu = { onClientMenuExpandedChange(false) },
+                    onLogout = onLogout,
+                ),
+            onDismiss = { onClientMenuExpandedChange(false) },
+        )
+    }
 }
 
 private fun clientMenuOptions(
@@ -188,63 +191,63 @@ private fun clientMenuOptions(
     closeMenu: () -> Unit,
     onLogout: () -> Unit,
 ): List<MenuOption> {
-  return listOf(
-      MenuOption(
-          title = "Agenda",
-          subtitle = "Citas, historial y seguimiento",
-          icon = TablerIcons.CalendarEvent,
-          iconColor = Color(0xFF5FA8D3),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientAgenda)
-          },
-      ),
-      MenuOption(
-          title = "Solicitudes",
-          subtitle = "Seguimiento de solicitudes y comprobantes",
-          icon = TablerIcons.Dashboard,
-          iconColor = Color(0xFF4F8CFF),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientRequests)
-          },
-      ),
-      MenuOption(
-          title = "Favoritos",
-          subtitle = "Trabajadores guardados por el cliente",
-          icon = TablerIcons.Briefcase,
-          iconColor = Color(0xFFE77E9B),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientFavorites)
-          },
-      ),
-      MenuOption(
-          title = "Mis Ubicaciones",
-          subtitle = "Gestiona tus direcciones frecuentes",
-          icon = TablerIcons.MapPin,
-          iconColor = Color(0xFF4A9EC7),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientLocationCatalog)
-          },
-      ),
-      MenuOption(
-          title = "Dashboard",
-          subtitle = "Resumen general y actividad reciente",
-          icon = TablerIcons.Dashboard,
-          iconColor = Color(0xFFE29C7A),
-          onClick = {
-            closeMenu()
-            navController.navigateSingleTop(ClientDashboard)
-          },
-      ),
-      MenuOption(
-          title = "Cerrar sesión",
-          subtitle = "Salir de la cuenta y volver al inicio",
-          icon = TablerIcons.Logout,
-          iconColor = Color(0xFFEF4444),
-          onClick = onLogout,
-      ),
-  )
+    return listOf(
+        MenuOption(
+            title = "Agenda",
+            subtitle = "Citas, historial y seguimiento",
+            icon = TablerIcons.CalendarEvent,
+            iconColor = Color(0xFF5FA8D3),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientAgenda)
+            },
+        ),
+        MenuOption(
+            title = "Solicitudes",
+            subtitle = "Seguimiento de solicitudes y comprobantes",
+            icon = TablerIcons.Dashboard,
+            iconColor = Color(0xFF4F8CFF),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientRequests)
+            },
+        ),
+        MenuOption(
+            title = "Favoritos",
+            subtitle = "Trabajadores guardados por el cliente",
+            icon = TablerIcons.Briefcase,
+            iconColor = Color(0xFFE77E9B),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientFavorites)
+            },
+        ),
+        MenuOption(
+            title = "Mis Ubicaciones",
+            subtitle = "Gestiona tus direcciones frecuentes",
+            icon = TablerIcons.MapPin,
+            iconColor = Color(0xFF4A9EC7),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientLocationCatalog)
+            },
+        ),
+        MenuOption(
+            title = "Dashboard",
+            subtitle = "Resumen general y actividad reciente",
+            icon = TablerIcons.Dashboard,
+            iconColor = Color(0xFFE29C7A),
+            onClick = {
+                closeMenu()
+                navController.navigateSingleTop(ClientDashboard)
+            },
+        ),
+        MenuOption(
+            title = "Cerrar sesión",
+            subtitle = "Salir de la cuenta y volver al inicio",
+            icon = TablerIcons.Logout,
+            iconColor = Color(0xFFEF4444),
+            onClick = onLogout,
+        ),
+    )
 }

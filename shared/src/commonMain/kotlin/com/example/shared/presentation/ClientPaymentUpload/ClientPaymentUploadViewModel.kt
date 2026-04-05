@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.shared.data.cloudinary.CloudinaryService
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptRepository
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +20,7 @@ class ClientPaymentUploadViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val paymentReceiptRepository: IPaymentReceiptRepository,
     private val cloudinaryService: CloudinaryService,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(ClientPaymentUploadUiState())
@@ -46,29 +51,42 @@ class ClientPaymentUploadViewModel(
     }
   }
 
-  fun onImageUploaded(imageUrl: String) {
-    val appointment = _state.value.appointment ?: return
-    val receipt = _state.value.paymentReceipt ?: return
+    fun onImageUploaded(imageUrl: String) {
+        val appointment = _state.value.appointment ?: return
+        val receipt = _state.value.paymentReceipt ?: return
 
-    viewModelScope.launch {
-      _state.value = _state.value.copy(isUploading = true)
-      try {
-        paymentReceiptRepository.updateReceiptImageUrl(
-            appointmentId = appointment.id,
-            receiptId = receipt.id,
-            imageUrl = imageUrl,
-        )
-        appointmentRepository.markPaymentPending(appointment.id)
-        _state.value = _state.value.copy(isUploading = false, uploadSuccess = true)
-      } catch (e: Exception) {
-        _state.value =
-            _state.value.copy(
-                isUploading = false,
-                errorMessage = e.message ?: "Error guardando comprobante",
-            )
-      }
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isUploading = true)
+            try {
+                paymentReceiptRepository.updateReceiptImageUrl(
+                    appointmentId = appointment.id,
+                    receiptId = receipt.id,
+                    imageUrl = imageUrl,
+                )
+
+                appointmentRepository.markPaymentPending(appointment.id)
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.workerId,
+                    recipientRole = "worker",
+                    title = "Comprobante recibido",
+                    message = "${appointment.clientName} subió un comprobante de pago para revisión.",
+                    type = NotificationTypes.PAYMENT_RECEIPT_UPLOADED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.WORKER_PAYMENT_DETAIL,
+                    actorId = appointment.clientId,
+                )
+
+                _state.value = _state.value.copy(isUploading = false, uploadSuccess = true)
+            } catch (e: Exception) {
+                _state.value =
+                    _state.value.copy(
+                        isUploading = false,
+                        errorMessage = e.message ?: "Error guardando comprobante",
+                    )
+            }
+        }
     }
-  }
 
   fun onUploadError(message: String) {
     _state.value = _state.value.copy(isUploading = false, errorMessage = message)
@@ -78,42 +96,50 @@ class ClientPaymentUploadViewModel(
     _state.value = _state.value.copy(selectedImageBytes = imageBytes)
   }
 
-  fun uploadReceipt() {
-    val appointment = _state.value.appointment ?: return
-    val receipt = _state.value.paymentReceipt ?: return
-    val imageBytes = _state.value.selectedImageBytes ?: return
+    fun uploadReceipt() {
+        val appointment = _state.value.appointment ?: return
+        val receipt = _state.value.paymentReceipt ?: return
+        val imageBytes = _state.value.selectedImageBytes ?: return
 
-    viewModelScope.launch {
-      _state.value = _state.value.copy(isUploading = true, errorMessage = null)
-      try {
-        // Subir imagen a Cloudinary
-        val imageUrl =
-            cloudinaryService.uploadImage(imageBytes = imageBytes, fileName = "receipttest123")
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isUploading = true, errorMessage = null)
+            try {
+                val imageUrl =
+                    cloudinaryService.uploadImage(imageBytes = imageBytes, fileName = "receipttest123")
 
-        if (imageUrl.isBlank()) {
-          _state.value =
-              _state.value.copy(isUploading = false, errorMessage = "Error al subir la imagen")
-          return@launch
+                if (imageUrl.isBlank()) {
+                    _state.value =
+                        _state.value.copy(isUploading = false, errorMessage = "Error al subir la imagen")
+                    return@launch
+                }
+
+                paymentReceiptRepository.updateReceiptImageUrl(
+                    appointmentId = appointment.id,
+                    receiptId = receipt.id,
+                    imageUrl = imageUrl,
+                )
+
+                appointmentRepository.markPaymentPending(appointment.id)
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.workerId,
+                    recipientRole = "worker",
+                    title = "Comprobante recibido",
+                    message = "${appointment.clientName} subió un comprobante de pago para revisión.",
+                    type = NotificationTypes.PAYMENT_RECEIPT_UPLOADED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.WORKER_PAYMENT_DETAIL,
+                    actorId = appointment.clientId,
+                )
+
+                _state.value = _state.value.copy(isUploading = false, uploadSuccess = true)
+            } catch (e: Exception) {
+                _state.value =
+                    _state.value.copy(
+                        isUploading = false,
+                        errorMessage = e.message ?: "Error subiendo comprobante",
+                    )
+            }
         }
-
-        // Actualizar imageUrl en el receipt (status se mantiene "pending")
-        paymentReceiptRepository.updateReceiptImageUrl(
-            appointmentId = appointment.id,
-            receiptId = receipt.id,
-            imageUrl = imageUrl,
-        )
-
-        // Cambiar Appointment a payment_pending
-        appointmentRepository.markPaymentPending(appointment.id)
-
-        _state.value = _state.value.copy(isUploading = false, uploadSuccess = true)
-      } catch (e: Exception) {
-        _state.value =
-            _state.value.copy(
-                isUploading = false,
-                errorMessage = e.message ?: "Error subiendo comprobante",
-            )
-      }
     }
-  }
 }
