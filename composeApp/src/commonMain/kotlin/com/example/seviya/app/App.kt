@@ -1,6 +1,5 @@
 package com.example.seviya.app
 
-// esto se agrego para que sirva drante la migracion de booking
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +42,6 @@ import com.example.shared.domain.entity.Address
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.domain.entity.AppointmentLocation
 import com.example.shared.domain.entity.AppointmentService
-import com.example.shared.domain.entity.Booking
 import com.example.shared.domain.entity.Service
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.notifications.NotificationsViewModel
@@ -325,96 +323,6 @@ private fun NavHostController.navigateToLandingClearingStack() {
         launchSingleTop = true
         restoreState = false
     }
-}
-
-// esto siguiente se tiene que borrar apenas todas las clases dejen de recibir booking
-internal fun Booking.toAppointment(): Appointment {
-    return Appointment(
-        id = id,
-        clientId = clientId,
-        clientName = clientName,
-        workerId = workerId,
-        workerName = workerName,
-        status = status,
-        serviceStartAt = date,
-        services = services.map { it.toAppointmentService() },
-        totalCost = totalCost.toInt(),
-        location = location.toAppointmentLocation(),
-        cancellationBy = cancellationBy.ifBlank { null },
-        cancellationReason = cancellationReason.ifBlank { null },
-        clientToWorkerReviewDone = ratingToWorkerDone,
-        workerToClientReviewDone = ratingToClientDone,
-    )
-}
-
-private fun Appointment.toBooking(): Booking {
-    return Booking(
-        id = id,
-        clientId = clientId,
-        clientName = clientName,
-        workerId = workerId,
-        workerName = workerName,
-        date = serviceStartAt,
-        status = status,
-        totalCost = totalCost.toDouble(),
-        services = services.map { it.toService() },
-        location = location.toAddress(),
-        cancellationReason = cancellationReason ?: "",
-        cancellationBy = cancellationBy ?: "",
-        ratingToClientDone = workerToClientReviewDone,
-        ratingToWorkerDone = clientToWorkerReviewDone,
-    )
-}
-
-private fun Service.toAppointmentService(): AppointmentService {
-    return AppointmentService(
-        id = id,
-        name = name,
-        description = description,
-        cost = cost.toInt(),
-        durationMinutes = extractMinutesFromDuration(duration),
-        subtotal = cost.toInt(),
-    )
-}
-
-private fun AppointmentService.toService(): Service {
-    return Service(
-        id = id,
-        name = name,
-        description = description,
-        cost = cost.toDouble(),
-        duration = "${durationMinutes} min",
-    )
-}
-
-private fun Address.toAppointmentLocation(): AppointmentLocation {
-    return AppointmentLocation(
-        id = id,
-        alias = alias,
-        province = province,
-        district = district,
-        canton = canton,
-        latitude = latitude,
-        longitude = longitude,
-        reference = reference,
-    )
-}
-
-private fun AppointmentLocation.toAddress(): Address {
-    return Address(
-        id = id,
-        alias = alias,
-        province = province,
-        district = district,
-        canton = canton,
-        latitude = latitude,
-        longitude = longitude,
-        reference = reference,
-    )
-}
-
-private fun extractMinutesFromDuration(duration: String): Int {
-    return duration.filter { it.isDigit() }.toIntOrNull() ?: 0
 }
 
 internal fun buildCurrentTimeSnapshot(): CurrentTimeSnapshot {
