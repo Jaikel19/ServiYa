@@ -7,8 +7,8 @@ import com.example.shared.data.repository.PaymentReceipt.IPaymentReceiptReposito
 import com.example.shared.data.repository.notifications.INotificationsRepository
 import com.example.shared.domain.entity.NotificationDeepLinks
 import com.example.shared.domain.entity.NotificationTypes
-import com.example.shared.presentation.notifications.pushNotification
 import com.example.shared.domain.entity.PaymentReceipt
+import com.example.shared.presentation.notifications.pushNotification
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,35 +22,39 @@ class WorkerRequestDetailViewModel(
     private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
-  private val _uiState = MutableStateFlow(WorkerRequestDetailUiState())
-  val uiState: StateFlow<WorkerRequestDetailUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(WorkerRequestDetailUiState())
+    val uiState: StateFlow<WorkerRequestDetailUiState> = _uiState.asStateFlow()
 
-  fun loadBooking(appointmentId: String) {
-    viewModelScope.launch {
-      _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-      try {
-        repository
-            .getAppointmentById(appointmentId)
-            .catch { e ->
-              _uiState.value =
-                  _uiState.value.copy(
-                      isLoading = false,
-                      errorMessage = e.message ?: "Error cargando solicitud",
-                  )
-            }
-            .first()
-            .let { appointment ->
-              _uiState.value = _uiState.value.copy(isLoading = false, appointment = appointment)
-            }
-      } catch (e: Exception) {
-        _uiState.value =
-            _uiState.value.copy(
-                isLoading = false,
-                errorMessage = e.message ?: "Error cargando solicitud",
+    fun loadAppointment(appointmentId: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                errorMessage = null,
             )
-      }
+
+            try {
+                val appointment = repository
+                    .getAppointmentById(appointmentId)
+                    .catch { e ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = e.message ?: "Error cargando solicitud",
+                        )
+                    }
+                    .first()
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    appointment = appointment,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Error cargando solicitud",
+                )
+            }
+        }
     }
-  }
 
     fun acceptRequest() {
         val appointment = _uiState.value.appointment ?: return
@@ -59,20 +63,22 @@ class WorkerRequestDetailViewModel(
         viewModelScope.launch {
             repository.approveAppointment(appointmentId)
 
-            val receipt =
-                PaymentReceipt(
-                    id = "",
-                    attemptNumber = 0L,
-                    imageUrl = "",
-                    note = null,
-                    sentAt = "",
-                    reviewedAt = null,
-                    reviewedBy = null,
-                    rejectionReason = null,
-                    status = "pending",
-                )
+            val receipt = PaymentReceipt(
+                id = "",
+                attemptNumber = 0L,
+                imageUrl = "",
+                note = null,
+                sentAt = "",
+                reviewedAt = null,
+                reviewedBy = null,
+                rejectionReason = null,
+                status = "pending",
+            )
 
-            paymentReceiptRepository.createReceipt(appointmentId = appointmentId, receipt = receipt)
+            paymentReceiptRepository.createReceipt(
+                appointmentId = appointmentId,
+                receipt = receipt,
+            )
 
             notificationsRepository.pushNotification(
                 userId = appointment.clientId,
@@ -95,15 +101,17 @@ class WorkerRequestDetailViewModel(
                 deepLink = NotificationDeepLinks.CLIENT_PAYMENT_UPLOAD,
                 actorId = appointment.workerId,
             )
+
+            loadAppointment(appointmentId)
         }
     }
 
     fun rejectRequest() {
         val appointment = _uiState.value.appointment ?: return
-        val bookingId = appointment.id
+        val appointmentId = appointment.id
 
         viewModelScope.launch {
-            repository.rejectAppointmentByWorker(bookingId)
+            repository.rejectAppointmentByWorker(appointmentId)
 
             notificationsRepository.pushNotification(
                 userId = appointment.clientId,
@@ -115,6 +123,8 @@ class WorkerRequestDetailViewModel(
                 deepLink = NotificationDeepLinks.CLIENT_REQUESTS,
                 actorId = appointment.workerId,
             )
+
+            loadAppointment(appointmentId)
         }
     }
 }

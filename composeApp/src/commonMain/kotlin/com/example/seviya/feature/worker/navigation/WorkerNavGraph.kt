@@ -160,7 +160,7 @@ fun NavGraphBuilder.workerNavGraph(
             navController.navigateSingleTop(WorkerDashboard)
           },
           onOpenPaymentDetail = { appointmentId ->
-              navController.navigate(WorkerPaymentDetail(bookingId = appointmentId))
+              navController.navigate(WorkerPaymentDetail(appointmentId = appointmentId))
           },
           onGoMap = {},
           onGoSearch = {
@@ -199,10 +199,10 @@ fun NavGraphBuilder.workerNavGraph(
     WorkerRequestsScreen(
         workerId = currentWorkerId,
         onOpenRequestDetail = { appointmentId ->
-          navController.navigate(WorkerRequestDetail(bookingId = appointmentId))
+          navController.navigate(WorkerRequestDetail(appointmentId = appointmentId))
         },
         onOpenPaymentDetail = { appointmentId ->
-          navController.navigate(WorkerPaymentDetail(bookingId = appointmentId))
+          navController.navigate(WorkerPaymentDetail(appointmentId = appointmentId))
         },
     )
   }
@@ -210,7 +210,7 @@ fun NavGraphBuilder.workerNavGraph(
   composable<WorkerRequestDetail> { backStackEntry ->
     val route = backStackEntry.toRoute<WorkerRequestDetail>()
     WorkerRequestDetailScreen(
-        bookingId = route.bookingId,
+        appointmentId = route.appointmentId,
         onBack = { navController.popBackStack() },
     )
   }
@@ -218,7 +218,7 @@ fun NavGraphBuilder.workerNavGraph(
   composable<WorkerPaymentDetail> { backStackEntry ->
     val route = backStackEntry.toRoute<WorkerPaymentDetail>()
     WorkerPaymentDetailScreen(
-        bookingId = route.bookingId,
+        appointmentId = route.appointmentId,
         onBack = { navController.popBackStack() },
     )
   }
@@ -228,10 +228,10 @@ fun NavGraphBuilder.workerNavGraph(
             workerId = currentWorkerId,
             onBack = { navController.popBackStack() },
             onOpenRequestDetail = { appointmentId ->
-                navController.navigate(WorkerRequestDetail(bookingId = appointmentId))
+                navController.navigate(WorkerRequestDetail(appointmentId = appointmentId))
             },
             onOpenPaymentDetail = { appointmentId ->
-                navController.navigate(WorkerPaymentDetail(bookingId = appointmentId))
+                navController.navigate(WorkerPaymentDetail(appointmentId = appointmentId))
             },
             onOpenRequests = { navController.navigateSingleTop(WorkerRequests) },
             onOpenDailyAppointments = { workerId ->

@@ -102,7 +102,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ClientAppointmentDetailScreen(
-    bookingId: String,
+    appointmentId: String,
     onBack: () -> Unit = {},
     onReviewClick: () -> Unit = {},
     onGoServices: () -> Unit = {},
@@ -114,7 +114,9 @@ fun ClientAppointmentDetailScreen(
     val viewModel: ClientAppointmentDetailViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(bookingId) { viewModel.loadAppointmentDetail(bookingId) }
+    LaunchedEffect(appointmentId) {
+        viewModel.loadAppointmentDetail(appointmentId)
+    }
 
     ClientAppointmentDetailContent(
         uiState = uiState,

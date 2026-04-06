@@ -42,7 +42,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class ClientWeeklyAppointments(val clientId: String)
 
-@Serializable data class ClientAppointmentDetail(val bookingId: String)
+@Serializable data class ClientAppointmentDetail(val appointmentId: String)
 
 @Serializable data class ClientToWorkerReview(val appointmentId: String)
 
@@ -57,9 +57,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable object WorkerRequests
 
-@Serializable data class WorkerRequestDetail(val bookingId: String)
+@Serializable data class WorkerRequestDetail(val appointmentId: String)
 
-@Serializable data class WorkerPaymentDetail(val bookingId: String)
+@Serializable data class WorkerPaymentDetail(val appointmentId: String)
 
 @Serializable object WorkerAlerts
 
