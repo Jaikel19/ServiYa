@@ -14,4 +14,10 @@ object DateTimeUtils {
     val minute = now.minute.toString().padStart(2, '0')
     return "${now.date}T$hour:$minute"
   }
+
+  @OptIn(ExperimentalTime::class)
+  fun todayDateKey(): String {
+    val now = Clock.System.now().toLocalDateTime(TimeZone.of("America/Costa_Rica"))
+    return now.date.toString() // YYYY-MM-DD
+  }
 }

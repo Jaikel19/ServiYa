@@ -1,0 +1,278 @@
+<mxfile host="app.diagrams.net" modified="2026-03-29" agent="Claude" version="21.0.0" type="device">
+  <diagram id="serviya-arch" name="ServiYa Architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1320" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ====== TITLE ====== -->
+        <mxCell id="title" value="ServiYa — Diagrama de Arquitectura de Software" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="190" y="18" width="1310" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Kotlin Multiplatform (KMP) · Clean Architecture · MVVM · Firebase Firestore · Compose Multiplatform" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="190" y="56" width="1310" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ====== MODULE BOUNDARIES (rendered first = behind layer BGs) ====== -->
+
+        <!-- composeApp module boundary -->
+        <mxCell id="boundary_composeapp" value="&lt;b&gt;composeApp/&lt;/b&gt;  —  Compose Multiplatform UI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#0050EF;strokeWidth=2;dashed=1;verticalAlign=top;align=left;fontSize=12;fontColor=#0050EF;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="183" y="208" width="1134" height="178" as="geometry" />
+        </mxCell>
+
+        <!-- shared KMP module boundary -->
+        <mxCell id="boundary_shared" value="&lt;b&gt;shared/&lt;/b&gt;  —  Kotlin Multiplatform  ·  Código compartido Android &amp; iOS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#E65C00;strokeWidth=2;dashed=1;verticalAlign=top;align=left;fontSize=12;fontColor=#E65C00;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+          <mxGeometry x="183" y="408" width="1134" height="600" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LAYER 0: PLATFORM ====== -->
+        <mxCell id="lbl_platform" value="Capa de Plataforma" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="30" y="97" width="150" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="android_box" value="&lt;b&gt;Android App&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;androidApp/&lt;br/&gt;MainActivity.kt&lt;br/&gt;MainApplication.kt&lt;br/&gt;google-services.json&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="340" y="90" width="190" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ios_box" value="&lt;b&gt;iOS App&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;iosApp/&lt;br/&gt;iOSApp.swift&lt;br/&gt;ContentView.swift&lt;br/&gt;KMP Framework bridge&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="560" y="90" width="190" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LAYER 1: UI ====== -->
+        <mxCell id="lbl_ui" value="Capa UI" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#0050EF;" vertex="1" parent="1">
+          <mxGeometry x="30" y="230" width="90" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ui_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="195" y="222" width="1110" height="152" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ui_client" value="&lt;b&gt;Pantallas Cliente&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;ClientDashboard · ClientRequests&lt;br/&gt;ClientAgenda · ClientMap&lt;br/&gt;ClientFavorites · ClientProfile&lt;br/&gt;ClientPaymentUpload · ClientToWorkerReview&lt;br/&gt;ClientLocationCatalog · ClientDailyAppointments&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="210" y="238" width="240" height="125" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ui_worker" value="&lt;b&gt;Pantallas Trabajador&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;WorkerDashboard · WorkerRequests&lt;br/&gt;WorkerAgenda · WorkerCalendar&lt;br/&gt;WorkerProfile · WorkerSchedule&lt;br/&gt;WorkerStartAppointmentOtp&lt;br/&gt;WorkerPaymentDetail · WorkerToClientReview&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="462" y="238" width="250" height="125" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ui_shared" value="&lt;b&gt;Pantallas Compartidas (Guest/Ambos)&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Landing · CategoriesCatalog&lt;br/&gt;WorkersList · ProfessionalProfile&lt;br/&gt;RequestAppointment · Services&lt;br/&gt;RoleCatalog&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="724" y="238" width="240" height="125" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ui_nav" value="&lt;b&gt;Navegación&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Routes.kt (50+ rutas)&lt;br/&gt;NavGraph · SessionRole&lt;br/&gt;GUEST / CLIENT / WORKER&lt;br/&gt;Animaciones slide + fade&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="976" y="238" width="180" height="125" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ui_ds" value="&lt;b&gt;Design System&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Theme · Colors (BrandBlue/Red)&lt;br/&gt;Typography · Shapes&lt;br/&gt;ClientScaffold · WorkerScaffold&lt;br/&gt;BottomBars · Menus&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1168" y="238" width="122" height="125" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LAYER 2: PRESENTATION ====== -->
+        <mxCell id="lbl_pres" value="Capa de Presentación" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#7B00D4;" vertex="1" parent="1">
+          <mxGeometry x="30" y="430" width="175" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pres_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="195" y="422" width="1110" height="165" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vm_client" value="&lt;b&gt;ViewModels Cliente&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;ClientDashboardViewModel&lt;br/&gt;ClientRequestsViewModel&lt;br/&gt;ClientAppointmentDetailViewModel&lt;br/&gt;ClientPaymentUploadViewModel&lt;br/&gt;ClientToWorkerReviewViewModel&lt;br/&gt;ClientLocationCatalogViewModel · ClientMapViewModel&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="210" y="440" width="270" height="135" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vm_worker" value="&lt;b&gt;ViewModels Trabajador&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;WorkerDashboardViewModel&lt;br/&gt;WorkerRequestsViewModel&lt;br/&gt;WorkerAppointmentDetailViewModel&lt;br/&gt;WorkerPaymentDetailViewModel&lt;br/&gt;WorkerStartAppointmentOtpViewModel&lt;br/&gt;WorkerToClientReviewViewModel · WorkerScheduleViewModel&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="492" y="440" width="285" height="135" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vm_shared" value="&lt;b&gt;ViewModels Compartidos&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;CategoriesViewModel · ServicesViewModel&lt;br/&gt;WorkersListViewModel&lt;br/&gt;ProfessionalProfileViewModel&lt;br/&gt;MonthlyCalendarViewModel&lt;br/&gt;FavoriteWorkersViewModel&lt;br/&gt;RequestAppointmentViewModel · DailyAgendaViewModel&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="789" y="440" width="280" height="135" as="geometry" />
+        </mxCell>
+
+        <mxCell id="state_mgmt" value="&lt;b&gt;Gestión de Estado&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;StateFlow / MutableStateFlow&lt;br/&gt;UiState (sealed classes)&lt;br/&gt;viewModelScope + Coroutines&lt;br/&gt;collectAsState() en UI&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1081" y="440" width="209" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LAYER 3: DOMAIN ====== -->
+        <mxCell id="lbl_domain" value="Capa de Dominio" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#B46504;" vertex="1" parent="1">
+          <mxGeometry x="30" y="628" width="155" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="domain_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="195" y="620" width="1110" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="entities" value="&lt;b&gt;Entidades de Dominio&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;User · Appointment · Booking (legacy)&lt;br/&gt;Service · Category · Address&lt;br/&gt;Review · ReviewMeta · Report&lt;br/&gt;OtpCode · OtpAppointment&lt;br/&gt;PaymentReceipt · CancellationPolicy&lt;br/&gt;WorkerProfile · ProfessionalProfileData&lt;br/&gt;WorkerListItemData · Schedule · Favorite&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="210" y="638" width="290" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="repo_iface" value="&lt;b&gt;Interfaces de Repositorio&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;IAppointmentRepository · IBookingRepository&lt;br/&gt;IUserRepository · IServiceRepository&lt;br/&gt;ICategoryRepository · IAddressRepository&lt;br/&gt;IReviewRepository · IReviewMetaRepository&lt;br/&gt;IScheduleRepository · IReportRepository&lt;br/&gt;IOtpAppointmentRepository · IOtpCodeRepository&lt;br/&gt;IPaymentReceiptRepository · IFavoriteWorkersRepository&lt;br/&gt;IWorkersListRepository · IProfessionalProfileRepository&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="512" y="638" width="340" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="biz_logic" value="&lt;b&gt;Lógica de Negocio&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;AppointmentCancellationCalculator&lt;br/&gt;OtpUtils (generación + SHA-256)&lt;br/&gt;DateTimeUtils&lt;br/&gt;(Timezone: America/Costa_Rica)&lt;br/&gt;AppConfig (USE_FAKE_REMOTE)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="864" y="638" width="256" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LAYER 4: DATA ====== -->
+        <mxCell id="lbl_data" value="Capa de Datos" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#006600;" vertex="1" parent="1">
+          <mxGeometry x="30" y="830" width="145" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="data_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="195" y="822" width="1110" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="repo_impl" value="&lt;b&gt;Implementaciones Repositorio&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;AppointmentRepository&lt;br/&gt;UserRepository · ServiceRepository&lt;br/&gt;ReviewRepository · ScheduleRepository&lt;br/&gt;OtpAppointmentRepository&lt;br/&gt;PaymentReceiptRepository&lt;br/&gt;FavoriteWorkersRepository (16+)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="210" y="840" width="255" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="remote_ds" value="&lt;b&gt;Fuentes de Datos Remotas&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;RemoteAppointmentDataSource&lt;br/&gt;RemoteUserDataSource&lt;br/&gt;RemotePaymentReceiptDataSource&lt;br/&gt;RemoteOtpAppointmentDataSource&lt;br/&gt;RemoteReviewDataSource&lt;br/&gt;RemoteWorkersListDataSource&lt;br/&gt;RemoteProfessionalProfileDataSource&lt;br/&gt;RemoteScheduleDataSource  (13+ total)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="477" y="840" width="295" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="local_ds" value="&lt;b&gt;Fuente de Datos Local&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;SQLDelight Database&lt;br/&gt;LocalServicesDataSource&lt;br/&gt;Driver Android: SQLite&lt;br/&gt;Driver iOS: NativeSqlite&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="784" y="840" width="210" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cloudinary_svc" value="&lt;b&gt;Cloudinary Service&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;CloudinaryService&lt;br/&gt;Ktor HTTP Client&lt;br/&gt;Upload imágenes&lt;br/&gt;(comprobantes de pago)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1006" y="840" width="210" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LAYER 5: EXTERNAL SERVICES ====== -->
+        <mxCell id="lbl_ext" value="Servicios Externos" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#B80000;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1030" width="160" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="firebase_box" value="&lt;b&gt;Firebase Firestore&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Colecciones:&lt;br/&gt;appointments · users · services&lt;br/&gt;categories · addresses · reviews&lt;br/&gt;payment_receipts · otp_appointments&lt;br/&gt;favorites · reports · schedules&lt;br/&gt;GitLive Firebase KMP SDK&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="370" y="1022" width="280" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cloudinary_ext" value="&lt;b&gt;Cloudinary CDN&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;api.cloudinary.com&lt;br/&gt;Cloud name: dfk5xx88f&lt;br/&gt;Preset: seviya_unsigned&lt;br/&gt;Almacenamiento de imágenes&lt;br/&gt;(comprobantes de pago)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="690" y="1022" width="250" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- ====== KOIN DI (side panel) ====== -->
+        <mxCell id="koin_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;opacity=60;" vertex="1" parent="1">
+          <mxGeometry x="1335" y="90" width="185" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="koin_title" value="&lt;b&gt;Koin DI&lt;/b&gt;&lt;br/&gt;Inyección de Dependencias" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1335" y="98" width="185" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="koin_modules" value="&lt;b&gt;Módulos:&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;SharedModule&lt;br/&gt; └ DataModule&lt;br/&gt; └ NetworkModule&lt;br/&gt; └ PresentationModule&lt;br/&gt; └ DomainModule&lt;br/&gt; └ PlatformModule&lt;br/&gt;&lt;br/&gt;&lt;b&gt;Provee:&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;HttpClient (Ktor)&lt;br/&gt;CloudinaryService&lt;br/&gt;Repositories (singleton)&lt;br/&gt;ViewModels (factory)&lt;br/&gt;Platform Drivers&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1335" y="138" width="185" height="390" as="geometry" />
+        </mxCell>
+
+        <!-- ====== FOLDER STRUCTURE ====== -->
+        <mxCell id="folder_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9f9f9;strokeColor=#aaaaaa;" vertex="1" parent="1">
+          <mxGeometry x="1548" y="90" width="590" height="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="folder_title" value="Estructura de Carpetas del Proyecto" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="1548" y="95" width="590" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="folder_divider" value="" style="line;strokeColor=#aaaaaa;" vertex="1" parent="1">
+          <mxGeometry x="1548" y="125" width="590" height="10" as="geometry" />
+        </mxCell>
+
+        <!-- androidApp folder -->
+        <mxCell id="f_android" value="&lt;b&gt;androidApp/&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=#f5f5f5;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#333333;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="135" width="570" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="f_android_c" value="&lt;font style=&quot;font-size:10px;font-family:monospace;&quot;&gt;├── src/main/kotlin/com/example/servi_ya/&lt;br/&gt;│   ├── MainActivity.kt          &lt;i&gt;(entry point Android)&lt;/i&gt;&lt;br/&gt;│   └── MainApplication.kt       &lt;i&gt;(init Koin)&lt;/i&gt;&lt;br/&gt;├── src/main/res/                &lt;i&gt;(íconos, strings, splash)&lt;/i&gt;&lt;br/&gt;└── google-services.json         &lt;i&gt;(config Firebase)&lt;/i&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="157" width="570" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- iosApp folder -->
+        <mxCell id="f_ios" value="&lt;b&gt;iosApp/&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=#f5f5f5;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#333333;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="242" width="570" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="f_ios_c" value="&lt;font style=&quot;font-size:10px;font-family:monospace;&quot;&gt;├── iOSApp.swift                 &lt;i&gt;(entry point iOS)&lt;/i&gt;&lt;br/&gt;└── ContentView.swift            &lt;i&gt;(bridge KMP → SwiftUI)&lt;/i&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="264" width="570" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- composeApp folder -->
+        <mxCell id="f_compose" value="&lt;b&gt;composeApp/src/commonMain/kotlin/com/example/seviya/&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=#dae8fc;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#0050EF;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="310" width="570" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="f_compose_c" value="&lt;font style=&quot;font-size:10px;font-family:monospace;&quot;&gt;├── core/&lt;br/&gt;│   ├── designsystem/&lt;br/&gt;│   │   ├── Color.kt · Theme.kt · Type.kt&lt;br/&gt;│   │   └── component/  &lt;i&gt;(Scaffolds, BottomBars, Menus)&lt;/i&gt;&lt;br/&gt;│   └── navigation/&lt;br/&gt;│       ├── Routes.kt       &lt;i&gt;(50+ rutas @Serializable)&lt;/i&gt;&lt;br/&gt;│       └── NavGraph.kt     &lt;i&gt;(grafo de navegación)&lt;/i&gt;&lt;br/&gt;└── feature/&lt;br/&gt;    ├── client/             &lt;i&gt;(pantallas del cliente)&lt;/i&gt;&lt;br/&gt;    ├── worker/             &lt;i&gt;(pantallas del trabajador)&lt;/i&gt;&lt;br/&gt;    └── shared/             &lt;i&gt;(pantallas compartidas)&lt;/i&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="332" width="570" height="175" as="geometry" />
+        </mxCell>
+
+        <!-- shared folder -->
+        <mxCell id="f_shared" value="&lt;b&gt;shared/src/commonMain/kotlin/com/example/shared/&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=#fce5cd;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#E65C00;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="512" width="570" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="f_shared_c" value="&lt;font style=&quot;font-size:10px;font-family:monospace;&quot;&gt;├── config/&lt;br/&gt;│   └── AppConfig.kt        &lt;i&gt;(USE_FAKE_REMOTE, BASE_URL)&lt;/i&gt;&lt;br/&gt;├── data/&lt;br/&gt;│   ├── local/&lt;br/&gt;│   │   └── LocalServicesDataSource.kt&lt;br/&gt;│   ├── remote/             &lt;i&gt;(13+ data sources Firebase)&lt;/i&gt;&lt;br/&gt;│   │   ├── RemoteAppointmentDataSource.kt&lt;br/&gt;│   │   ├── RemoteUserDataSource.kt&lt;br/&gt;│   │   └── ...&lt;br/&gt;│   ├── repository/         &lt;i&gt;(16+ implementaciones)&lt;/i&gt;&lt;br/&gt;│   └── cloudinary/&lt;br/&gt;│       └── CloudinaryService.kt&lt;br/&gt;├── domain/&lt;br/&gt;│   └── entity/             &lt;i&gt;(19+ entidades de dominio)&lt;/i&gt;&lt;br/&gt;├── di/&lt;br/&gt;│   └── modules/            &lt;i&gt;(DataModule, PresentationModule...)&lt;/i&gt;&lt;br/&gt;├── presentation/           &lt;i&gt;(27 ViewModels)&lt;/i&gt;&lt;br/&gt;│   ├── client/&lt;br/&gt;│   ├── worker/&lt;br/&gt;│   └── shared/&lt;br/&gt;└── utils/&lt;br/&gt;    ├── OtpUtils.kt         &lt;i&gt;(generación + SHA-256)&lt;/i&gt;&lt;br/&gt;    └── DateTimeUtils.kt    &lt;i&gt;(zona horaria CR)&lt;/i&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1556" y="534" width="570" height="450" as="geometry" />
+        </mxCell>
+
+        <!-- ====== ARROWS ====== -->
+        <mxCell id="arr_android_ui" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeColor=#6c8ebf;" edge="1" source="android_box" target="ui_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_ios_ui" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.38;entryY=0;entryDx=0;entryDy=0;strokeColor=#6c8ebf;" edge="1" source="ios_box" target="ui_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr_ui_pres" value="observa StateFlow" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#9673a6;fontColor=#7B00D4;fontSize=10;" edge="1" source="ui_bg" target="pres_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr_pres_domain" value="llama interfaces" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#d6b656;fontColor=#B46504;fontSize=10;" edge="1" source="pres_bg" target="domain_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr_domain_data" value="implementa interfaces" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#82b366;fontColor=#006600;fontSize=10;" edge="1" source="domain_bg" target="data_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr_data_firebase" value="Firestore SDK (realtime)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.38;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#b85450;fontColor=#B80000;fontSize=10;" edge="1" source="data_bg" target="firebase_box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr_data_cloudinary" value="HTTPS / REST" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.65;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#b85450;fontColor=#B80000;fontSize=10;" edge="1" source="data_bg" target="cloudinary_ext" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr_koin_pres" style="dashed=1;endArrow=open;endFill=0;rounded=0;html=1;strokeColor=#d6b656;exitX=0;exitY=0.35;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="koin_bg" target="pres_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_koin_domain" style="dashed=1;endArrow=open;endFill=0;rounded=0;html=1;strokeColor=#d6b656;exitX=0;exitY=0.6;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="koin_bg" target="domain_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_koin_data" style="dashed=1;endArrow=open;endFill=0;rounded=0;html=1;strokeColor=#d6b656;exitX=0;exitY=0.85;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="koin_bg" target="data_bg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LEGEND ====== -->
+        <mxCell id="leg_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="195" y="1175" width="1130" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_title" value="&lt;b&gt;Leyenda:&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="205" y="1190" width="55" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="l1c" value="" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="263" y="1194" width="14" height="12" as="geometry"/></mxCell>
+        <mxCell id="l1t" value="UI Layer (composeApp)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1"><mxGeometry x="280" y="1191" width="130" height="20" as="geometry"/></mxCell>
+
+        <mxCell id="l2c" value="" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="418" y="1194" width="14" height="12" as="geometry"/></mxCell>
+        <mxCell id="l2t" value="Presentation Layer (shared)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1"><mxGeometry x="435" y="1191" width="145" height="20" as="geometry"/></mxCell>
+
+        <mxCell id="l3c" value="" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="588" y="1194" width="14" height="12" as="geometry"/></mxCell>
+        <mxCell id="l3t" value="Domain Layer (shared)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1"><mxGeometry x="605" y="1191" width="130" height="20" as="geometry"/></mxCell>
+
+        <mxCell id="l4c" value="" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="743" y="1194" width="14" height="12" as="geometry"/></mxCell>
+        <mxCell id="l4t" value="Data Layer (shared)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1"><mxGeometry x="760" y="1191" width="120" height="20" as="geometry"/></mxCell>
+
+        <mxCell id="l5c" value="" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="888" y="1194" width="14" height="12" as="geometry"/></mxCell>
+        <mxCell id="l5t" value="Servicios Externos" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1"><mxGeometry x="905" y="1191" width="115" height="20" as="geometry"/></mxCell>
+
+        <mxCell id="l6c" value="" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="1028" y="1194" width="14" height="12" as="geometry"/></mxCell>
+        <mxCell id="l6t" value="Plataforma (Android/iOS)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1"><mxGeometry x="1045" y="1191" width="150" height="20" as="geometry"/></mxCell>
+
+        <mxCell id="l7_line" value="- - -" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#E65C00;" vertex="1" parent="1"><mxGeometry x="1205" y="1191" width="30" height="20" as="geometry"/></mxCell>
+        <mxCell id="l7t" value="Límite módulo KMP (shared)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#E65C00;" vertex="1" parent="1"><mxGeometry x="1238" y="1191" width="175" height="20" as="geometry"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

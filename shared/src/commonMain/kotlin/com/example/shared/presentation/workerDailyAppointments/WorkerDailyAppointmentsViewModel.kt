@@ -3,6 +3,7 @@ package com.example.shared.presentation.workerDailyAppointments
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
+import com.example.shared.utils.DateTimeUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +21,8 @@ class WorkerDailyAppointmentsViewModel(private val appointmentRepository: IAppoi
     viewModelScope.launch {
       _state.value = _state.value.copy(isLoading = true, errorMessage = null)
 
+      val today = DateTimeUtils.todayDateKey()
+
       appointmentRepository
           .getAppointmentsByWorker(workerId)
           .catch { e ->
@@ -34,7 +37,10 @@ class WorkerDailyAppointmentsViewModel(private val appointmentRepository: IAppoi
                 _state.value.copy(
                     isLoading = false,
                     appointments =
-                        appointments.filter { it.status !in listOf("cancelled", "rejected") },
+                        appointments.filter {
+                          it.dateKey == today &&
+                              it.status !in listOf("cancelled", "rejected")
+                        },
                 )
           }
     }
