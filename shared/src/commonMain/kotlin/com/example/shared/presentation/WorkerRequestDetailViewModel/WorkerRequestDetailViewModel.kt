@@ -24,7 +24,7 @@ class WorkerRequestDetailViewModel(
     private val _uiState = MutableStateFlow(WorkerRequestDetailUiState())
     val uiState: StateFlow<WorkerRequestDetailUiState> = _uiState.asStateFlow()
 
-    fun loadBooking(appointmentId: String) {
+    fun loadAppointment(appointmentId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,

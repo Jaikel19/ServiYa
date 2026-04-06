@@ -84,14 +84,14 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WorkerRequestDetailScreen(
-    bookingId: String,
+    appointmentId: String,
     onBack: () -> Unit,
 ) {
     val viewModel: WorkerRequestDetailViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(bookingId) {
-        viewModel.loadBooking(bookingId)
+    LaunchedEffect(appointmentId) {
+        viewModel.loadAppointment(appointmentId)
     }
 
     LaunchedEffect(uiState.requestHandled) {
@@ -102,7 +102,7 @@ fun WorkerRequestDetailScreen(
 
     uiState.appointment?.let { appointment ->
         WorkerRequestDetailContent(
-            booking = appointment,
+            appointment = appointment,
             onBack = onBack,
             onAccept = { viewModel.acceptRequest() },
             onReject = { viewModel.rejectRequest() },
@@ -116,7 +116,7 @@ fun WorkerRequestDetailScreen(
 
 @Composable
 private fun WorkerRequestDetailContent(
-    booking: Appointment,
+    appointment: Appointment,
     onBack: () -> Unit,
     onAccept: () -> Unit,
     onReject: () -> Unit,
@@ -127,26 +127,30 @@ private fun WorkerRequestDetailContent(
     onGoAlerts: () -> Unit = {},
     onGoMenu: () -> Unit = {},
 ) {
-    val formattedDate = formatAppointmentDate(booking.serviceStartAt)
-    val serviceTimeline = buildServiceTimeline(booking.serviceStartAt, booking.services, booking.currency)
+    val formattedDate = formatAppointmentDate(appointment.serviceStartAt)
+    val serviceTimeline = buildServiceTimeline(
+        appointment.serviceStartAt,
+        appointment.services,
+        appointment.currency
+    )
 
     Scaffold(
         containerColor = AppBackgroundAlt,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPadding ->
         Column(
-            modifier =
-                Modifier.fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
         ) {
             WorkerRequestDetailHeader(onBack = onBack)
 
             Column(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 24.dp, bottom = 32.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp, bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -177,10 +181,10 @@ private fun WorkerRequestDetailContent(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             Box(
-                                modifier =
-                                    Modifier.size(42.dp)
-                                        .clip(CircleShape)
-                                        .background(SoftBlueSurface),
+                                modifier = Modifier
+                                    .size(42.dp)
+                                    .clip(CircleShape)
+                                    .background(SoftBlueSurface),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
@@ -194,15 +198,14 @@ private fun WorkerRequestDetailContent(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = "SERVICIOS SOLICITADOS",
-                                    style =
-                                        MaterialTheme.typography.labelSmall.copy(
-                                            fontWeight = FontWeight.ExtraBold,
-                                            letterSpacing = 1.sp,
-                                        ),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        letterSpacing = 1.sp,
+                                    ),
                                     color = TextSecondary,
                                 )
                                 Text(
-                                    text = "${booking.services.size} servicio${if (booking.services.size == 1) "" else "s"}",
+                                    text = "${appointment.services.size} servicio${if (appointment.services.size == 1) "" else "s"}",
                                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                     color = TextBluePrimary,
                                 )
@@ -217,8 +220,8 @@ private fun WorkerRequestDetailContent(
 
                         if (serviceTimeline.isEmpty()) {
                             EmptyServicesCard(
-                                totalDurationLabel = formatMinutesLabel(booking.serviceDurationMinutes),
-                                totalCostLabel = formatCurrency(booking.totalCost, booking.currency),
+                                totalDurationLabel = formatMinutesLabel(appointment.serviceDurationMinutes),
+                                totalCostLabel = formatCurrency(appointment.totalCost, appointment.currency),
                             )
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -251,7 +254,7 @@ private fun WorkerRequestDetailContent(
                         DetailRow(
                             icon = TablerIcons.User,
                             label = "CLIENTE",
-                            value = booking.clientName.ifBlank { "Sin nombre" },
+                            value = appointment.clientName.ifBlank { "Sin nombre" },
                         )
 
                         HorizontalDivider(color = BorderSoft)
@@ -259,7 +262,7 @@ private fun WorkerRequestDetailContent(
                         DetailRow(
                             icon = TablerIcons.MapPin,
                             label = "UBICACIÓN",
-                            value = booking.location.district.ifBlank { "Sin ubicación" },
+                            value = appointment.location.district.ifBlank { "Sin ubicación" },
                         )
 
                         HorizontalDivider(color = BorderSoft)
@@ -267,7 +270,7 @@ private fun WorkerRequestDetailContent(
                         DetailRow(
                             icon = TablerIcons.CreditCard,
                             label = "COSTO TOTAL",
-                            value = formatCurrency(booking.totalCost, booking.currency),
+                            value = formatCurrency(appointment.totalCost, appointment.currency),
                             highlightValue = true,
                         )
                     }

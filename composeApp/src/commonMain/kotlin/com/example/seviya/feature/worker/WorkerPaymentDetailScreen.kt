@@ -81,14 +81,14 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WorkerPaymentDetailScreen(
-    bookingId: String,
+    appointmentId: String,
     onBack: () -> Unit,
 ) {
     val viewModel: WorkerPaymentDetailViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(bookingId) {
-        viewModel.loadPaymentDetail(bookingId)
+    LaunchedEffect(appointmentId) {
+        viewModel.loadPaymentDetail(appointmentId)
     }
 
     LaunchedEffect(uiState.paymentVerified) {
