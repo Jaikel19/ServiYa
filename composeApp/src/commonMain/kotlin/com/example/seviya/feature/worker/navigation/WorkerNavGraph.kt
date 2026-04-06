@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.seviya.app.FeaturePlaceholder
 import com.example.seviya.app.navigateSingleTop
-import com.example.seviya.app.toAppointment
 import com.example.seviya.core.designsystem.components.WorkerTab
 import com.example.seviya.core.navigation.WorkerAgenda
 import com.example.seviya.core.navigation.WorkerAlerts
