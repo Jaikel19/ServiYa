@@ -78,6 +78,7 @@ import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.clientDashboard.ClientDashboardUiState
 import com.example.shared.presentation.clientDashboard.ClientDashboardViewModel
+import com.example.shared.utils.DateTimeUtils
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Apps
 import compose.icons.tablericons.CalendarEvent
@@ -142,20 +143,23 @@ private fun ClientDashboardContent(
     var upcomingExpanded by rememberSaveable { mutableStateOf(true) }
     var completedExpanded by rememberSaveable { mutableStateOf(true) }
 
+    val todayIso = dashboardTodayDateKey()
+
     val upcomingAppointments =
-        remember(state.appointments) {
+        remember(state.appointments, todayIso) {
             state.appointments
                 .filter {
-                    it.status.clientStatusKey() in setOf("payment_pending", "confirmed", "in_progress")
+                    it.status.clientStatusKey() in setOf("payment_pending", "confirmed", "in_progress") &&
+                            shouldShowClientDashboardAppointment(it, todayIso)
                 }
-                .sortedBy { it.serviceStartAt }
+                .sortedBy { clientDashboardOrderKey(it) }
         }
 
     val completedAppointments =
         remember(state.appointments) {
             state.appointments
                 .filter { it.status.clientStatusKey() == "completed" }
-                .sortedByDescending { it.serviceStartAt }
+                .sortedByDescending { clientDashboardOrderKey(it) }
         }
 
     val cancelledAppointments =
@@ -988,3 +992,39 @@ private fun String.toInitials(): String {
 }
 
 private fun formatPrice(value: Int): String = "₡$value"
+
+private fun dashboardTodayDateKey(): String {
+    return DateTimeUtils.nowIsoMinute().take(10)
+}
+
+private fun shouldShowClientDashboardAppointment(
+    appointment: Appointment,
+    todayIso: String,
+): Boolean {
+    if (appointment.status.clientStatusKey() == "in_progress") {
+        return true
+    }
+
+    val dateKey = appointmentDashboardDateKey(appointment)
+    if (dateKey.isBlank()) return false
+
+    return dateKey >= todayIso
+}
+
+private fun appointmentDashboardDateKey(appointment: Appointment): String {
+    return when {
+        appointment.dateKey.isNotBlank() -> appointment.dateKey.take(10)
+        appointment.serviceStartAt.contains("T") -> appointment.serviceStartAt.substringBefore("T")
+        appointment.serviceStartAt.contains(" ") -> appointment.serviceStartAt.substringBefore(" ")
+        appointment.serviceStartAt.isNotBlank() -> appointment.serviceStartAt.take(10)
+        else -> ""
+    }
+}
+
+private fun clientDashboardOrderKey(appointment: Appointment): String {
+    return when {
+        appointment.serviceStartAt.isNotBlank() -> appointment.serviceStartAt.trim()
+        appointment.dateKey.isNotBlank() -> appointment.dateKey.trim()
+        else -> ""
+    }
+}

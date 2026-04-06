@@ -73,6 +73,7 @@ import com.example.seviya.core.designsystem.theme.White
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.workerDashboard.WorkerDashboardUiState
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
+import com.example.shared.utils.DateTimeUtils
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.CalendarEvent
@@ -131,34 +132,30 @@ private fun WorkerDashboardContent(
     onOpenReview: (Appointment) -> Unit = {},
 ) {
     val profile = state.profile
+    val todayIso = dashboardTodayDateKey()
 
-    val sortedAppointments =
-        state.appointments.sortedBy { parseAppointmentOrderKey(it.serviceStartAt, it.dateKey) }
+    val visibleDashboardAppointments =
+        state.appointments
+            .filter { shouldShowWorkerDashboardAppointment(it, todayIso) }
+            .sortedBy { parseAppointmentOrderKey(it.serviceStartAt, it.dateKey) }
 
-    var currentQueueAppointmentId by rememberSaveable { mutableStateOf<String?>(null) }
-
-    val currentQueueAppointment =
-        sortedAppointments.firstOrNull { it.id == currentQueueAppointmentId }
-
-    val firstPriorityAppointment =
-        sortedAppointments.firstOrNull {
-            it.status.equals("in_progress", ignoreCase = true) ||
-                    it.status.equals("confirmed", ignoreCase = true)
+    val currentAppointment =
+        visibleDashboardAppointments.firstOrNull {
+            it.status.equals("in_progress", ignoreCase = true)
+        } ?: visibleDashboardAppointments.firstOrNull {
+            it.status.equals("confirmed", ignoreCase = true) &&
+                    appointmentDashboardDateKey(it) == todayIso
+        } ?: visibleDashboardAppointments.firstOrNull {
+            it.status.equals("confirmed", ignoreCase = true)
         }
-
-    LaunchedEffect(sortedAppointments, currentQueueAppointmentId) {
-        val currentStillExists = sortedAppointments.any { it.id == currentQueueAppointmentId }
-        if (!currentStillExists) {
-            currentQueueAppointmentId = firstPriorityAppointment?.id
-        }
-    }
-
-    val currentAppointment = currentQueueAppointment ?: firstPriorityAppointment
 
     val upcomingAppointments =
-        sortedAppointments.filter {
-            (it.status.equals("confirmed", ignoreCase = true) ||
-                    it.status.equals("in_progress", ignoreCase = true)) && it.id != currentAppointment?.id
+        visibleDashboardAppointments.filter {
+            it.id != currentAppointment?.id &&
+                    (
+                            it.status.equals("confirmed", ignoreCase = true) ||
+                                    it.status.equals("in_progress", ignoreCase = true)
+                            )
         }
 
     val completedCount =
@@ -180,7 +177,9 @@ private fun WorkerDashboardContent(
             else -> {
                 Column(
                     modifier =
-                        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding()
+                        Modifier.fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .navigationBarsPadding()
                 ) {
                     WorkerDashboardHeader(
                         workerName = profile?.name ?: "Trabajador",
@@ -200,14 +199,7 @@ private fun WorkerDashboardContent(
                             onStartAppointment = onStartAppointment,
                             onCompleteAppointment = onCompleteAppointment,
                             onOpenReview = onOpenReview,
-                            onGoNextConfirmed = {
-                                val nextConfirmed =
-                                    sortedAppointments.firstOrNull {
-                                        it.status.equals("confirmed", ignoreCase = true) &&
-                                                it.id != currentAppointment?.id
-                                    }
-                                currentQueueAppointmentId = nextConfirmed?.id
-                            },
+                            onGoNextConfirmed = {},
                         )
 
                         QuickAccessSection(
@@ -230,7 +222,11 @@ private fun WorkerDashboardContent(
                         )
 
                         state.errorMessage?.let { error ->
-                            Text(text = error, color = VibrantRed, style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                text = error,
+                                color = VibrantRed,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
                 }
@@ -1065,4 +1061,39 @@ private fun initialsFromName(name: String): String {
         .take(2)
         .joinToString("") { it.first().uppercase() }
         .ifBlank { "W" }
+}
+
+private fun dashboardTodayDateKey(): String {
+    return DateTimeUtils.nowIsoMinute().take(10)
+}
+
+private fun shouldShowWorkerDashboardAppointment(
+    appointment: Appointment,
+    todayIso: String,
+): Boolean {
+    if (appointment.status.equals("in_progress", ignoreCase = true)) {
+        return true
+    }
+
+    val statusSupported =
+        appointment.status.equals("confirmed", ignoreCase = true) ||
+                appointment.status.equals("payment_pending", ignoreCase = true) ||
+                appointment.status.equals("completed", ignoreCase = true)
+
+    if (!statusSupported) return false
+
+    val dateKey = appointmentDashboardDateKey(appointment)
+    if (dateKey.isBlank()) return false
+
+    return dateKey >= todayIso
+}
+
+private fun appointmentDashboardDateKey(appointment: Appointment): String {
+    return when {
+        appointment.dateKey.isNotBlank() -> appointment.dateKey.take(10)
+        appointment.serviceStartAt.contains("T") -> appointment.serviceStartAt.substringBefore("T")
+        appointment.serviceStartAt.contains(" ") -> appointment.serviceStartAt.substringBefore(" ")
+        appointment.serviceStartAt.isNotBlank() -> appointment.serviceStartAt.take(10)
+        else -> ""
+    }
 }

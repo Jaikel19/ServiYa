@@ -1,5 +1,7 @@
 package com.example.seviya.feature.worker.navigation
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -72,7 +74,8 @@ fun NavGraphBuilder.workerNavGraph(
                 navController.navigateSingleTop(WorkerAppointmentDetail)
             },
             onStartAppointment = { appointment ->
-                monthlyCalendarViewModel.startAppointment(appointment.id)
+                monthlyCalendarViewModel.selectAppointment(appointment)
+                navController.navigate(WorkerStartAppointmentOtp(appointmentId = appointment.id))
             },
             onCompleteAppointment = { appointment ->
                 monthlyCalendarViewModel.completeAppointment(appointment.id)
@@ -144,45 +147,47 @@ fun NavGraphBuilder.workerNavGraph(
     )
   }
 
-  composable<WorkerAppointmentDetail> {
-    selectedAppointment?.let { appointment ->
-      WorkerAppointmentDetailScreen(
-          appointment = appointment,
-          monthlyCalendarViewModel = monthlyCalendarViewModel,
-          onBack = { navController.popBackStack() },
-          onStartAppointment = { appointmentId ->
-            navController.navigate(WorkerStartAppointmentOtp(appointmentId = appointmentId))
-          },
-          onRateClient = { appointmentId ->
-            navController.navigate(WorkerToClientReview(appointmentId = appointmentId))
-          },
-          onGoServices = {
-            onCurrentWorkerTabChange(WorkerTab.DASHBOARD)
-            navController.navigateSingleTop(WorkerDashboard)
-          },
-          onOpenPaymentDetail = { appointmentId ->
-              navController.navigate(WorkerPaymentDetail(appointmentId = appointmentId))
-          },
-          onGoMap = {},
-          onGoSearch = {
-            onCurrentWorkerTabChange(WorkerTab.REQUESTS)
-            navController.navigateSingleTop(WorkerRequests)
-          },
-          onGoAlerts = {
-            onCurrentWorkerTabChange(WorkerTab.ALERTS)
-            navController.navigateSingleTop(WorkerAlerts)
-          },
-          onGoMenu = {
-            onWorkerMenuExpandedChange(true)
-            onClientMenuExpandedChange(false)
-          },
-      )
-    }
-        ?: FeaturePlaceholder(
+    composable<WorkerAppointmentDetail> {
+        val calendarUiState by monthlyCalendarViewModel.uiState.collectAsState()
+        val appointment = calendarUiState.selectedAppointment
+
+        appointment?.let { selected ->
+            WorkerAppointmentDetailScreen(
+                appointment = selected,
+                monthlyCalendarViewModel = monthlyCalendarViewModel,
+                onBack = { navController.popBackStack() },
+                onStartAppointment = { appointmentId ->
+                    navController.navigate(WorkerStartAppointmentOtp(appointmentId = appointmentId))
+                },
+                onRateClient = { appointmentId ->
+                    navController.navigate(WorkerToClientReview(appointmentId = appointmentId))
+                },
+                onGoServices = {
+                    onCurrentWorkerTabChange(WorkerTab.DASHBOARD)
+                    navController.navigateSingleTop(WorkerDashboard)
+                },
+                onOpenPaymentDetail = { appointmentId ->
+                    navController.navigate(WorkerPaymentDetail(appointmentId = appointmentId))
+                },
+                onGoMap = {},
+                onGoSearch = {
+                    onCurrentWorkerTabChange(WorkerTab.REQUESTS)
+                    navController.navigateSingleTop(WorkerRequests)
+                },
+                onGoAlerts = {
+                    onCurrentWorkerTabChange(WorkerTab.ALERTS)
+                    navController.navigateSingleTop(WorkerAlerts)
+                },
+                onGoMenu = {
+                    onWorkerMenuExpandedChange(true)
+                    onClientMenuExpandedChange(false)
+                },
+            )
+        } ?: FeaturePlaceholder(
             title = "Detalle de cita",
             subtitle = "No hay una cita seleccionada en este momento.",
         )
-  }
+    }
 
   composable<WorkerStartAppointmentOtp> { backStackEntry ->
     val route = backStackEntry.toRoute<WorkerStartAppointmentOtp>()
