@@ -53,35 +53,37 @@ fun NavGraphBuilder.workerNavGraph(
     monthlyCalendarViewModel: MonthlyCalendarViewModel,
     selectedAppointment: Appointment?,
 ) {
-  composable<WorkerDashboard> {
-    WorkerDashboardScreen(
-        workerId = currentWorkerId,
-        onOpenCategories = {
-            navController.navigateSingleTop(WorkerCategories)
-        },
-        onOpenTravelTime = {
-            navController.navigateSingleTop(TravelTimeConfig)
-        },
-        onOpenDailyAgenda = {
-            onCurrentWorkerTabChange(WorkerTab.AGENDA)
-            navController.navigate(WorkerDailyAgenda(workerId = currentWorkerId))
-        },
-        onOpenSchedule = { navController.navigateSingleTop(WorkerSchedule) },
-        onOpenPortfolio = { navController.navigateSingleTop(WorkerPortfolio) },
-        onOpenAppointmentDetail = { booking ->
-          monthlyCalendarViewModel.selectAppointment(booking.toAppointment())
-          navController.navigateSingleTop(WorkerAppointmentDetail)
-        },
-        onStartAppointment = { booking -> monthlyCalendarViewModel.startAppointment(booking.id) },
-        onCompleteAppointment = { booking ->
-          monthlyCalendarViewModel.completeAppointment(booking.id)
-        },
-        onOpenReview = { booking ->
-          monthlyCalendarViewModel.selectAppointment(booking.toAppointment())
-          navController.navigateSingleTop(WorkerAppointmentDetail)
-        },
-    )
-  }
+    composable<WorkerDashboard> {
+        WorkerDashboardScreen(
+            workerId = currentWorkerId,
+            onOpenCategories = {
+                navController.navigateSingleTop(WorkerCategories)
+            },
+            onOpenTravelTime = {
+                navController.navigateSingleTop(TravelTimeConfig)
+            },
+            onOpenDailyAgenda = {
+                onCurrentWorkerTabChange(WorkerTab.AGENDA)
+                navController.navigate(WorkerDailyAgenda(workerId = currentWorkerId))
+            },
+            onOpenSchedule = { navController.navigateSingleTop(WorkerSchedule) },
+            onOpenPortfolio = { navController.navigateSingleTop(WorkerPortfolio) },
+            onOpenAppointmentDetail = { appointment ->
+                monthlyCalendarViewModel.selectAppointment(appointment)
+                navController.navigateSingleTop(WorkerAppointmentDetail)
+            },
+            onStartAppointment = { appointment ->
+                monthlyCalendarViewModel.startAppointment(appointment.id)
+            },
+            onCompleteAppointment = { appointment ->
+                monthlyCalendarViewModel.completeAppointment(appointment.id)
+            },
+            onOpenReview = { appointment ->
+                monthlyCalendarViewModel.selectAppointment(appointment)
+                navController.navigateSingleTop(WorkerAppointmentDetail)
+            },
+        )
+    }
 
   composable<WorkerDailyAppointments> { backStackEntry ->
     val route = backStackEntry.toRoute<WorkerDailyAppointments>()

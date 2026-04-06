@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class WorkerRequestDetailViewModel(
@@ -30,101 +29,131 @@ class WorkerRequestDetailViewModel(
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
                 errorMessage = null,
+                requestHandled = false,
             )
 
-            try {
-                val appointment = repository
-                    .getAppointmentById(appointmentId)
-                    .catch { e ->
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            errorMessage = e.message ?: "Error cargando solicitud",
-                        )
-                    }
-                    .first()
-
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    appointment = appointment,
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    errorMessage = e.message ?: "Error cargando solicitud",
-                )
-            }
+            repository
+                .getAppointmentById(appointmentId)
+                .catch { e ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        appointment = null,
+                        errorMessage = e.message ?: "Error al cargar la solicitud",
+                    )
+                }
+                .collect { appointment ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        appointment = appointment,
+                        errorMessage = null,
+                    )
+                }
         }
     }
 
     fun acceptRequest() {
         val appointment = _uiState.value.appointment ?: return
-        val appointmentId = appointment.id
 
         viewModelScope.launch {
-            repository.approveAppointment(appointmentId)
-
-            val receipt = PaymentReceipt(
-                id = "",
-                attemptNumber = 0L,
-                imageUrl = "",
-                note = null,
-                sentAt = "",
-                reviewedAt = null,
-                reviewedBy = null,
-                rejectionReason = null,
-                status = "pending",
+            _uiState.value = _uiState.value.copy(
+                actionInProgress = true,
+                errorMessage = null,
+                requestHandled = false,
             )
 
-            paymentReceiptRepository.createReceipt(
-                appointmentId = appointmentId,
-                receipt = receipt,
-            )
+            try {
+                repository.approveAppointment(appointment.id)
 
-            notificationsRepository.pushNotification(
-                userId = appointment.clientId,
-                recipientRole = "client",
-                title = "Solicitud aceptada",
-                message = "${appointment.workerName} aceptó tu solicitud de cita.",
-                type = NotificationTypes.REQUEST_ACCEPTED,
-                appointmentId = appointment.id,
-                deepLink = NotificationDeepLinks.CLIENT_PAYMENT_UPLOAD,
-                actorId = appointment.workerId,
-            )
+                val receipt = PaymentReceipt(
+                    id = "",
+                    attemptNumber = 0L,
+                    imageUrl = "",
+                    note = null,
+                    sentAt = "",
+                    reviewedAt = null,
+                    reviewedBy = null,
+                    rejectionReason = null,
+                    status = "pending",
+                )
 
-            notificationsRepository.pushNotification(
-                userId = appointment.clientId,
-                recipientRole = "client",
-                title = "Pago pendiente",
-                message = "Tu solicitud fue aceptada. Ahora debes subir el comprobante SINPE.",
-                type = NotificationTypes.PAYMENT_PENDING,
-                appointmentId = appointment.id,
-                deepLink = NotificationDeepLinks.CLIENT_PAYMENT_UPLOAD,
-                actorId = appointment.workerId,
-            )
+                paymentReceiptRepository.createReceipt(
+                    appointmentId = appointment.id,
+                    receipt = receipt,
+                )
 
-            loadAppointment(appointmentId)
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Solicitud aceptada",
+                    message = "${appointment.workerName} aceptó tu solicitud de cita.",
+                    type = NotificationTypes.REQUEST_ACCEPTED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_PAYMENT_UPLOAD,
+                    actorId = appointment.workerId,
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Pago pendiente",
+                    message = "Tu solicitud fue aceptada. Ahora debes subir el comprobante SINPE.",
+                    type = NotificationTypes.PAYMENT_PENDING,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_PAYMENT_UPLOAD,
+                    actorId = appointment.workerId,
+                )
+
+                _uiState.value = _uiState.value.copy(
+                    actionInProgress = false,
+                    requestHandled = true,
+                    errorMessage = null,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    actionInProgress = false,
+                    requestHandled = false,
+                    errorMessage = e.message ?: "No se pudo aceptar la solicitud",
+                )
+            }
         }
     }
 
     fun rejectRequest() {
         val appointment = _uiState.value.appointment ?: return
-        val appointmentId = appointment.id
 
         viewModelScope.launch {
-            repository.rejectAppointmentByWorker(appointmentId)
-
-            notificationsRepository.pushNotification(
-                userId = appointment.clientId,
-                recipientRole = "client",
-                title = "Solicitud rechazada",
-                message = "${appointment.workerName} rechazó tu solicitud de cita.",
-                type = NotificationTypes.REQUEST_REJECTED,
-                appointmentId = appointment.id,
-                deepLink = NotificationDeepLinks.CLIENT_REQUESTS,
-                actorId = appointment.workerId,
+            _uiState.value = _uiState.value.copy(
+                actionInProgress = true,
+                errorMessage = null,
+                requestHandled = false,
             )
 
-            loadAppointment(appointmentId)
+            try {
+                repository.rejectAppointmentByWorker(appointment.id)
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Solicitud rechazada",
+                    message = "${appointment.workerName} rechazó tu solicitud de cita.",
+                    type = NotificationTypes.REQUEST_REJECTED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_REQUESTS,
+                    actorId = appointment.workerId,
+                )
+
+                _uiState.value = _uiState.value.copy(
+                    actionInProgress = false,
+                    requestHandled = true,
+                    errorMessage = null,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    actionInProgress = false,
+                    requestHandled = false,
+                    errorMessage = e.message ?: "No se pudo rechazar la solicitud",
+                )
+            }
         }
     }
 }

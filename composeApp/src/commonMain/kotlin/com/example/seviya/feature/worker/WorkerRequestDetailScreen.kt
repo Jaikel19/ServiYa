@@ -94,22 +94,23 @@ fun WorkerRequestDetailScreen(
         viewModel.loadAppointment(appointmentId)
     }
 
+    LaunchedEffect(uiState.requestHandled) {
+        if (uiState.requestHandled) {
+            onBack()
+        }
+    }
+
     uiState.appointment?.let { appointment ->
         WorkerRequestDetailContent(
             appointment = appointment,
             onBack = onBack,
-            onAccept = {
-                viewModel.acceptRequest()
-                onBack()
-            },
-            onReject = {
-                viewModel.rejectRequest()
-                onBack()
-            },
+            onAccept = { viewModel.acceptRequest() },
+            onReject = { viewModel.rejectRequest() },
+            actionInProgress = uiState.actionInProgress,
         )
     } ?: FeaturePlaceholder(
         title = "Solicitud",
-        subtitle = "No se encontró la solicitud."
+        subtitle = "No se encontró la solicitud.",
     )
 }
 
@@ -119,6 +120,7 @@ private fun WorkerRequestDetailContent(
     onBack: () -> Unit,
     onAccept: () -> Unit,
     onReject: () -> Unit,
+    actionInProgress: Boolean,
     onGoServices: () -> Unit = {},
     onGoAgenda: () -> Unit = {},
     onGoRequests: () -> Unit = {},
@@ -280,6 +282,7 @@ private fun WorkerRequestDetailContent(
                 ) {
                     Button(
                         onClick = onAccept,
+                        enabled = !actionInProgress,
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -295,13 +298,14 @@ private fun WorkerRequestDetailContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Aceptar Solicitud",
+                            text = if (actionInProgress) "Procesando..." else "Aceptar Solicitud",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         )
                     }
 
                     OutlinedButton(
                         onClick = onReject,
+                        enabled = !actionInProgress,
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = BrandRed),

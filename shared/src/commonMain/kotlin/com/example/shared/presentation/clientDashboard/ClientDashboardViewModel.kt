@@ -2,7 +2,7 @@ package com.example.shared.presentation.clientDashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shared.data.repository.IBookingRepository
+import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,63 +12,52 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class ClientDashboardViewModel(private val bookingRepository: IBookingRepository) : ViewModel() {
+class ClientDashboardViewModel(
+    private val appointmentRepository: IAppointmentRepository,
+) : ViewModel() {
 
-  private val _uiState = MutableStateFlow(ClientDashboardUiState())
-  val uiState: StateFlow<ClientDashboardUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ClientDashboardUiState())
+    val uiState: StateFlow<ClientDashboardUiState> = _uiState.asStateFlow()
 
-  private var bookingsJob: Job? = null
+    private var appointmentsJob: Job? = null
 
-  fun loadBookings(clientId: String) {
-    if (clientId.isBlank()) return
+    fun loadAppointments(clientId: String) {
+        if (clientId.isBlank()) return
 
-    bookingsJob?.cancel()
-    bookingsJob =
-        viewModelScope.launch {
-          _uiState.value =
-              _uiState.value.copy(
-                  clientId = clientId,
-                  isLoading = true,
-                  errorMessage = null,
-                  bookings = emptyList(),
-              )
-
-          try {
-            val clientProfile = bookingRepository.getWorkerProfile(clientId)
-
-            _uiState.value =
-                _uiState.value.copy(
-                    clientId = clientId,
-                    clientName = clientProfile?.name.orEmpty(),
-                    clientPhotoUrl = clientProfile?.profilePicture.orEmpty(),
-                )
-          } catch (e: Exception) {
-            println("ERROR loading client profile: ${e.message}")
-          }
-
-          bookingRepository
-              .getBookingsByClient(clientId)
-              .onEach { bookings ->
-                val fallbackName = bookings.firstOrNull()?.clientName.orEmpty()
-
+        appointmentsJob?.cancel()
+        appointmentsJob =
+            viewModelScope.launch {
                 _uiState.value =
                     _uiState.value.copy(
                         clientId = clientId,
-                        clientName = _uiState.value.clientName.ifBlank { fallbackName },
-                        bookings = bookings,
-                        isLoading = false,
+                        isLoading = true,
                         errorMessage = null,
+                        appointments = emptyList(),
                     )
-              }
-              .catch { e ->
-                _uiState.value =
-                    _uiState.value.copy(
-                        isLoading = false,
-                        bookings = emptyList(),
-                        errorMessage = e.message ?: "Error al cargar las citas del cliente.",
-                    )
-              }
-              .collect()
-        }
-  }
+
+                appointmentRepository
+                    .getAppointmentsByClient(clientId)
+                    .onEach { appointments ->
+                        val fallbackName = appointments.firstOrNull()?.clientName.orEmpty()
+
+                        _uiState.value =
+                            _uiState.value.copy(
+                                clientId = clientId,
+                                clientName = _uiState.value.clientName.ifBlank { fallbackName },
+                                appointments = appointments,
+                                isLoading = false,
+                                errorMessage = null,
+                            )
+                    }
+                    .catch { e ->
+                        _uiState.value =
+                            _uiState.value.copy(
+                                isLoading = false,
+                                appointments = emptyList(),
+                                errorMessage = e.message ?: "Error al cargar las citas del cliente.",
+                            )
+                    }
+                    .collect()
+            }
+    }
 }
