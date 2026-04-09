@@ -46,6 +46,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class ClientToWorkerReview(val appointmentId: String)
 
+@Serializable
+data class LoginRoute(val role: String)
+
 @Serializable data class WorkerDailyAppointments(val workerId: String)
 
 @Serializable object RequestAppointment

@@ -59,6 +59,9 @@ import com.example.seviya.feature.worker.navigation.workerNavGraph
 import com.example.shared.domain.entity.Appointment
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentDraft
+import com.example.seviya.core.navigation.LoginRoute
+import com.example.seviya.feature.landing.LoginScreen
+import com.example.shared.domain.entity.User
 
 @Composable
 fun AppNavGraph(
@@ -181,45 +184,42 @@ fun NavGraphBuilder.homeNavGraph(
     TravelTimeConfigScreen(workerId = currentWorkerId, onBack = { navController.popBackStack() })
   }
 
-  composable<RoleCatalog> {
-    RoleCatalogScreen(
-        onPickClient = {
-          onSessionRoleChange(SessionRole.CLIENT)
-          onCurrentClientIdChange("client_demo_001")
-          onCurrentClientNameChange("Cliente Demo")
-          onCurrentClientTabChange(ClientTab.SERVICES)
-          onRequestAppointmentDraftChange(null)
-          navController.navigateSingleTop(ClientHome)
-        },
-        onPickWorker = {
-          onSessionRoleChange(SessionRole.WORKER)
-          onCurrentWorkerTabChange(WorkerTab.DASHBOARD)
-          onCurrentWorkerIdChange("worker_demo_001")
-          onRequestAppointmentDraftChange(null)
-          navController.navigateSingleTop(WorkerDashboard)
-        },
-    )
-  }
+    composable<RoleCatalog> {
+        RoleCatalogScreen(
+            onPickClient = {},
+            onPickWorker = {},
+        )
+    }
 
-  composable<RoleAdmissionCatalog> {
-    RoleAdmissionCatalogScreen(
-        onPickClient = {
-          onSessionRoleChange(SessionRole.CLIENT)
-          onCurrentClientIdChange("client_demo_001")
-          onCurrentClientNameChange("Cliente Demo")
-          onCurrentClientTabChange(ClientTab.SERVICES)
-          onRequestAppointmentDraftChange(null)
-          navController.navigateSingleTop(ClientHome)
-        },
-        onPickWorker = {
-          onSessionRoleChange(SessionRole.WORKER)
-          onCurrentWorkerTabChange(WorkerTab.DASHBOARD)
-          onCurrentWorkerIdChange("worker_demo_001")
-          onRequestAppointmentDraftChange(null)
-          navController.navigateSingleTop(WorkerDashboard)
-        },
-    )
-  }
+    composable<RoleAdmissionCatalog> {
+        LoginScreen(
+            onBack = { navController.popBackStack() },
+            onLoginSuccess = { user: User ->
+                onRequestAppointmentDraftChange(null)
+
+                when (user.role.trim().lowercase()) {
+                    "client" -> {
+                        onSessionRoleChange(SessionRole.CLIENT)
+                        onCurrentClientIdChange(user.uid)
+                        onCurrentClientNameChange(user.name)
+                        onCurrentWorkerIdChange("")
+                        onCurrentClientTabChange(ClientTab.SERVICES)
+                        navController.navigateSingleTop(ClientHome)
+                    }
+
+                    "worker" -> {
+                        onSessionRoleChange(SessionRole.WORKER)
+                        onCurrentWorkerIdChange(user.uid)
+                        onCurrentClientIdChange("")
+                        onCurrentClientNameChange("")
+                        onCurrentWorkerTabChange(WorkerTab.DASHBOARD)
+                        navController.navigateSingleTop(WorkerDashboard)
+                    }
+                }
+            },
+        )
+    }
+
 
   composable<CategoriesCatalog> {
     var selectedCategoryId by rememberSaveable { mutableStateOf<String?>(null) }

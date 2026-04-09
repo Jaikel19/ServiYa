@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,16 +39,14 @@ import com.example.seviya.feature.client.navigation.ClientScaffold
 import com.example.seviya.feature.client.navigation.isClientScaffoldDestination
 import com.example.seviya.feature.worker.navigation.WorkerScaffold
 import com.example.seviya.feature.worker.navigation.isWorkerScaffoldDestination
-import com.example.shared.domain.entity.Address
-import com.example.shared.domain.entity.Appointment
-import com.example.shared.domain.entity.AppointmentLocation
-import com.example.shared.domain.entity.AppointmentService
-import com.example.shared.domain.entity.Service
+import com.example.shared.data.repository.Auth.IAuthRepository
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.shared.presentation.notifications.NotificationsViewModel
 import com.example.shared.presentation.requestAppointment.CurrentTimeSnapshot
 import com.example.shared.presentation.requestAppointment.RequestAppointmentDraft
 import com.example.shared.utils.DateTimeUtils
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 enum class SessionRole {
@@ -59,11 +58,13 @@ enum class SessionRole {
 @Composable
 fun App() {
     val navController = rememberNavController()
+    val appScope = rememberCoroutineScope()
+    val authRepository: IAuthRepository = koinInject()
 
     var sessionRole by rememberSaveable { mutableStateOf(SessionRole.GUEST) }
-    var currentWorkerId by rememberSaveable { mutableStateOf("worker_demo_001") }
-    var currentClientId by rememberSaveable { mutableStateOf("client_demo_001") }
-    var currentClientName by rememberSaveable { mutableStateOf("Cliente Demo") }
+    var currentWorkerId by rememberSaveable { mutableStateOf("") }
+    var currentClientId by rememberSaveable { mutableStateOf("") }
+    var currentClientName by rememberSaveable { mutableStateOf("") }
 
     var requestAppointmentDraft by remember { mutableStateOf<RequestAppointmentDraft?>(null) }
 
@@ -80,8 +81,16 @@ fun App() {
 
     LaunchedEffect(sessionRole, currentClientId, currentWorkerId) {
         when (sessionRole) {
-            SessionRole.CLIENT -> notificationsViewModel.start(currentClientId)
-            SessionRole.WORKER -> notificationsViewModel.start(currentWorkerId)
+            SessionRole.CLIENT -> {
+                if (currentClientId.isNotBlank()) {
+                    notificationsViewModel.start(currentClientId)
+                }
+            }
+            SessionRole.WORKER -> {
+                if (currentWorkerId.isNotBlank()) {
+                    notificationsViewModel.start(currentWorkerId)
+                }
+            }
             SessionRole.GUEST -> Unit
         }
     }
@@ -127,10 +136,17 @@ fun App() {
                     onClientMenuExpandedChange = { clientMenuExpanded = it },
                     onWorkerMenuExpandedChange = { workerMenuExpanded = it },
                     onLogout = {
+                        appScope.launch {
+                            authRepository.signOut()
+                        }
                         clientMenuExpanded = false
                         workerMenuExpanded = false
                         sessionRole = SessionRole.GUEST
+                        currentClientId = ""
+                        currentClientName = ""
+                        currentWorkerId = ""
                         currentClientTab = ClientTab.SERVICES
+                        currentWorkerTab = WorkerTab.DASHBOARD
                         requestAppointmentDraft = null
                         navController.navigateToLandingClearingStack()
                     },
@@ -167,10 +183,17 @@ fun App() {
                     onClientMenuExpandedChange = { clientMenuExpanded = it },
                     onWorkerMenuExpandedChange = { workerMenuExpanded = it },
                     onLogout = {
+                        appScope.launch {
+                            authRepository.signOut()
+                        }
                         workerMenuExpanded = false
                         clientMenuExpanded = false
                         sessionRole = SessionRole.GUEST
+                        currentWorkerId = ""
+                        currentClientId = ""
+                        currentClientName = ""
                         currentWorkerTab = WorkerTab.DASHBOARD
+                        currentClientTab = ClientTab.SERVICES
                         requestAppointmentDraft = null
                         navController.navigateToLandingClearingStack()
                     },
