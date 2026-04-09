@@ -185,9 +185,9 @@ fun NavGraphBuilder.homeNavGraph(
   }
 
     composable<RoleCatalog> {
-        FeaturePlaceholder(
-            title = "Registro",
-            subtitle = "El registro aún no está implementado.",
+        RoleCatalogScreen(
+            onPickClient = {},
+            onPickWorker = {},
         )
     }
 
