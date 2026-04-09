@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface IRemoteUserDataSource {
   suspend fun getAllWorkers(): Flow<List<User>>
 
-  suspend fun getUserById(userId: String): Flow<User?>
+  suspend fun getUserById(userId: String): User?
 
   suspend fun getWorkZonesByUser(userId: String): Flow<List<WorkZone>>
 

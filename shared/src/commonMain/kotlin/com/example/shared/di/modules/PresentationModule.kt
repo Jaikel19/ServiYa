@@ -14,6 +14,7 @@ import com.example.shared.presentation.clientRequests.ClientRequestsViewModel
 import com.example.shared.presentation.clientToWorkerReview.ClientToWorkerReviewViewModel
 import com.example.shared.presentation.dailyAgenda.DailyAgendaViewModel
 import com.example.shared.presentation.favoriteWorkers.FavoriteWorkersViewModel
+import com.example.shared.presentation.login.LoginViewModel
 import com.example.shared.presentation.professionalProfile.ProfessionalProfileViewModel
 import com.example.shared.presentation.requestAppointment.RequestAppointmentViewModel
 import com.example.shared.presentation.services.ServicesViewModel
@@ -58,4 +59,6 @@ val presentationModule = module {
   factory { WorkerToClientReviewViewModel(get(), get(), get()) }
   factory { ClientToWorkerReviewViewModel(get(), get(), get()) }
   factory { NotificationsViewModel(get()) }
+  factory { LoginViewModel(get(), get()) }
+
 }

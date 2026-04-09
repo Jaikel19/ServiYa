@@ -59,6 +59,10 @@ import com.example.shared.data.remote.notifications.IRemoteNotificationsDataSour
 import com.example.shared.data.remote.notifications.RemoteNotificationsDataSource
 import com.example.shared.data.repository.notifications.INotificationsRepository
 import com.example.shared.data.repository.notifications.NotificationsRepository
+import com.example.shared.data.remote.Auth.IRemoteAuthDataSource
+import com.example.shared.data.remote.Auth.RemoteAuthDataSource
+import com.example.shared.data.repository.Auth.AuthRepository
+import com.example.shared.data.repository.Auth.IAuthRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -129,6 +133,10 @@ val dataModule = module {
 
   single<IRemoteUserDataSource> { RemoteUserDataSource() }
   single<IUserRepository> { UserRepository(get()) }
+
+  // Auth
+  single<IRemoteAuthDataSource> { RemoteAuthDataSource() }
+  single<IAuthRepository> { AuthRepository(get()) }
 
   single(named("cloudinary")) {
     HttpClient { install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) } }
