@@ -35,7 +35,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -52,7 +51,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -65,6 +63,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -80,13 +79,11 @@ import com.example.seviya.core.designsystem.theme.SoftBlueSurface
 import com.example.seviya.core.designsystem.theme.TextBluePrimary
 import com.example.seviya.core.designsystem.theme.TextSecondary
 import com.example.seviya.core.designsystem.theme.White
-import com.example.shared.presentation.workerAvailability.ExceptionUiItem
+import com.example.shared.presentation.workerAvailability.DayUiItem
 import com.example.shared.presentation.workerAvailability.WorkerAvailabilityUiState
 import com.example.shared.presentation.workerAvailability.WorkerAvailabilityViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
-import compose.icons.tablericons.Calendar
-import compose.icons.tablericons.CalendarOff
 import compose.icons.tablericons.Check
 import compose.icons.tablericons.Clock
 import compose.icons.tablericons.Plus
@@ -104,15 +101,9 @@ fun WorkerAvailabilityScreen(workerId: String, onBack: () -> Unit) {
         uiState = uiState,
         onBack = onBack,
         onToggleDay = { viewModel.toggleDay(it) },
-        onUpdateDayTime = { key, s, e -> viewModel.updateDayTime(key, s, e) },
-        onOpenExceptionDialog = { viewModel.openExceptionDialog() },
-        onCloseExceptionDialog = { viewModel.closeExceptionDialog() },
-        onUpdatePendingDate = { viewModel.updatePendingDate(it) },
-        onUpdatePendingType = { viewModel.updatePendingType(it) },
-        onUpdatePendingStart = { viewModel.updatePendingStart(it) },
-        onUpdatePendingEnd = { viewModel.updatePendingEnd(it) },
-        onConfirmException = { viewModel.confirmException(workerId) },
-        onDeleteException = { viewModel.deleteException(workerId, it) },
+        onAddTimeBlock = { viewModel.addTimeBlock(it) },
+        onRemoveTimeBlock = { day, idx -> viewModel.removeTimeBlock(day, idx) },
+        onUpdateTimeBlock = { day, idx, s, e -> viewModel.updateTimeBlock(day, idx, s, e) },
         onSave = { viewModel.save(workerId) },
         onClearSaveSuccess = { viewModel.clearSaveSuccess() },
         onClearError = { viewModel.clearError() },
@@ -124,15 +115,9 @@ private fun WorkerAvailabilityContent(
     uiState: WorkerAvailabilityUiState,
     onBack: () -> Unit,
     onToggleDay: (String) -> Unit,
-    onUpdateDayTime: (String, String, String) -> Unit,
-    onOpenExceptionDialog: () -> Unit,
-    onCloseExceptionDialog: () -> Unit,
-    onUpdatePendingDate: (String) -> Unit,
-    onUpdatePendingType: (Boolean) -> Unit,
-    onUpdatePendingStart: (String) -> Unit,
-    onUpdatePendingEnd: (String) -> Unit,
-    onConfirmException: () -> Unit,
-    onDeleteException: (String) -> Unit,
+    onAddTimeBlock: (String) -> Unit,
+    onRemoveTimeBlock: (String, Int) -> Unit,
+    onUpdateTimeBlock: (String, Int, String, String) -> Unit,
     onSave: () -> Unit,
     onClearSaveSuccess: () -> Unit,
     onClearError: () -> Unit,
@@ -141,7 +126,7 @@ private fun WorkerAvailabilityContent(
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
-            snackbarHostState.showSnackbar("Disponibilidad guardada correctamente")
+            snackbarHostState.showSnackbar("Availability saved successfully")
             onClearSaveSuccess()
         }
     }
@@ -151,21 +136,6 @@ private fun WorkerAvailabilityContent(
             snackbarHostState.showSnackbar(it)
             onClearError()
         }
-    }
-
-    if (uiState.showExceptionDialog) {
-        AddExceptionDialog(
-            pendingDate = uiState.pendingDate,
-            pendingIsUnavailable = uiState.pendingIsUnavailable,
-            pendingStart = uiState.pendingStart,
-            pendingEnd = uiState.pendingEnd,
-            onDateChange = onUpdatePendingDate,
-            onTypeChange = onUpdatePendingType,
-            onStartChange = onUpdatePendingStart,
-            onEndChange = onUpdatePendingEnd,
-            onConfirm = onConfirmException,
-            onDismiss = onCloseExceptionDialog,
-        )
     }
 
     Scaffold(
@@ -186,7 +156,10 @@ private fun WorkerAvailabilityContent(
             AvailabilityHeader(onBack = onBack)
 
             if (uiState.isLoading) {
-                Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(48.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
                     CircularProgressIndicator(color = BrandBlue)
                 }
             } else {
@@ -195,105 +168,44 @@ private fun WorkerAvailabilityContent(
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
                         .padding(top = 24.dp, bottom = 100.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    // Reglas semanales
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                text = "Reglas semanales",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = TextBluePrimary,
-                            )
-                            Text(
-                                text = "HORARIO BASE",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.sp,
-                                ),
-                                color = BrandBlue,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(SoftBlueSurface)
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                            )
-                        }
-
-                        uiState.days.forEach { day ->
-                            DayCard(
-                                label = day.label,
-                                enabled = day.enabled,
-                                startTime = day.startTime,
-                                endTime = day.endTime,
-                                onToggle = { onToggleDay(day.dayKey) },
-                                onStartChange = { onUpdateDayTime(day.dayKey, it, day.endTime) },
-                                onEndChange = { onUpdateDayTime(day.dayKey, day.startTime, it) },
-                            )
-                        }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Weekly schedule",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = TextBluePrimary,
+                        )
+                        Text(
+                            text = "BASE HOURS",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp,
+                            ),
+                            color = BrandBlue,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(SoftBlueSurface)
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                        )
                     }
 
-                    // Excepciones
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                text = "Excepciones",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = TextBluePrimary,
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .clickable { onOpenExceptionDialog() }
-                                    .background(SoftBlueSurface)
-                                    .padding(horizontal = 10.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                Icon(
-                                    imageVector = TablerIcons.Plus,
-                                    contentDescription = null,
-                                    tint = BrandBlue,
-                                    modifier = Modifier.size(14.dp),
-                                )
-                                Text(
-                                    text = "AGREGAR",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 1.sp,
-                                    ),
-                                    color = BrandBlue,
-                                )
-                            }
-                        }
-
-                        if (uiState.exceptions.isEmpty()) {
-                            Text(
-                                text = "Sin excepciones registradas",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = InactiveSoft,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 12.dp),
-                            )
-                        } else {
-                            uiState.exceptions.forEach { exc ->
-                                ExceptionCard(
-                                    exception = exc,
-                                    onDelete = { onDeleteException(exc.date) },
-                                )
-                            }
-                        }
+                    uiState.days.forEach { day ->
+                        DayCard(
+                            day = day,
+                            onToggle = { onToggleDay(day.dayKey) },
+                            onAddTimeBlock = { onAddTimeBlock(day.dayKey) },
+                            onRemoveTimeBlock = { idx -> onRemoveTimeBlock(day.dayKey, idx) },
+                            onUpdateTimeBlock = { idx, s, e -> onUpdateTimeBlock(day.dayKey, idx, s, e) },
+                        )
                     }
 
-                    // Guardar
+                    Spacer(Modifier.height(8.dp))
+
                     Button(
                         onClick = onSave,
                         enabled = !uiState.isSaving,
@@ -315,7 +227,7 @@ private fun WorkerAvailabilityContent(
                             )
                         } else {
                             Text(
-                                "Guardar cambios",
+                                "Save changes",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             )
                             Spacer(Modifier.width(8.dp))
@@ -334,20 +246,20 @@ private fun WorkerAvailabilityContent(
 
 @Composable
 private fun DayCard(
-    label: String,
-    enabled: Boolean,
-    startTime: String,
-    endTime: String,
+    day: DayUiItem,
     onToggle: () -> Unit,
-    onStartChange: (String) -> Unit,
-    onEndChange: (String) -> Unit,
+    onAddTimeBlock: () -> Unit,
+    onRemoveTimeBlock: (Int) -> Unit,
+    onUpdateTimeBlock: (Int, String, String) -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (enabled) White else White.copy(alpha = 0.6f)
+            containerColor = if (day.enabled) White else White.copy(alpha = 0.6f),
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (enabled) 2.dp else 0.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (day.enabled) 2.dp else 0.dp,
+        ),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -357,12 +269,12 @@ private fun DayCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = label,
+                    text = day.label,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    color = if (enabled) TextBluePrimary else InactiveSoft,
+                    color = if (day.enabled) TextBluePrimary else InactiveSoft,
                 )
                 Switch(
-                    checked = enabled,
+                    checked = day.enabled,
                     onCheckedChange = { onToggle() },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = White,
@@ -373,45 +285,111 @@ private fun DayCard(
                 )
             }
 
+            // Time blocks when enabled
             AnimatedVisibility(
-                visible = enabled,
+                visible = day.enabled,
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut(),
             ) {
-                Column {
-                    Spacer(Modifier.height(12.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        TimeField(
-                            modifier = Modifier.weight(1f),
-                            label = "Desde",
-                            value = startTime,
-                            onValueChange = onStartChange,
+                Column(
+                    modifier = Modifier.padding(top = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    day.timeBlocks.forEachIndexed { index, block ->
+                        TimeBlockRow(
+                            start = block.start,
+                            end = block.end,
+                            canRemove = day.timeBlocks.size > 1,
+                            onStartChange = { onUpdateTimeBlock(index, it, block.end) },
+                            onEndChange = { onUpdateTimeBlock(index, block.start, it) },
+                            onRemove = { onRemoveTimeBlock(index) },
                         )
-                        TimeField(
-                            modifier = Modifier.weight(1f),
-                            label = "Hasta",
-                            value = endTime,
-                            onValueChange = onEndChange,
+                    }
+
+                    // Add time range button
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { onAddTimeBlock() }
+                            .background(SoftBlueSurface)
+                            .padding(vertical = 10.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = TablerIcons.Plus,
+                            contentDescription = null,
+                            tint = BrandBlue,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = "Add time range",
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = BrandBlue,
                         )
                     }
                 }
             }
 
+            // Not available label when disabled
             AnimatedVisibility(
-                visible = !enabled,
+                visible = !day.enabled,
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
                 Text(
-                    text = "No disponible",
-                    style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
+                    text = "Not available",
+                    style = MaterialTheme.typography.bodySmall.copy(fontStyle = FontStyle.Italic),
                     color = InactiveSoft,
                     modifier = Modifier.padding(top = 4.dp),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun TimeBlockRow(
+    start: String,
+    end: String,
+    canRemove: Boolean,
+    onStartChange: (String) -> Unit,
+    onEndChange: (String) -> Unit,
+    onRemove: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TimeField(
+            modifier = Modifier.weight(1f),
+            label = "From",
+            value = start,
+            onValueChange = onStartChange,
+        )
+        TimeField(
+            modifier = Modifier.weight(1f),
+            label = "To",
+            value = end,
+            onValueChange = onEndChange,
+        )
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (canRemove) ErrorRedSoft else BorderSoft)
+                .clickable(enabled = canRemove) { onRemove() },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = TablerIcons.Trash,
+                contentDescription = "Remove",
+                tint = if (canRemove) ErrorText else InactiveSoft,
+                modifier = Modifier.size(18.dp),
+            )
         }
     }
 }
@@ -473,223 +451,6 @@ private fun TimeField(
 }
 
 @Composable
-private fun ExceptionCard(
-    exception: ExceptionUiItem,
-    onDelete: () -> Unit,
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(if (exception.isUnavailable) ErrorRedSoft else SoftBlueSurface),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = if (exception.isUnavailable) TablerIcons.CalendarOff else TablerIcons.Calendar,
-                    contentDescription = null,
-                    tint = if (exception.isUnavailable) ErrorText else BrandBlue,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-
-            Spacer(Modifier.width(12.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = exception.displayDate,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = TextBluePrimary,
-                )
-                Text(
-                    text = if (exception.isUnavailable) "No disponible"
-                    else "${exception.startTime} – ${exception.endTime}",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
-                    ),
-                    color = if (exception.isUnavailable) ErrorText else BrandBlue,
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .clickable { onDelete() }
-                    .background(ErrorRedSoft),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = TablerIcons.Trash,
-                    contentDescription = "Eliminar",
-                    tint = ErrorText,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AddExceptionDialog(
-    pendingDate: String,
-    pendingIsUnavailable: Boolean,
-    pendingStart: String,
-    pendingEnd: String,
-    onDateChange: (String) -> Unit,
-    onTypeChange: (Boolean) -> Unit,
-    onStartChange: (String) -> Unit,
-    onEndChange: (String) -> Unit,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = White,
-        shape = RoundedCornerShape(20.dp),
-        title = {
-            Text(
-                "Nueva excepción",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = TextBluePrimary,
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Fecha
-                Column {
-                    Text(
-                        "FECHA (AAAA-MM-DD)",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
-                        ),
-                        color = TextSecondary,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = pendingDate,
-                        onValueChange = onDateChange,
-                        placeholder = {
-                            Text("2025-10-15", color = InactiveSoft)
-                        },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BrandBlue,
-                            unfocusedBorderColor = BorderSoft,
-                            cursorColor = BrandBlue,
-                        ),
-                    )
-                }
-
-                // Tipo
-                Column {
-                    Text(
-                        "TIPO",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
-                        ),
-                        color = TextSecondary,
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TypeChip(
-                            modifier = Modifier.weight(1f),
-                            label = "No disponible",
-                            selected = pendingIsUnavailable,
-                            selectedColor = BrandRed,
-                            onClick = { onTypeChange(true) },
-                        )
-                        TypeChip(
-                            modifier = Modifier.weight(1f),
-                            label = "Horario especial",
-                            selected = !pendingIsUnavailable,
-                            selectedColor = BrandBlue,
-                            onClick = { onTypeChange(false) },
-                        )
-                    }
-                }
-
-                // Horas (solo si horario especial)
-                AnimatedVisibility(visible = !pendingIsUnavailable) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        TimeField(
-                            modifier = Modifier.weight(1f),
-                            label = "Desde",
-                            value = pendingStart,
-                            onValueChange = onStartChange,
-                        )
-                        TimeField(
-                            modifier = Modifier.weight(1f),
-                            label = "Hasta",
-                            value = pendingEnd,
-                            onValueChange = onEndChange,
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                enabled = pendingDate.isNotBlank(),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-            ) {
-                Text("Agregar", color = White, fontWeight = FontWeight.Bold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar", color = TextSecondary)
-            }
-        },
-    )
-}
-
-@Composable
-private fun TypeChip(
-    modifier: Modifier = Modifier,
-    label: String,
-    selected: Boolean,
-    selectedColor: Color,
-    onClick: () -> Unit,
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .border(
-                width = 1.5.dp,
-                color = if (selected) selectedColor else BorderSoft,
-                shape = RoundedCornerShape(10.dp),
-            )
-            .background(if (selected) selectedColor.copy(alpha = 0.08f) else White)
-            .clickable { onClick() }
-            .padding(vertical = 10.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = if (selected) selectedColor else InactiveSoft,
-        )
-    }
-}
-
-@Composable
 private fun AvailabilityHeader(onBack: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "availability_header")
 
@@ -731,16 +492,12 @@ private fun AvailabilityHeader(onBack: () -> Unit) {
                 .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
                 .background(BrandBlue)
         ) {
-            // Shimmer
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(140.dp)
                     .offset(x = shimmerOffset.dp)
-                    .graphicsLayer {
-                        rotationZ = -18f
-                        alpha = 0.16f
-                    }
+                    .graphicsLayer { rotationZ = -18f; alpha = 0.16f }
                     .background(
                         Brush.linearGradient(
                             colors = listOf(
@@ -752,7 +509,6 @@ private fun AvailabilityHeader(onBack: () -> Unit) {
                     )
             )
 
-            // Back + Logo
             Row(
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -760,11 +516,7 @@ private fun AvailabilityHeader(onBack: () -> Unit) {
                     .graphicsLayer { scaleX = badgeScale; scaleY = badgeScale }
                     .clip(RoundedCornerShape(999.dp))
                     .background(White.copy(alpha = 0.14f))
-                    .border(
-                        width = 1.dp,
-                        color = White.copy(alpha = 0.16f),
-                        shape = RoundedCornerShape(999.dp),
-                    )
+                    .border(1.dp, White.copy(alpha = 0.16f), RoundedCornerShape(999.dp))
                     .padding(horizontal = 12.dp, vertical = 9.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -779,7 +531,7 @@ private fun AvailabilityHeader(onBack: () -> Unit) {
                 ) {
                     Icon(
                         imageVector = TablerIcons.ArrowLeft,
-                        contentDescription = "Volver",
+                        contentDescription = "Back",
                         tint = White,
                         modifier = Modifier.size(16.dp),
                     )
@@ -790,19 +542,14 @@ private fun AvailabilityHeader(onBack: () -> Unit) {
                 }
             }
 
-            // Badge derecho
             Text(
-                text = "DISPONIBILIDAD",
+                text = "AVAILABILITY",
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(end = 20.dp, top = 42.dp)
                     .clip(RoundedCornerShape(999.dp))
                     .background(White.copy(alpha = 0.14f))
-                    .border(
-                        width = 1.dp,
-                        color = White.copy(alpha = 0.16f),
-                        shape = RoundedCornerShape(999.dp),
-                    )
+                    .border(1.dp, White.copy(alpha = 0.16f), RoundedCornerShape(999.dp))
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 color = White,
                 fontSize = 14.sp,
