@@ -43,6 +43,7 @@ import com.example.shared.presentation.calendar.CalendarUserRole
 import com.example.shared.presentation.calendar.MonthlyCalendarViewModel
 import com.example.seviya.core.navigation.TravelTimeConfig
 import com.example.seviya.feature.worker.WorkerAlertsScreen
+import com.example.seviya.feature.worker.WorkerAvailabilityScreen
 import com.example.seviya.core.navigation.ProfessionalProfile
 
 fun NavGraphBuilder.workerNavGraph(
@@ -273,9 +274,9 @@ fun NavGraphBuilder.workerNavGraph(
   }
 
   composable<WorkerSchedule> {
-    FeaturePlaceholder(
-        title = "Horario del trabajador",
-        subtitle = "Aquí irá la configuración de días laborales, zonas y disponibilidad.",
+    WorkerAvailabilityScreen(
+        workerId = currentWorkerId,
+        onBack = { navController.popBackStack() },
     )
   }
 

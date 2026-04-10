@@ -24,6 +24,7 @@ import com.example.shared.presentation.workerDailyAppointments.WorkerDailyAppoin
 import com.example.shared.presentation.workerDashboard.WorkerDashboardViewModel
 import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppointmentOtpViewModel
 import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
+import com.example.shared.presentation.workerAvailability.WorkerAvailabilityViewModel
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.shared.presentation.notifications.NotificationsViewModel
@@ -56,6 +57,7 @@ val presentationModule = module {
   factory { ClientLocationCatalogViewModel(get()) }
   factory { WorkerCategoriesViewModel(get(), get()) }
   factory { WorkerTravelTimeViewModel(get()) }
+  factory { WorkerAvailabilityViewModel(get()) }
   factory { WorkerToClientReviewViewModel(get(), get(), get()) }
   factory { ClientToWorkerReviewViewModel(get(), get(), get()) }
   factory { NotificationsViewModel(get()) }

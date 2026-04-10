@@ -138,6 +138,10 @@ val dataModule = module {
   single<IRemoteAuthDataSource> { RemoteAuthDataSource() }
   single<IAuthRepository> { AuthRepository(get()) }
 
+  // Schedule
+  single<com.example.shared.data.remote.Schedule.IRemoteScheduleDataSource> { com.example.shared.data.remote.Schedule.RemoteScheduleDataSource() }
+  single<com.example.shared.data.repository.Schedule.IScheduleRepository> { com.example.shared.data.repository.Schedule.ScheduleRepository(get()) }
+
   single(named("cloudinary")) {
     HttpClient { install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) } }
   }
