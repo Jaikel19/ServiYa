@@ -25,7 +25,7 @@ class WorkerAvailabilityViewModel(private val scheduleRepo: IScheduleRepository)
                 .catch { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        errorMessage = e.message ?: "Error loading availability",
+                        errorMessage = e.message ?: "Error al cargar la disponibilidad",
                     )
                 }
                 .collect { schedules ->
@@ -118,7 +118,7 @@ class WorkerAvailabilityViewModel(private val scheduleRepo: IScheduleRepository)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    errorMessage = e.message ?: "Error saving availability",
+                    errorMessage = e.message ?: "Error al guardar la disponibilidad",
                 )
             }
         }

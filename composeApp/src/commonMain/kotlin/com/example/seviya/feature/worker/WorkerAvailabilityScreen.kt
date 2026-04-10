@@ -126,7 +126,7 @@ private fun WorkerAvailabilityContent(
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
-            snackbarHostState.showSnackbar("Availability saved successfully")
+            snackbarHostState.showSnackbar("Disponibilidad guardada correctamente")
             onClearSaveSuccess()
         }
     }
@@ -176,12 +176,12 @@ private fun WorkerAvailabilityContent(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Weekly schedule",
+                            text = "Horario semanal",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = TextBluePrimary,
                         )
                         Text(
-                            text = "BASE HOURS",
+                            text = "HORARIO BASE",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp,
@@ -227,7 +227,7 @@ private fun WorkerAvailabilityContent(
                             )
                         } else {
                             Text(
-                                "Save changes",
+                                "Guardar cambios",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             )
                             Spacer(Modifier.width(8.dp))
@@ -325,7 +325,7 @@ private fun DayCard(
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
-                            text = "Add time range",
+                            text = "Agregar rango de hora",
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                             color = BrandBlue,
                         )
@@ -340,7 +340,7 @@ private fun DayCard(
                 exit = fadeOut(),
             ) {
                 Text(
-                    text = "Not available",
+                    text = "No disponible",
                     style = MaterialTheme.typography.bodySmall.copy(fontStyle = FontStyle.Italic),
                     color = InactiveSoft,
                     modifier = Modifier.padding(top = 4.dp),
@@ -366,13 +366,13 @@ private fun TimeBlockRow(
     ) {
         TimeField(
             modifier = Modifier.weight(1f),
-            label = "From",
+            label = "Desde",
             value = start,
             onValueChange = onStartChange,
         )
         TimeField(
             modifier = Modifier.weight(1f),
-            label = "To",
+            label = "Hasta",
             value = end,
             onValueChange = onEndChange,
         )
@@ -543,7 +543,7 @@ private fun AvailabilityHeader(onBack: () -> Unit) {
             }
 
             Text(
-                text = "AVAILABILITY",
+                text = "DISPONIBILIDAD",
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(end = 20.dp, top = 42.dp)
