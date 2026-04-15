@@ -26,6 +26,7 @@ import com.example.shared.presentation.workerStartAppointmentOtp.WorkerStartAppo
 import com.example.shared.presentation.workerToClientReview.WorkerToClientReviewViewModel
 import com.example.shared.presentation.workerAvailability.WorkerAvailabilityViewModel
 import com.example.shared.presentation.workerTravelTime.WorkerTravelTimeViewModel
+import com.example.shared.presentation.workerZones.WorkerZonesViewModel
 import com.example.shared.presentation.workersList.WorkersListViewModel
 import com.example.shared.presentation.notifications.NotificationsViewModel
 import org.koin.dsl.module
@@ -62,5 +63,6 @@ val presentationModule = module {
   factory { ClientToWorkerReviewViewModel(get(), get(), get()) }
   factory { NotificationsViewModel(get()) }
   factory { LoginViewModel(get(), get()) }
+  factory { WorkerZonesViewModel(get()) } // IUserRepository
 
 }

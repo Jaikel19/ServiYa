@@ -94,6 +94,7 @@ fun WorkerDashboardScreen(
     onOpenDailyAgenda: () -> Unit = {},
     onOpenSchedule: () -> Unit = {},
     onOpenPortfolio: () -> Unit = {},
+    onOpenZones: () -> Unit = {},
     onOpenAppointmentDetail: (Appointment) -> Unit = {},
     onStartAppointment: (Appointment) -> Unit = {},
     onCompleteAppointment: (Appointment) -> Unit = {},
@@ -111,6 +112,7 @@ fun WorkerDashboardScreen(
         onOpenDailyAgenda = onOpenDailyAgenda,
         onOpenSchedule = onOpenSchedule,
         onOpenPortfolio = onOpenPortfolio,
+        onOpenZones = onOpenZones,
         onOpenAppointmentDetail = onOpenAppointmentDetail,
         onStartAppointment = onStartAppointment,
         onCompleteAppointment = onCompleteAppointment,
@@ -126,6 +128,7 @@ private fun WorkerDashboardContent(
     onOpenDailyAgenda: () -> Unit = {},
     onOpenSchedule: () -> Unit = {},
     onOpenPortfolio: () -> Unit = {},
+    onOpenZones: () -> Unit = {},
     onOpenAppointmentDetail: (Appointment) -> Unit = {},
     onStartAppointment: (Appointment) -> Unit = {},
     onCompleteAppointment: (Appointment) -> Unit = {},
@@ -208,6 +211,7 @@ private fun WorkerDashboardContent(
                             onOpenDailyAgenda = onOpenDailyAgenda,
                             onOpenSchedule = onOpenSchedule,
                             onOpenPortfolio = onOpenPortfolio,
+                            onOpenZones = onOpenZones,
                         )
 
                         UpcomingAppointmentsSection(
@@ -597,6 +601,7 @@ private fun QuickAccessSection(
     onOpenDailyAgenda: () -> Unit,
     onOpenSchedule: () -> Unit,
     onOpenPortfolio: () -> Unit,
+    onOpenZones: () -> Unit = {},
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text(
@@ -650,6 +655,14 @@ private fun QuickAccessSection(
                 iconTint = BrandBlue,
                 background = SoftBlueSurface,
                 onClick = onOpenPortfolio,
+            )
+
+            QuickAccessItem(
+                title = "Zonas",
+                icon = TablerIcons.MapPin,
+                iconTint = BrandBlue,
+                background = SoftBlueSurface,
+                onClick = onOpenZones,
             )
         }
     }

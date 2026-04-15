@@ -84,6 +84,8 @@ data class LoginRoute(val role: String)
 
 @Serializable object WorkerCategories
 
+@Serializable object WorkerZones
+
 @Serializable object WorkerAppointmentDetail
 
 @Serializable data class WorkerWeeklyAppointments(val workerId: String)

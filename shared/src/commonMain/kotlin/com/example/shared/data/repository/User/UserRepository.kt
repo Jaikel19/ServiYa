@@ -22,4 +22,13 @@ class UserRepository(
 
     override suspend fun getAddressesByUser(userId: String): Flow<List<Address>> =
         remote.getAddressesByUser(userId).catchEmpty("fetching addresses")
+
+    override suspend fun createWorkZone(userId: String, zone: WorkZone) =
+        remote.createWorkZone(userId, zone)
+
+    override suspend fun updateWorkZoneBlocked(userId: String, zoneId: String, blocked: Boolean) =
+        remote.updateWorkZoneBlocked(userId, zoneId, blocked)
+
+    override suspend fun deleteWorkZone(userId: String, zoneId: String) =
+        remote.deleteWorkZone(userId, zoneId)
 }

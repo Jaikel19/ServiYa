@@ -79,6 +79,19 @@ class RemoteUserDataSource : IRemoteUserDataSource {
         emit(zones)
     }
 
+    override suspend fun createWorkZone(userId: String, zone: WorkZone) {
+        db.collection("users").document(userId).collection("workZones").document(zone.id).set(zone)
+    }
+
+    override suspend fun updateWorkZoneBlocked(userId: String, zoneId: String, blocked: Boolean) {
+        db.collection("users").document(userId).collection("workZones").document(zoneId)
+            .update("blocked" to blocked)
+    }
+
+    override suspend fun deleteWorkZone(userId: String, zoneId: String) {
+        db.collection("users").document(userId).collection("workZones").document(zoneId).delete()
+    }
+
     override suspend fun getAddressesByUser(userId: String): Flow<List<Address>> {
         return db.collection("users").document(userId).collection("addresses").snapshots.map { snapshot ->
             snapshot.documents.mapNotNull { doc ->

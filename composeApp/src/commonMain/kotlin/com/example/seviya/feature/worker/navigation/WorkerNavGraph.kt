@@ -13,6 +13,7 @@ import com.example.seviya.core.navigation.WorkerAgenda
 import com.example.seviya.core.navigation.WorkerAlerts
 import com.example.seviya.core.navigation.WorkerAppointmentDetail
 import com.example.seviya.core.navigation.WorkerCategories
+import com.example.seviya.core.navigation.WorkerZones
 import com.example.seviya.core.navigation.WorkerConfiguration
 import com.example.seviya.core.navigation.WorkerDailyAgenda
 import com.example.seviya.core.navigation.WorkerDailyAppointments
@@ -31,6 +32,7 @@ import com.example.seviya.feature.shared.MonthlyCalendarScreen
 import com.example.seviya.feature.shared.WeeklyAgendaScreen
 import com.example.seviya.feature.worker.WorkerAppointmentDetailScreen
 import com.example.seviya.feature.worker.WorkerCategoriesScreen
+import com.example.seviya.feature.worker.WorkerZonesScreen
 import com.example.seviya.feature.worker.WorkerDailyAppointmentsScreen
 import com.example.seviya.feature.worker.WorkerDashboardScreen
 import com.example.seviya.feature.worker.WorkerPaymentDetailScreen
@@ -63,6 +65,9 @@ fun NavGraphBuilder.workerNavGraph(
             },
             onOpenTravelTime = {
                 navController.navigateSingleTop(TravelTimeConfig)
+            },
+            onOpenZones = {
+                navController.navigateSingleTop(WorkerZones)
             },
             onOpenDailyAgenda = {
                 onCurrentWorkerTabChange(WorkerTab.AGENDA)
@@ -282,6 +287,10 @@ fun NavGraphBuilder.workerNavGraph(
 
   composable<WorkerCategories> {
     WorkerCategoriesScreen(workerId = currentWorkerId, onBack = { navController.popBackStack() })
+  }
+
+  composable<WorkerZones> {
+    WorkerZonesScreen(workerId = currentWorkerId, onBack = { navController.popBackStack() })
   }
 
   composable<WorkerToClientReview> { backStackEntry ->
