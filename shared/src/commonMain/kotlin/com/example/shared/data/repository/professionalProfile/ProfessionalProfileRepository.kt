@@ -84,4 +84,8 @@ class ProfessionalProfileRepository(
   override suspend fun updateTravelTime(workerId: String, minutes: Int) {
     remoteProfile.updateTravelTime(workerId, minutes)
   }
+
+  override suspend fun updateStars(userId: String, stars: Double) {
+    remoteProfile.updateStars(userId, stars)
+  }
 }

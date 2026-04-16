@@ -22,4 +22,6 @@ interface IProfessionalProfileRepository {
   suspend fun getWorkerTravelTime(workerId: String): Flow<Int>
 
   suspend fun updateTravelTime(workerId: String, minutes: Int)
+
+  suspend fun updateStars(userId: String, stars: Double)
 }

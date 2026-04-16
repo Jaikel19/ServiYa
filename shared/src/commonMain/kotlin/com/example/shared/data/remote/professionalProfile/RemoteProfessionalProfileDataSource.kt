@@ -176,4 +176,8 @@ class RemoteProfessionalProfileDataSource : IRemoteProfessionalProfileDataSource
   override suspend fun updateTravelTime(workerId: String, minutes: Int) {
     db.collection("users").document(workerId).update("travelTime" to minutes)
   }
+
+  override suspend fun updateStars(userId: String, stars: Double) {
+    db.collection("users").document(userId).update("stars" to stars)
+  }
 }

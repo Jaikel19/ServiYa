@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.Appointment.IAppointmentRepository
 import com.example.shared.data.repository.Review.IReviewRepository
 import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.data.repository.professionalProfile.IProfessionalProfileRepository
 import com.example.shared.domain.entity.NotificationDeepLinks
 import com.example.shared.domain.entity.NotificationTypes
 import com.example.shared.presentation.notifications.pushNotification
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -23,6 +25,7 @@ import kotlinx.datetime.toLocalDateTime
 class ClientToWorkerReviewViewModel(
     private val appointmentRepository: IAppointmentRepository,
     private val reviewRepository: IReviewRepository,
+    private val professionalProfileRepository: IProfessionalProfileRepository,
     private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
@@ -101,6 +104,24 @@ class ClientToWorkerReviewViewModel(
               )
           return@launch
         }
+
+          val updatedReviews = reviewRepository.getReviewsByTarget(review.targetId).first()
+
+          val publishedReviews = updatedReviews.filter {
+              it.status.equals("published", ignoreCase = true)
+          }
+
+          val averageStars =
+              if (publishedReviews.isNotEmpty()) {
+                  publishedReviews.map { it.rating }.average()
+              } else {
+                  review.rating.toDouble()
+              }
+
+          professionalProfileRepository.updateStars(
+              userId = review.targetId,
+              stars = averageStars,
+          )
 
           notificationsRepository.pushNotification(
               userId = appointment.clientId,

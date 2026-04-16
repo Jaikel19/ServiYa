@@ -58,8 +58,8 @@ val presentationModule = module {
   factory { WorkerCategoriesViewModel(get(), get()) }
   factory { WorkerTravelTimeViewModel(get()) }
   factory { WorkerAvailabilityViewModel(get()) }
-  factory { WorkerToClientReviewViewModel(get(), get(), get()) }
-  factory { ClientToWorkerReviewViewModel(get(), get(), get()) }
+  factory { WorkerToClientReviewViewModel(get(), get(), get(), get()) }
+  factory { ClientToWorkerReviewViewModel(get(), get(), get(), get()) }
   factory { NotificationsViewModel(get()) }
   factory { LoginViewModel(get(), get()) }
 
