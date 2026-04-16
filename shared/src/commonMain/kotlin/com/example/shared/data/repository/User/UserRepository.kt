@@ -26,6 +26,9 @@ class UserRepository(
     override suspend fun createWorkZone(userId: String, zone: WorkZone) =
         remote.createWorkZone(userId, zone)
 
+    override suspend fun updateWorkZone(userId: String, zone: WorkZone) =
+        remote.updateWorkZone(userId, zone)
+
     override suspend fun updateWorkZoneBlocked(userId: String, zoneId: String, blocked: Boolean) =
         remote.updateWorkZoneBlocked(userId, zoneId, blocked)
 

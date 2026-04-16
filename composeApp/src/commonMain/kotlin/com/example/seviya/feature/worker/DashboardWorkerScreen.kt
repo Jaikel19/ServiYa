@@ -78,6 +78,7 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.Adjustments
 import compose.icons.tablericons.CalendarEvent
 import compose.icons.tablericons.Clock
+import compose.icons.tablericons.Home
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Tool
@@ -94,7 +95,7 @@ fun WorkerDashboardScreen(
     onOpenDailyAgenda: () -> Unit = {},
     onOpenSchedule: () -> Unit = {},
     onOpenPortfolio: () -> Unit = {},
-    onOpenZones: () -> Unit = {},
+    onOpenLocations: () -> Unit = {},
     onOpenAppointmentDetail: (Appointment) -> Unit = {},
     onStartAppointment: (Appointment) -> Unit = {},
     onCompleteAppointment: (Appointment) -> Unit = {},
@@ -112,7 +113,7 @@ fun WorkerDashboardScreen(
         onOpenDailyAgenda = onOpenDailyAgenda,
         onOpenSchedule = onOpenSchedule,
         onOpenPortfolio = onOpenPortfolio,
-        onOpenZones = onOpenZones,
+        onOpenLocations = onOpenLocations,
         onOpenAppointmentDetail = onOpenAppointmentDetail,
         onStartAppointment = onStartAppointment,
         onCompleteAppointment = onCompleteAppointment,
@@ -128,7 +129,7 @@ private fun WorkerDashboardContent(
     onOpenDailyAgenda: () -> Unit = {},
     onOpenSchedule: () -> Unit = {},
     onOpenPortfolio: () -> Unit = {},
-    onOpenZones: () -> Unit = {},
+    onOpenLocations: () -> Unit = {},
     onOpenAppointmentDetail: (Appointment) -> Unit = {},
     onStartAppointment: (Appointment) -> Unit = {},
     onCompleteAppointment: (Appointment) -> Unit = {},
@@ -211,7 +212,7 @@ private fun WorkerDashboardContent(
                             onOpenDailyAgenda = onOpenDailyAgenda,
                             onOpenSchedule = onOpenSchedule,
                             onOpenPortfolio = onOpenPortfolio,
-                            onOpenZones = onOpenZones,
+                            onOpenLocations = onOpenLocations,
                         )
 
                         UpcomingAppointmentsSection(
@@ -602,6 +603,7 @@ private fun QuickAccessSection(
     onOpenSchedule: () -> Unit,
     onOpenPortfolio: () -> Unit,
     onOpenZones: () -> Unit = {},
+    onOpenLocations: () -> Unit = {},
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text(
@@ -658,11 +660,11 @@ private fun QuickAccessSection(
             )
 
             QuickAccessItem(
-                title = "Zonas",
+                title = "Ubicaciones",
                 icon = TablerIcons.MapPin,
                 iconTint = BrandBlue,
                 background = SoftBlueSurface,
-                onClick = onOpenZones,
+                onClick = onOpenLocations,
             )
         }
     }

@@ -83,6 +83,10 @@ class RemoteUserDataSource : IRemoteUserDataSource {
         db.collection("users").document(userId).collection("workZones").document(zone.id).set(zone)
     }
 
+    override suspend fun updateWorkZone(userId: String, zone: WorkZone) {
+        db.collection("users").document(userId).collection("workZones").document(zone.id).set(zone)
+    }
+
     override suspend fun updateWorkZoneBlocked(userId: String, zoneId: String, blocked: Boolean) {
         db.collection("users").document(userId).collection("workZones").document(zoneId)
             .update("blocked" to blocked)

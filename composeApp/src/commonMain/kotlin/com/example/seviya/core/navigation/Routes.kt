@@ -100,6 +100,8 @@ data class LoginRoute(val role: String)
 
 @Serializable object ClientLocationCatalog
 
+@Serializable object WorkerLocationCatalog
+
 @Serializable data class ClientPaymentUpload(val appointmentId: String)
 
 @Serializable data class WorkersList(val categoryId: String?, val categoryName: String?)

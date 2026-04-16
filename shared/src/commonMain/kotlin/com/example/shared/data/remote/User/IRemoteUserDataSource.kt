@@ -16,6 +16,8 @@ interface IRemoteUserDataSource {
 
   suspend fun createWorkZone(userId: String, zone: WorkZone)
 
+  suspend fun updateWorkZone(userId: String, zone: WorkZone)
+
   suspend fun updateWorkZoneBlocked(userId: String, zoneId: String, blocked: Boolean)
 
   suspend fun deleteWorkZone(userId: String, zoneId: String)

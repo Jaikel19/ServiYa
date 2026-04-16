@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,24 +33,32 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,8 +77,12 @@ import com.example.shared.presentation.workerZones.ZoneItem
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Check
+import compose.icons.tablericons.Lock
+import compose.icons.tablericons.LockOpen
 import compose.icons.tablericons.MapPin
+import compose.icons.tablericons.Search
 import compose.icons.tablericons.Trash
+import compose.icons.tablericons.X
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -88,6 +101,7 @@ fun WorkerZonesScreen(workerId: String, onBack: () -> Unit) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WorkerZonesContent(
     uiState: WorkerZonesUiState,
@@ -97,6 +111,8 @@ private fun WorkerZonesContent(
     onClearError: () -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val blockSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showBlockSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
@@ -117,6 +133,23 @@ private fun WorkerZonesContent(
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             WorkerZonesHeader(onBack = onBack)
 
+            var searchQuery by remember { mutableStateOf("") }
+
+            // Zonas filtradas según la búsqueda
+            val filteredProvinces = remember(searchQuery) {
+                val q = searchQuery.trim().lowercase()
+                if (q.isEmpty()) {
+                    WorkerZonesUiState.PROVINCES
+                } else {
+                    WorkerZonesUiState.PROVINCES.filter { province ->
+                        province.lowercase().contains(q) ||
+                            WorkerZonesUiState.ALL_ZONES.any { zone ->
+                                zone.province == province && zone.canton.lowercase().contains(q)
+                            }
+                    }
+                }
+            }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 24.dp),
@@ -128,7 +161,63 @@ private fun WorkerZonesContent(
                         activeCount = uiState.activeZoneIds.size,
                         blockedCount = uiState.blockedZoneIds.size,
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    BlockZoneButton(
+                        blockedCount = uiState.blockedZoneIds.size,
+                        onClick = { showBlockSheet = true },
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                // ── Barra de búsqueda ────────────────────────────────
+                item {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(
+                                "Buscar provincia o cantón...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = BlueGrayText,
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                TablerIcons.Search,
+                                contentDescription = null,
+                                tint = BlueGrayText,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .clip(CircleShape)
+                                        .clickable { searchQuery = "" },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(
+                                        TablerIcons.X,
+                                        contentDescription = "Limpiar",
+                                        tint = BlueGrayText,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+                            }
+                        },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = BrandBlue,
+                            unfocusedBorderColor = BorderSoft,
+                            focusedContainerColor = White,
+                            unfocusedContainerColor = White,
+                        ),
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
 
                 if (uiState.isLoading) {
@@ -140,9 +229,34 @@ private fun WorkerZonesContent(
                             CircularProgressIndicator(color = BrandBlue, strokeWidth = 3.dp)
                         }
                     }
+                } else if (filteredProvinces.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "Sin resultados para \"$searchQuery\"",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = BlueGrayText,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
                 } else {
-                    WorkerZonesUiState.PROVINCES.forEach { province ->
-                        val zonesForProvince = WorkerZonesUiState.ALL_ZONES.filter { it.province == province }
+                    filteredProvinces.forEach { province ->
+                        val q = searchQuery.trim().lowercase()
+                        // Si la búsqueda coincide con la provincia → mostrar todos sus cantones
+                        // Si coincide con un cantón → mostrar solo ese cantón bajo la provincia
+                        val zonesForProvince = WorkerZonesUiState.ALL_ZONES
+                            .filter { it.province == province }
+                            .let { allInProvince ->
+                                if (q.isEmpty() || province.lowercase().contains(q)) {
+                                    allInProvince
+                                } else {
+                                    allInProvince.filter { it.canton.lowercase().contains(q) }
+                                }
+                            }
                         val selectedInProvince = uiState.selectedCountByProvince(province)
 
                         item(key = "header-$province") {
@@ -170,6 +284,178 @@ private fun WorkerZonesContent(
 
                         item(key = "spacer-$province") {
                             Spacer(modifier = Modifier.height(14.dp))
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    if (showBlockSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBlockSheet = false },
+            sheetState = blockSheetState,
+            containerColor = CardSurface,
+        ) {
+            BlockZoneSheet(
+                servedZones = WorkerZonesUiState.ALL_ZONES.filter { it.id in uiState.servedZoneIds },
+                blockedZoneIds = uiState.blockedZoneIds,
+                isSaving = uiState.isSaving,
+                onToggleBlocked = onToggleBlocked,
+            )
+        }
+    }
+}
+
+@Composable
+private fun BlockZoneButton(blockedCount: Int, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().height(50.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFFEF3C7),
+            contentColor = Color(0xFFF59E0B),
+        ),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Icon(TablerIcons.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = if (blockedCount > 0) "Bloquear / Desbloquear zonas ($blockedCount bloqueadas)"
+                   else "Bloquear una zona",
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+        )
+    }
+}
+
+@Composable
+private fun BlockZoneSheet(
+    servedZones: List<ZoneItem>,
+    blockedZoneIds: Set<String>,
+    isSaving: Boolean,
+    onToggleBlocked: (String) -> Unit,
+) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filtered = remember(searchQuery, servedZones) {
+        if (searchQuery.isBlank()) servedZones
+        else servedZones.filter {
+            it.canton.lowercase().contains(searchQuery.lowercase()) ||
+                it.province.lowercase().contains(searchQuery.lowercase())
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(
+                modifier = Modifier.size(32.dp).clip(CircleShape).background(Color(0xFFFEF3C7)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(TablerIcons.Lock, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(17.dp))
+            }
+            Text("Bloquear / Desbloquear zonas", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        }
+
+        Text(
+            text = "Selecciona una zona activa para bloquearla temporalmente o desbloquearla.",
+            color = BlueGrayText, fontSize = 13.sp, lineHeight = 18.sp,
+        )
+
+        if (servedZones.size > 5) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Buscar cantón o provincia...", color = BlueGrayText, fontSize = 13.sp) },
+                leadingIcon = { Icon(TablerIcons.Search, contentDescription = null, tint = BlueGrayText, modifier = Modifier.size(16.dp)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFF59E0B),
+                    unfocusedBorderColor = BorderSoft,
+                    focusedContainerColor = White,
+                    unfocusedContainerColor = AppBackground,
+                ),
+            )
+        }
+
+        if (servedZones.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "No tienes zonas activas para bloquear.\nPrimero activa zonas desde la lista.",
+                    color = BlueGrayText, fontSize = 13.sp, textAlign = TextAlign.Center,
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 360.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(filtered, key = { it.id }) { zone ->
+                    val isBlocked = zone.id in blockedZoneIds
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (isBlocked) Color(0xFFFFFBEB) else White,
+                        shadowElevation = 1.dp,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(
+                                    1.dp,
+                                    if (isBlocked) Color(0xFFFBBF24).copy(alpha = 0.6f) else BorderSoft,
+                                    RoundedCornerShape(16.dp),
+                                )
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(
+                                modifier = Modifier.size(38.dp).clip(RoundedCornerShape(12.dp))
+                                    .background(if (isBlocked) Color(0xFFFEF3C7) else AvatarBlueSoft),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    if (isBlocked) TablerIcons.Lock else TablerIcons.LockOpen,
+                                    contentDescription = null,
+                                    tint = if (isBlocked) Color(0xFFF59E0B) else BrandBlue,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(zone.canton, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                                    color = if (isBlocked) Color(0xFFF59E0B) else TextPrimary)
+                                Text(zone.province, fontSize = 12.sp, color = BlueGrayText)
+                            }
+                            OutlinedButton(
+                                onClick = { onToggleBlocked(zone.id) },
+                                enabled = !isSaving,
+                                shape = RoundedCornerShape(10.dp),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (isBlocked) Color(0xFFFBBF24) else BrandBlue,
+                                ),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                                modifier = Modifier.height(34.dp),
+                            ) {
+                                Text(
+                                    text = if (isBlocked) "Desbloquear" else "Bloquear",
+                                    fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                                    color = if (isBlocked) Color(0xFFF59E0B) else BrandBlue,
+                                )
+                            }
                         }
                     }
                 }
@@ -492,3 +778,4 @@ private fun ZoneRow(
         }
     }
 }
+
