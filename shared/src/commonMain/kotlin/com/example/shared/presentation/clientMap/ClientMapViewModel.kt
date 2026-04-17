@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repository.User.IUserRepository
 import com.example.shared.domain.entity.Address
+import com.example.shared.domain.entity.WorkZone
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -13,6 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class ClientMapViewModel(private val userRepository: IUserRepository) : ViewModel() {
 
@@ -54,36 +57,43 @@ class ClientMapViewModel(private val userRepository: IUserRepository) : ViewMode
   }
 
   private suspend fun loadMarkersForAddress(address: Address) {
-    _state.value = _state.value.copy(isLoading = true)
+    _state.value = _state.value.copy(isLoading = true, markers = emptyList(), filteredMarkers = emptyList())
+
+    val mutex = Mutex()
 
     try {
       val workers = userRepository.getAllWorkers().catch { emit(emptyList()) }.first()
 
-      val markers = coroutineScope {
-        workers
-            .map { worker ->
-              async {
-                // Solo la zona principal (isDefault = true) y no bloqueada
-                val principalZone = userRepository
-                    .getWorkZonesByUser(worker.uid).first()
-                    .firstOrNull { it.isDefault && !it.blocked && (it.latitude != 0.0 || it.longitude != 0.0) }
+      coroutineScope {
+        workers.map { worker ->
+          async {
+            val allZones = userRepository.getWorkZonesByUser(worker.uid).first()
 
-                principalZone?.let { zone -> WorkerMapMarker(user = worker, workZone = zone) }
-              }
+            // Si alguna zona bloqueada del trabajador coincide con la ubicación de Ana → no mostrar
+            if (workerBlockedAddress(allZones, address)) return@async
+
+            val principalZone = allZones
+                .firstOrNull { it.isDefault && !it.blocked && (it.latitude != 0.0 || it.longitude != 0.0) }
+                ?: return@async
+
+            val marker = WorkerMapMarker(user = worker, workZone = principalZone)
+
+            // Agregar al estado en cuanto este trabajador esté listo
+            mutex.withLock {
+              val updated = _state.value.markers + marker
+              val availableCategories = updated.flatMap { it.user.categories }.distinctBy { it.id }
+              _state.value = _state.value.copy(
+                  markers = updated,
+                  filteredMarkers = updated,
+                  availableCategories = availableCategories,
+              )
+              applyFilters()
             }
-            .awaitAll()
-            .filterNotNull()
+          }
+        }.awaitAll()
       }
 
-      val availableCategories = markers.flatMap { it.user.categories }.distinctBy { it.id }
-
-      _state.value =
-          _state.value.copy(
-              isLoading = false,
-              markers = markers,
-              filteredMarkers = markers,
-              availableCategories = availableCategories,
-          )
+      _state.value = _state.value.copy(isLoading = false)
     } catch (e: Exception) {
       _state.value =
           _state.value.copy(
@@ -135,4 +145,39 @@ class ClientMapViewModel(private val userRepository: IUserRepository) : ViewMode
     _state.value = _state.value.copy(minStars = stars)
     applyFilters()
   }
+
+  // Retorna true si el trabajador bloqueó explícitamente la zona donde está Ana
+  private fun workerBlockedAddress(zones: List<WorkZone>, address: Address): Boolean {
+    val selectedProvince = normalizeText(address.province)
+    val selectedCanton = normalizeText(address.canton)
+    val selectedDistrict = normalizeText(address.district)
+
+    if (selectedProvince.isBlank()) return false
+
+    return zones.filter { it.blocked }.any { zone ->
+      val zoneProvince = normalizeText(zone.province)
+      val zoneCanton = normalizeText(zone.canton)
+      val zoneDistrict = normalizeText(zone.district)
+
+      // La provincia siempre debe coincidir
+      if (zoneProvince != selectedProvince) return@any false
+
+      when {
+        // Zona a nivel provincia (sin cantón): bloquea toda la provincia
+        zoneCanton.isBlank() -> true
+        // Zona a nivel cantón (sin distrito): bloquea todo el cantón
+        zoneDistrict.isBlank() -> zoneCanton == selectedCanton
+        // Zona a nivel distrito: bloquea solo ese distrito exacto
+        else -> zoneCanton == selectedCanton && zoneDistrict == selectedDistrict
+      }
+    }
+  }
+
+  private fun normalizeText(value: String): String =
+      value.trim().lowercase()
+          .replace("á", "a").replace("é", "e").replace("í", "i")
+          .replace("ó", "o").replace("ú", "u")
+          .replace("ä", "a").replace("ë", "e").replace("ï", "i")
+          .replace("ö", "o").replace("ü", "u")
+          .replace("ñ", "n")
 }

@@ -60,7 +60,7 @@ class WorkersListViewModel(
                   when {
                     currentSelected != null && addresses.any { it.id == currentSelected } ->
                         currentSelected
-                    else -> null
+                    else -> addresses.firstOrNull { it.isDefault }?.id
                   }
 
               _uiState.value =
