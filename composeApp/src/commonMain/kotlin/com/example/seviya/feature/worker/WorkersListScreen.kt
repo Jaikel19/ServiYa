@@ -739,7 +739,7 @@ private fun workerMatchesAddress(worker: WorkerListItemData, address: Address): 
   val workZones = workerWorkZones(worker)
 
   if (workZones.isEmpty()) {
-    return normalizeText(workerProvinceText(worker)) == selectedProvince
+    return false
   }
 
   val provinceZones = workZones.filter { normalizeText(it.province) == selectedProvince }

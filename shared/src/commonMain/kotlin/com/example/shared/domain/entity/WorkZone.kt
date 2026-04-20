@@ -12,4 +12,7 @@ data class WorkZone(
     val blocked: Boolean = false,
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
+    val alias: String = "",
+    val reference: String = "",
+    val isDefault: Boolean = false,
 )
