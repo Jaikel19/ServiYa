@@ -329,46 +329,6 @@ private fun WorkerToClientReviewContent(
                         }
                     }
 
-                    SectionCard(
-                        title = "Subir fotos",
-                        subtitle = "Opcional",
-                    ) {
-                        Surface(
-                            modifier = Modifier.size(116.dp),
-                            shape = RoundedCornerShape(22.dp),
-                            color = Color(0xFFF5F8FC),
-                            border = androidx.compose.foundation.BorderStroke(
-                                1.dp,
-                                Color(0xFFE3EAF4)
-                            ),
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                                ) {
-                                    Text(
-                                        text = "+",
-                                        style = MaterialTheme.typography.headlineLarge.copy(
-                                            color = BrandBlue,
-                                            fontWeight = FontWeight.Bold,
-                                        ),
-                                    )
-                                    Text(
-                                        text = "Añadir",
-                                        style = MaterialTheme.typography.titleSmall.copy(
-                                            color = Color(0xFF98A2B3),
-                                            fontWeight = FontWeight.SemiBold,
-                                        ),
-                                    )
-                                }
-                            }
-                        }
-                    }
-
                     uiState.errorMessage?.let { error ->
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
