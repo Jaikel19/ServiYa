@@ -104,7 +104,6 @@ fun WorkerPaymentDetailScreen(
             onBack = onBack,
             onVerifyPayment = {
                 viewModel.verifyPayment()
-                onBack()
             },
             onReportProblem = {
                 viewModel.reportProblem()

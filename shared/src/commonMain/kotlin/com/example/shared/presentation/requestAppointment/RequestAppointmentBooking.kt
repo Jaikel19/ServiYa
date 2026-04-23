@@ -88,21 +88,27 @@ fun hasUsableCurrentTime(snapshot: CurrentTimeSnapshot): Boolean {
 
 fun buildAvailableMonths(
     currentTime: CurrentTimeSnapshot,
-    monthsAhead: Int = REQUEST_APPOINTMENT_MONTH_SELECTION_RANGE,
 ): List<AppointmentMonthOption> {
-  val today = resolveToday(currentTime) ?: return emptyList()
-  val currentMonthStart =
-      LocalDate(year = today.year, monthNumber = today.monthNumber, dayOfMonth = 1)
+    val today = resolveToday(currentTime) ?: return emptyList()
 
-  return (0 until monthsAhead.coerceAtLeast(1)).map { index ->
-    val monthDate = currentMonthStart.plus(DatePeriod(months = index))
-    AppointmentMonthOption(
-        monthStart = monthDate,
-        shortLabel = shortMonthLabel(monthDate.monthNumber),
-        yearLabel = monthDate.year.toString(),
-        fullLabel = fullMonthLabel(monthDate.year, monthDate.monthNumber),
-    )
-  }
+    val currentMonthStart =
+        LocalDate(
+            year = today.year,
+            monthNumber = today.monthNumber,
+            dayOfMonth = 1,
+        )
+
+    val monthsUntilDecember = (12 - today.monthNumber) + 1
+
+    return (0 until monthsUntilDecember).map { index ->
+        val monthDate = currentMonthStart.plus(DatePeriod(months = index))
+        AppointmentMonthOption(
+            monthStart = monthDate,
+            shortLabel = shortMonthLabel(monthDate.monthNumber),
+            yearLabel = monthDate.year.toString(),
+            fullLabel = fullMonthLabel(monthDate.year, monthDate.monthNumber),
+        )
+    }
 }
 
 fun buildAvailableDays(

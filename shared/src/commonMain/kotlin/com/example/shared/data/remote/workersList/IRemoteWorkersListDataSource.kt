@@ -7,14 +7,17 @@ import com.example.shared.domain.entity.WorkerProfile
 import com.example.shared.domain.entity.WorkerSchedule
 import kotlinx.coroutines.flow.Flow
 
-data class WorkerRemoteItem(val workerId: String, val profile: WorkerProfile)
+data class WorkerRemoteItem(
+  val workerId: String,
+  val profile: WorkerProfile,
+)
 
 interface IRemoteWorkersListDataSource {
   suspend fun getWorkers(): Flow<List<WorkerRemoteItem>>
 
   suspend fun getWorkersByIds(workerIds: Set<String>): List<WorkerRemoteItem>
 
-  suspend fun getCategoryNames(categoryIds: List<String>): List<String>
+  suspend fun getCategoryNamesMap(categoryIds: Set<String>): Map<String, String>
 
   suspend fun getWorkerAddress(workerId: String): Address?
 

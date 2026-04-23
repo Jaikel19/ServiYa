@@ -195,16 +195,6 @@ private fun workerMenuOptions(
 ): List<MenuOption> {
     return listOf(
         MenuOption(
-            title = "Perfil",
-            subtitle = "Datos personales e información pública",
-            icon = TablerIcons.User,
-            iconColor = Color(0xFF8E7CC3),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(WorkerProfile)
-            },
-        ),
-        MenuOption(
             title = "Agenda Diaria",
             subtitle = "Vista diaria en lista o mapa de las citas",
             icon = TablerIcons.CalendarEvent,
@@ -212,16 +202,6 @@ private fun workerMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(WorkerDailyAppointments(workerId = currentWorkerId))
-            },
-        ),
-        MenuOption(
-            title = "Mis Servicios",
-            subtitle = "Registrar y modificar servicios ofrecidos",
-            icon = TablerIcons.Briefcase,
-            iconColor = Color(0xFF4CB5AE),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(WorkerServices)
             },
         ),
         MenuOption(
@@ -242,16 +222,6 @@ private fun workerMenuOptions(
             onClick = {
                 closeMenu()
                 navController.navigateSingleTop(TravelTimeConfig)
-            },
-        ),
-        MenuOption(
-            title = "Portafolio",
-            subtitle = "Trabajos realizados y evidencia visual",
-            icon = TablerIcons.Photo,
-            iconColor = Color(0xFFC96AE6),
-            onClick = {
-                closeMenu()
-                navController.navigateSingleTop(WorkerPortfolio)
             },
         ),
         MenuOption(
