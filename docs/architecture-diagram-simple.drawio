@@ -1,0 +1,151 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.6">
+  <diagram id="serviya-simple" name="ServiYa Estructura Simple">
+    <mxGraphModel dx="1426" dy="785" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1a1a2e;" value="ServiYa — Estructura General del Sistema" vertex="1">
+          <mxGeometry height="36" width="1000" x="100" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#555555;" value="Aplicación móvil para Android e iOS que conecta clientes con trabajadores de servicios del hogar" vertex="1">
+          <mxGeometry height="20" width="1000" x="100" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_platform" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#555555;" value="Plataformas" vertex="1">
+          <mxGeometry height="20" width="130" x="20" y="92" as="geometry" />
+        </mxCell>
+        <mxCell id="android_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Aplicación Android&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Punto de entrada en dispositivos Android&lt;br/&gt;Inicializa la app y conecta con Firebase&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="240" x="310" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="ios_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Aplicación iOS&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Punto de entrada en dispositivos iPhone&lt;br/&gt;Comparte toda la lógica con Android&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="240" x="580" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_ui" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#0050EF;" value="Pantallas" vertex="1">
+          <mxGeometry height="20" width="130" x="20" y="208" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;opacity=30;" value="" vertex="1">
+          <mxGeometry height="120" width="820" x="195" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_screens" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Pantallas de la Aplicación&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Registro e inicio de sesión · Búsqueda de servicios y trabajadores&lt;br/&gt;Gestión de citas · Subida de comprobantes de pago&lt;br/&gt;Calificaciones y reseñas · Perfil del cliente y del trabajador · Agenda&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="495" x="210" y="216" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_ds" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Sistema de Diseño&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Colores, tipografía y componentes&lt;br/&gt;visuales reutilizables en toda la app&lt;br/&gt;(botones, menús, barras, etc.)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="282" x="720" y="216" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_pres" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#7B00D4;" value="Lógica de la App" vertex="1">
+          <mxGeometry height="20" width="160" x="20" y="368" as="geometry" />
+        </mxCell>
+        <mxCell id="pres_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;opacity=30;" value="" vertex="1">
+          <mxGeometry height="110" width="820" x="195" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="pres_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Lógica de la Aplicación&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Maneja las acciones del usuario y actualiza lo que se muestra en pantalla&lt;br/&gt;Reacciona a eventos: buscar servicios, agendar citas, subir comprobantes, confirmar asistencia con código OTP, calificar, etc.&lt;br/&gt;Actúa como puente entre lo que ve el usuario y las reglas del negocio&lt;/font&gt;" vertex="1">
+          <mxGeometry height="82" width="790" x="210" y="376" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_domain" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#B46504;" value="Reglas del Negocio" vertex="1">
+          <mxGeometry height="20" width="165" x="20" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="domain_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;opacity=30;" value="" vertex="1">
+          <mxGeometry height="148" width="820" x="195" y="512" as="geometry" />
+        </mxCell>
+        <mxCell id="entities" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Objetos del Sistema&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Los &quot;datos&quot; del negocio:&lt;br/&gt;Usuario, Cita, Servicio&lt;br/&gt;Categoría, Reseña, Pago&lt;br/&gt;Perfil del trabajador, Agenda&lt;br/&gt;Dirección, Código OTP, etc.&lt;/font&gt;" vertex="1">
+          <mxGeometry height="118" width="230" x="210" y="528" as="geometry" />
+        </mxCell>
+        <mxCell id="repo_iface" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Contratos de Datos&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Define QUÉ información puede&lt;br/&gt;solicitar la app (citas, usuarios,&lt;br/&gt;pagos, calificaciones, horarios…)&lt;br/&gt;sin importar cómo se guarda&lt;/font&gt;" vertex="1">
+          <mxGeometry height="118" width="272" x="456" y="528" as="geometry" />
+        </mxCell>
+        <mxCell id="biz_logic" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Herramientas y Reglas&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Generación de códigos OTP&lt;br/&gt;Cálculo de penalizaciones&lt;br/&gt;por cancelación&lt;br/&gt;Manejo de fechas y horas&lt;br/&gt;(Zona horaria: Costa Rica)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="118" width="256" x="744" y="528" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_data" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#006600;" value="Acceso a Datos" vertex="1">
+          <mxGeometry height="20" width="150" x="20" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="data_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;opacity=30;" value="" vertex="1">
+          <mxGeometry height="140" width="820" x="195" y="702" as="geometry" />
+        </mxCell>
+        <mxCell id="repo_impl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Repositorios&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Obtiene y guarda datos&lt;br/&gt;conectándose a Firebase&lt;br/&gt;o a la base de datos local&lt;br/&gt;según corresponda&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="195" x="210" y="718" as="geometry" />
+        </mxCell>
+        <mxCell id="remote_ds" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Datos Remotos&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Consulta y escucha cambios&lt;br/&gt;en tiempo real desde&lt;br/&gt;Firebase Firestore&lt;br/&gt;(base de datos en la nube)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="195" x="420" y="718" as="geometry" />
+        </mxCell>
+        <mxCell id="local_ds" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Datos Locales&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Base de datos SQLite&lt;br/&gt;guardada en el dispositivo&lt;br/&gt;del usuario&lt;br/&gt;(funciona sin internet)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="185" x="630" y="718" as="geometry" />
+        </mxCell>
+        <mxCell id="cloudinary_svc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Servicio de Imágenes&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Sube fotos de comprobantes&lt;br/&gt;de pago a la nube&lt;br/&gt;mediante Cloudinary&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="172" x="830" y="718" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_ext" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#B80000;" value="Servicios en la Nube" vertex="1">
+          <mxGeometry height="20" width="170" x="20" y="890" as="geometry" />
+        </mxCell>
+        <mxCell id="firebase_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Firebase Firestore&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Base de datos en la nube&lt;br/&gt;Guarda citas, usuarios, servicios&lt;br/&gt;pagos, reseñas, horarios, etc.&lt;br/&gt;Actualización en tiempo real&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="290" x="310" y="882" as="geometry" />
+        </mxCell>
+        <mxCell id="cloudinary_ext" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Cloudinary CDN&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;Almacenamiento de imágenes&lt;br/&gt;en la nube para los&lt;br/&gt;comprobantes de pago&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="270" x="640" y="882" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_android_ui" edge="1" parent="1" source="android_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;" target="ui_bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_ios_ui" edge="1" parent="1" source="ios_box" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;" target="ui_bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_ui_pres" edge="1" parent="1" source="ui_bg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#9673a6;fontColor=#7B00D4;fontSize=10;" target="pres_bg" value="acciones del usuario">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_pres_domain" edge="1" parent="1" source="pres_bg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#d6b656;fontColor=#B46504;fontSize=10;" target="domain_bg" value="consulta reglas y datos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_domain_data" edge="1" parent="1" source="domain_bg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#82b366;fontColor=#006600;fontSize=10;" target="data_bg" value="solicita y guarda datos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_data_firebase" edge="1" parent="1" source="data_bg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.38;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#b85450;fontColor=#B80000;fontSize=10;" target="firebase_box" value="sincroniza en tiempo real">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_data_cloudinary" edge="1" parent="1" source="data_bg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.88;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#b85450;fontColor=#B80000;fontSize=10;" target="cloudinary_ext" value="sube imágenes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;" value="" vertex="1">
+          <mxGeometry height="50" width="820" x="195" y="1015" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" value="&lt;b&gt;Leyenda:&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="55" x="205" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="l1c" parent="1" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="263" y="1033" as="geometry" />
+        </mxCell>
+        <mxCell id="l1t" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" value="Plataformas" vertex="1">
+          <mxGeometry height="20" width="80" x="278" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="l2c" parent="1" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="365" y="1033" as="geometry" />
+        </mxCell>
+        <mxCell id="l2t" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" value="Pantallas" vertex="1">
+          <mxGeometry height="20" width="80" x="380" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="l3c" parent="1" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="467" y="1033" as="geometry" />
+        </mxCell>
+        <mxCell id="l3t" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" value="Lógica de la App" vertex="1">
+          <mxGeometry height="20" width="110" x="482" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="l4c" parent="1" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d6b656;" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="599" y="1033" as="geometry" />
+        </mxCell>
+        <mxCell id="l4t" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" value="Reglas del Negocio" vertex="1">
+          <mxGeometry height="20" width="115" x="614" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="l5c" parent="1" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="736" y="1033" as="geometry" />
+        </mxCell>
+        <mxCell id="l5t" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" value="Acceso a Datos" vertex="1">
+          <mxGeometry height="20" width="100" x="751" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="l6c" parent="1" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="858" y="1033" as="geometry" />
+        </mxCell>
+        <mxCell id="l6t" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" value="Servicios en la Nube" vertex="1">
+          <mxGeometry height="20" width="130" x="873" y="1030" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

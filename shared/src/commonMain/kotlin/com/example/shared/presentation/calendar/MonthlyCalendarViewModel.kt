@@ -2,8 +2,15 @@ package com.example.shared.presentation.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shared.data.repository.IBookingRepository
-import com.example.shared.domain.entity.Booking
+import com.example.shared.data.repository.Appointment.IAppointmentRepository
+import com.example.shared.domain.entity.Appointment
+import com.example.shared.data.repository.notifications.INotificationsRepository
+import com.example.shared.domain.entity.NotificationDeepLinks
+import com.example.shared.domain.entity.NotificationTypes
+import com.example.shared.presentation.notifications.pushNotification
+import kotlinx.coroutines.flow.first
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,190 +20,270 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class MonthlyCalendarViewModel(
-    private val bookingRepository: IBookingRepository
+    private val appointmentRepository: IAppointmentRepository,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
-    private val today = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault())
-        .date
+  private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-    private val _uiState = MutableStateFlow(
-        MonthlyCalendarUiState(
-            currentMonth = today.monthNumber,
-            currentYear = today.year,
-            currentWeekDay = today.dayOfMonth,
-            bookings = emptyList(),
-            selectedBooking = null,
-            isLoading = false,
-            errorMessage = null
-        )
-    )
+  private val _uiState =
+      MutableStateFlow(
+          MonthlyCalendarUiState(
+              currentMonth = today.monthNumber,
+              currentYear = today.year,
+              currentWeekDay = today.dayOfMonth,
+              appointments = emptyList(),
+              selectedAppointment = null,
+              isLoading = false,
+              errorMessage = null,
+          )
+      )
 
-    val uiState: StateFlow<MonthlyCalendarUiState> = _uiState.asStateFlow()
+  val uiState: StateFlow<MonthlyCalendarUiState> = _uiState.asStateFlow()
 
-    fun loadBookings(workerId: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                isLoading = true,
-                bookings = emptyList(),
-                errorMessage = null
-            )
+  fun loadAppointments(userId: String, role: CalendarUserRole) {
+    viewModelScope.launch {
+      _uiState.value =
+          _uiState.value.copy(isLoading = true, appointments = emptyList(), errorMessage = null)
 
-            bookingRepository.getBookingsByWorker(workerId)
-                .onEach { bookings ->
-                    println("DEBUG bookings recibidos en ViewModel: $bookings")
+      val appointmentsFlow =
+          when (role) {
+            CalendarUserRole.WORKER -> appointmentRepository.getAppointmentsByWorker(userId)
+            CalendarUserRole.CLIENT -> appointmentRepository.getAppointmentsByClient(userId)
+          }
 
-                    val currentSelected = _uiState.value.selectedBooking
-                    val refreshedSelected = if (currentSelected != null) {
-                        bookings.firstOrNull { it.id == currentSelected.id }
-                    } else {
-                        null
-                    }
-
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        bookings = bookings,
-                        selectedBooking = refreshedSelected,
-                        errorMessage = null
-                    )
+      appointmentsFlow
+          .onEach { appointments ->
+            val visibleAppointments =
+                appointments.filter { appointment ->
+                  appointment.status.equals("confirmed", ignoreCase = true) ||
+                      appointment.status.equals("in_progress", ignoreCase = true) ||
+                      appointment.status.equals("completed", ignoreCase = true)
                 }
-                .catch { e ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        bookings = emptyList(),
-                        errorMessage = e.message ?: "Error fetching bookings"
-                    )
+
+            println("DEBUG appointments visibles en agenda ($role): $visibleAppointments")
+
+            val currentSelected = _uiState.value.selectedAppointment
+            val refreshedSelected =
+                if (currentSelected != null) {
+                  visibleAppointments.firstOrNull { it.id == currentSelected.id }
+                } else {
+                  null
                 }
-                .collect()
-        }
+
+            _uiState.value =
+                _uiState.value.copy(
+                    isLoading = false,
+                    appointments = visibleAppointments,
+                    selectedAppointment = refreshedSelected,
+                    errorMessage = null,
+                )
+          }
+          .catch { e ->
+            _uiState.value =
+                _uiState.value.copy(
+                    isLoading = false,
+                    appointments = emptyList(),
+                    errorMessage = e.message ?: "Error fetching appointments",
+                )
+          }
+          .collect()
+    }
+  }
+
+  fun goToPreviousMonth() {
+    val currentMonth = _uiState.value.currentMonth
+    val currentYear = _uiState.value.currentYear
+
+    val newMonth: Int
+    val newYear: Int
+
+    if (currentMonth == 1) {
+      newMonth = 12
+      newYear = currentYear - 1
+    } else {
+      newMonth = currentMonth - 1
+      newYear = currentYear
     }
 
-    fun goToPreviousMonth() {
-        val currentMonth = _uiState.value.currentMonth
-        val currentYear = _uiState.value.currentYear
-
-        val newMonth: Int
-        val newYear: Int
-
-        if (currentMonth == 1) {
-            newMonth = 12
-            newYear = currentYear - 1
+    val newWeekDay =
+        if (newMonth == today.monthNumber && newYear == today.year) {
+          today.dayOfMonth
         } else {
-            newMonth = currentMonth - 1
-            newYear = currentYear
+          1
         }
 
-        val newWeekDay =
-            if (newMonth == today.monthNumber && newYear == today.year) {
-                today.dayOfMonth
-            } else {
-                1
-            }
-
-        _uiState.value = _uiState.value.copy(
+    _uiState.value =
+        _uiState.value.copy(
             currentMonth = newMonth,
             currentYear = newYear,
-            currentWeekDay = newWeekDay
+            currentWeekDay = newWeekDay,
         )
+  }
+
+  fun goToNextMonth() {
+    val currentMonth = _uiState.value.currentMonth
+    val currentYear = _uiState.value.currentYear
+
+    val newMonth: Int
+    val newYear: Int
+
+    if (currentMonth == 12) {
+      newMonth = 1
+      newYear = currentYear + 1
+    } else {
+      newMonth = currentMonth + 1
+      newYear = currentYear
     }
 
-    fun goToNextMonth() {
-        val currentMonth = _uiState.value.currentMonth
-        val currentYear = _uiState.value.currentYear
-
-        val newMonth: Int
-        val newYear: Int
-
-        if (currentMonth == 12) {
-            newMonth = 1
-            newYear = currentYear + 1
+    val newWeekDay =
+        if (newMonth == today.monthNumber && newYear == today.year) {
+          today.dayOfMonth
         } else {
-            newMonth = currentMonth + 1
-            newYear = currentYear
+          1
         }
 
-        val newWeekDay =
-            if (newMonth == today.monthNumber && newYear == today.year) {
-                today.dayOfMonth
-            } else {
-                1
-            }
-
-        _uiState.value = _uiState.value.copy(
+    _uiState.value =
+        _uiState.value.copy(
             currentMonth = newMonth,
             currentYear = newYear,
-            currentWeekDay = newWeekDay
+            currentWeekDay = newWeekDay,
         )
-    }
+  }
 
-    fun selectBooking(booking: Booking) {
-        _uiState.value = _uiState.value.copy(
-            selectedBooking = booking
-        )
-    }
+  fun selectAppointment(appointment: Appointment) {
+    _uiState.value = _uiState.value.copy(selectedAppointment = appointment)
+  }
 
-    fun clearSelectedBooking() {
-        _uiState.value = _uiState.value.copy(
-            selectedBooking = null
-        )
-    }
+  fun clearSelectedAppointment() {
+    _uiState.value = _uiState.value.copy(selectedAppointment = null)
+  }
 
-    fun setCurrentWeekDay(day: Int) {
-        _uiState.value = _uiState.value.copy(
-            currentWeekDay = day
-        )
-    }
+  fun setCurrentWeekDay(day: Int) {
+    _uiState.value = _uiState.value.copy(currentWeekDay = day)
+  }
 
-    fun confirmPayment(bookingId: String) {
+  fun approveAppointment(appointmentId: String) {
+    viewModelScope.launch {
+      try {
+        appointmentRepository.approveAppointment(appointmentId)
+      } catch (e: Exception) {
+        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al aprobar cita")
+      }
+    }
+  }
+
+  fun confirmPayment(appointmentId: String) {
+    viewModelScope.launch {
+      try {
+        appointmentRepository.confirmPayment(appointmentId)
+      } catch (e: Exception) {
+        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al confirmar pago")
+      }
+    }
+  }
+
+  fun startAppointment(appointmentId: String) {
+    viewModelScope.launch {
+      try {
+        appointmentRepository.startAppointment(appointmentId)
+      } catch (e: Exception) {
+        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al iniciar cita")
+      }
+    }
+  }
+
+    fun completeAppointment(appointmentId: String) {
         viewModelScope.launch {
             try {
-                bookingRepository.confirmPayment(bookingId)
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Error al confirmar pago"
+                val appointment = appointmentRepository.getAppointmentById(appointmentId).first()
+
+                if (appointment == null) {
+                    _uiState.value = _uiState.value.copy(errorMessage = "No se encontró la cita")
+                    return@launch
+                }
+
+                appointmentRepository.completeAppointment(appointmentId)
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Cita finalizada",
+                    message = "${appointment.workerName} marcó tu cita como finalizada.",
+                    type = NotificationTypes.APPOINTMENT_COMPLETED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_APPOINTMENT_DETAIL,
+                    actorId = appointment.workerId,
                 )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.workerId,
+                    recipientRole = "worker",
+                    title = "Cita finalizada",
+                    message = "La cita con ${appointment.clientName} fue finalizada correctamente.",
+                    type = NotificationTypes.APPOINTMENT_COMPLETED,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.WORKER_REQUESTS,
+                    actorId = appointment.clientId,
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.clientId,
+                    recipientRole = "client",
+                    title = "Reseña pendiente",
+                    message = "La cita finalizó. Ahora debes calificar al trabajador.",
+                    type = NotificationTypes.REVIEW_PENDING_CLIENT,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.CLIENT_APPOINTMENT_DETAIL,
+                    actorId = appointment.workerId,
+                )
+
+                notificationsRepository.pushNotification(
+                    userId = appointment.workerId,
+                    recipientRole = "worker",
+                    title = "Reseña pendiente",
+                    message = "La cita finalizó. Ahora puedes calificar al cliente.",
+                    type = NotificationTypes.REVIEW_PENDING_WORKER,
+                    appointmentId = appointment.id,
+                    deepLink = NotificationDeepLinks.WORKER_REQUESTS,
+                    actorId = appointment.clientId,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al completar cita")
             }
         }
     }
 
-    fun startAppointment(bookingId: String) {
-        viewModelScope.launch {
-            try {
-                bookingRepository.startAppointment(bookingId)
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Error al iniciar cita"
-                )
-            }
-        }
+  fun rejectAppointmentByWorker(appointmentId: String) {
+    viewModelScope.launch {
+      try {
+        appointmentRepository.rejectAppointmentByWorker(appointmentId)
+      } catch (e: Exception) {
+        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al rechazar cita")
+      }
     }
+  }
 
-    fun completeAppointment(bookingId: String) {
-        viewModelScope.launch {
-            try {
-                bookingRepository.completeAppointment(bookingId)
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Error al completar cita"
-                )
-            }
-        }
+  fun cancelAppointmentByWorker(appointmentId: String) {
+    viewModelScope.launch {
+      try {
+        appointmentRepository.cancelAppointmentByWorker(appointmentId)
+      } catch (e: Exception) {
+        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al cancelar cita")
+      }
     }
+  }
 
-    fun cancelAppointmentByWorker(bookingId: String) {
-        viewModelScope.launch {
-            try {
-                bookingRepository.cancelAppointmentByWorker(bookingId)
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Error al cancelar cita"
-                )
-            }
-        }
+  fun cancelAppointmentByClient(appointmentId: String) {
+    viewModelScope.launch {
+      try {
+        appointmentRepository.cancelAppointmentByClient(appointmentId)
+      } catch (e: Exception) {
+        _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Error al cancelar cita")
+      }
     }
+  }
 }

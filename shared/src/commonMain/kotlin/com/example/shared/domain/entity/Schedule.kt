@@ -7,6 +7,6 @@ data class Schedule(
     val dayKey: String = "",
     val dayNumber: Int = 0,
     val enabled: Boolean = false,
-    val timeBlocks: List<String> = emptyList(),
-    val updatedAt: Long = 0L
+    val timeBlocks: List<TimeBlock> = emptyList(),
+    val updatedAt: Long? = null,
 )

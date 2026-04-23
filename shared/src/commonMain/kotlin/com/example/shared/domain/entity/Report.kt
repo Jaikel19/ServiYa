@@ -10,5 +10,5 @@ data class Report(
     val reason: String = "",
     val description: String? = null,
     val isValid: Boolean? = null,
-    val createdAt: Long = 0L
+    val createdAt: String = "", // YYYY-MM-DDTHH:mm
 )

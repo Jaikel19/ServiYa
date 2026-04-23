@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class ReviewMeta(
     val id: String = "",
     val clientToWorkerCreated: Boolean = false,
-    val clientToWorkerReviewId: String = "",
+    val clientToWorkerReviewId: String? = null,
     val workerToClientCreated: Boolean = false,
-    val workerToClientReviewId: String? = null
+    val workerToClientReviewId: String? = null,
 )
