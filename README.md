@@ -174,61 +174,72 @@ To install on device/emulator:
 ```bash
 ./gradlew :composeApp:installDebug
 ```
+---
 
 ## 🍎 Run iOS
 
-Open the project in Android Studio
+- Open the project in Android Studio
 
-Or open /iosApp in Xcode
+- Or open /iosApp in Xcode
 
-Run on simulator or device
+- Run on simulator or device
 
-🔐 Firebase Setup
+---
 
-Create a Firebase project
+## 🔐 Firebase Setup
 
-Download google-services.json
+- Create a Firebase project
 
-Place it inside:
+- Download google-services.json
 
-/composeApp/google-services.json
+- Place it inside:
 
-Enable:
+- /composeApp/google-services.json
 
-Authentication
+- Enable:
 
-Firestore
+- Authentication
 
-📊 Versioning
+- Firestore
 
-versionCode = 1
+---
 
-versionName = 1.0
+## 📊 Versioning
 
-🧪 Methodology
+- versionCode = 1
 
-This project is developed using Agile (Scrum) methodology:
+- versionName = 1.0
 
-Sprint-based development
+---
 
-Task distribution per team member
+## 🧪 Methodology
 
-Incremental feature delivery
+- This project is developed using Agile (Scrum) methodology:
 
-📄 License
+- Sprint-based development
 
-MIT License
+- Task distribution per team member
 
-Copyright (c) 2026 ServiYa
+- Incremental feature delivery
 
-🚀 Final Notes
+---
 
-ServiYa demonstrates:
+## 📄 License
 
-Modern Kotlin Multiplatform architecture
+- MIT License
 
-Shared UI across platforms
+- Copyright (c) 2026 ServiYa
 
-Real-world service workflow management
+---
 
-Scalable and modular design
+## 🚀 Final Notes
+
+- ServiYa demonstrates:
+
+- Modern Kotlin Multiplatform architecture
+
+- Shared UI across platforms
+
+- Real-world service workflow management
+
+- Scalable and modular design
