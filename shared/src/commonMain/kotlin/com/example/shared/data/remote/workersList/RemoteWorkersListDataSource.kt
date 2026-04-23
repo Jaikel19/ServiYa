@@ -16,8 +16,8 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
   private val db = Firebase.firestore
 
   private fun toWorkerRemoteItemOrNull(
-      workerId: String,
-      profile: WorkerProfile,
+    workerId: String,
+    profile: WorkerProfile,
   ): WorkerRemoteItem? {
     return if (profile.role == "worker") {
       WorkerRemoteItem(workerId = workerId, profile = profile)
@@ -45,7 +45,6 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
     return workerIds.mapNotNull { workerId ->
       try {
         val snapshot = db.collection("users").document(workerId).get()
-
         val profile = snapshot.data<WorkerProfile>()
         toWorkerRemoteItemOrNull(snapshot.id, profile)
       } catch (e: Exception) {
@@ -54,25 +53,28 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
     }
   }
 
-  override suspend fun getCategoryNames(categoryIds: List<String>): List<String> {
+  override suspend fun getCategoryNamesMap(categoryIds: Set<String>): Map<String, String> {
+    if (categoryIds.isEmpty()) return emptyMap()
+
     return categoryIds.mapNotNull { categoryId ->
       try {
-        db.collection("categories").document(categoryId).get().data<Category>().name
+        val category = db.collection("categories").document(categoryId).get().data<Category>()
+        categoryId to category.name
       } catch (e: Exception) {
         null
       }
-    }
+    }.toMap()
   }
 
   override suspend fun getWorkerAddress(workerId: String): Address? {
     return try {
       db.collection("users")
-          .document(workerId)
-          .collection("addresses")
-          .get()
-          .documents
-          .firstOrNull()
-          ?.data<Address>()
+        .document(workerId)
+        .collection("addresses")
+        .get()
+        .documents
+        .firstOrNull()
+        ?.data<Address>()
     } catch (e: Exception) {
       null
     }
@@ -80,14 +82,18 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
 
   override suspend fun getWorkerSchedule(workerId: String): List<WorkerSchedule> {
     return try {
-      db.collection("users").document(workerId).collection("schedule").get().documents.mapNotNull {
-          document ->
-        try {
-          document.data<WorkerSchedule>()
-        } catch (e: Exception) {
-          null
+      db.collection("users")
+        .document(workerId)
+        .collection("schedule")
+        .get()
+        .documents
+        .mapNotNull { document ->
+          try {
+            document.data<WorkerSchedule>()
+          } catch (e: Exception) {
+            null
+          }
         }
-      }
     } catch (e: Exception) {
       emptyList()
     }
@@ -96,16 +102,16 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
   override suspend fun getWorkerAppointments(workerId: String): List<Appointment> {
     return try {
       db.collection("appointments")
-          .get()
-          .documents
-          .mapNotNull { document ->
-            try {
-              document.data<Appointment>()
-            } catch (e: Exception) {
-              null
-            }
+        .get()
+        .documents
+        .mapNotNull { document ->
+          try {
+            document.data<Appointment>()
+          } catch (e: Exception) {
+            null
           }
-          .filter { appointment -> appointment.workerId == workerId }
+        }
+        .filter { appointment -> appointment.workerId == workerId }
     } catch (e: Exception) {
       emptyList()
     }
@@ -114,38 +120,45 @@ class RemoteWorkersListDataSource : IRemoteWorkersListDataSource {
   override suspend fun getWorkerWorkZones(workerId: String): List<WorkZone> {
     return try {
       db.collection("users")
-          .document(workerId)
-          .collection("workZones")
-          .get()
-          .documents
-          .mapNotNull { document ->
-            try {
-              document.data<WorkZone>()
-            } catch (e: Exception) {
-              null
-            }
+        .document(workerId)
+        .collection("workZones")
+        .get()
+        .documents
+        .mapNotNull { document ->
+          try {
+            document.data<WorkZone>()
+          } catch (e: Exception) {
+            null
           }
+        }
     } catch (e: Exception) {
       emptyList()
     }
   }
 
   override suspend fun getFavoriteWorkerIds(clientId: String): Flow<Set<String>> {
-    return db.collection("users").document(clientId).collection("favorites").snapshots.map {
-        querySnapshot ->
-      querySnapshot.documents.map { it.id }.toSet()
-    }
+    return db.collection("users")
+      .document(clientId)
+      .collection("favorites")
+      .snapshots
+      .map { querySnapshot ->
+        querySnapshot.documents.map { it.id }.toSet()
+      }
   }
 
   override suspend fun addFavorite(clientId: String, workerId: String) {
     db.collection("users")
-        .document(clientId)
-        .collection("favorites")
-        .document(workerId)
-        .set(mapOf("workerId" to workerId))
+      .document(clientId)
+      .collection("favorites")
+      .document(workerId)
+      .set(mapOf("workerId" to workerId))
   }
 
   override suspend fun removeFavorite(clientId: String, workerId: String) {
-    db.collection("users").document(clientId).collection("favorites").document(workerId).delete()
+    db.collection("users")
+      .document(clientId)
+      .collection("favorites")
+      .document(workerId)
+      .delete()
   }
 }
