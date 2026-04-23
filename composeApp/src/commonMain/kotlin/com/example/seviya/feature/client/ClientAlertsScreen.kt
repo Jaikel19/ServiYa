@@ -16,7 +16,7 @@ fun ClientAlertsScreen(
 ) {
     NotificationCenterScreen(
         userId = clientId,
-        title = "Alertas del cliente",
+        title = "Alertas",
         emptyTitle = "Sin alertas",
         emptySubtitle = "Aquí verás solicitudes, pagos, citas y recordatorios.",
         onBack = onBack,
