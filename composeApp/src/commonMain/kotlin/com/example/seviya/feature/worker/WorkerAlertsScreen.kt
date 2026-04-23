@@ -19,7 +19,7 @@ fun WorkerAlertsScreen(
 ) {
     NotificationCenterScreen(
         userId = workerId,
-        title = "Alertas del trabajador",
+        title = "Alertas",
         emptyTitle = "Sin alertas",
         emptySubtitle = "Aquí verás solicitudes, pagos, citas y recordatorios.",
         onBack = onBack,
